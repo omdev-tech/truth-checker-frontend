@@ -3,10 +3,12 @@ import {
   FactCheckResponse, 
   HealthStatus, 
   TranscriptionResult,
-  TranscriptionRequest 
+  TranscriptionRequest,
+  ChunkProcessingRequest,
+  ChunkProcessingResponse 
 } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://109.238.11.43:8001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 class ApiError extends Error {
   constructor(message: string, public status?: number) {
@@ -17,8 +19,36 @@ class ApiError extends Error {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
-    throw new ApiError(error.detail || `HTTP ${response.status}`, response.status);
+    let errorMessage = `HTTP ${response.status}`;
+    
+    try {
+      const errorData = await response.json();
+      // Handle different error response formats
+      if (typeof errorData === 'string') {
+        errorMessage = errorData;
+      } else if (errorData.detail) {
+        errorMessage = errorData.detail;
+      } else if (errorData.message) {
+        errorMessage = errorData.message;
+      } else if (errorData.error) {
+        errorMessage = errorData.error;
+      } else {
+        // If it's an object without known error fields, stringify it properly
+        errorMessage = JSON.stringify(errorData);
+      }
+    } catch {
+      // If JSON parsing fails, try to get text
+      try {
+        const errorText = await response.text();
+        if (errorText) {
+          errorMessage = errorText;
+        }
+      } catch {
+        // Keep the default HTTP status message
+      }
+    }
+    
+    throw new ApiError(errorMessage, response.status);
   }
   return response.json();
 }
@@ -62,13 +92,54 @@ export const truthCheckerApi = {
   ): Promise<TranscriptionResult> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('request', JSON.stringify(config));
+    
+    // Send transcription config as form data fields
+    if (config.provider) {
+      formData.append('provider', config.provider);
+    } else {
+      formData.append('provider', 'elevenlabs'); // Default provider
+    }
+    
+    if (config.language) {
+      formData.append('language', config.language);
+    }
 
     const response = await fetch(`${API_BASE_URL}/stt/transcribe`, {
       method: 'POST',
       body: formData,
     });
     return handleResponse<TranscriptionResult>(response);
+  },
+
+  // Audio/Video chunk processing for sequencer
+  async transcribeAndFactCheckChunk(
+    file: File,
+    config: ChunkProcessingRequest = {}
+  ): Promise<ChunkProcessingResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Send chunk processing config as form data fields
+    formData.append('provider', config.provider || 'elevenlabs');
+    formData.append('fast_mode', String(config.fast_mode ?? true));
+    
+    if (config.language) {
+      formData.append('language', config.language);
+    }
+    
+    if (config.start_time !== undefined) {
+      formData.append('start_time', String(config.start_time));
+    }
+    
+    if (config.end_time !== undefined) {
+      formData.append('end_time', String(config.end_time));
+    }
+
+    const response = await fetch(`${API_BASE_URL}/stt/transcribe-chunk`, {
+      method: 'POST',
+      body: formData,
+    });
+    return handleResponse<ChunkProcessingResponse>(response);
   },
 
   // WebSocket connections

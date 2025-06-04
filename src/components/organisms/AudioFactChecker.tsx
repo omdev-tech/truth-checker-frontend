@@ -82,14 +82,39 @@ export function AudioFactChecker() {
 
     } catch (error) {
       console.error('Audio fact-check error:', error);
+      
+      let errorMessage = 'Failed to process audio file. Please try again.';
+      
+      // Provide more specific error messages based on error type
+      if (error instanceof Error) {
+        if (error.message.includes('HTTP 400')) {
+          errorMessage = 'Invalid file format or corrupted file. Please upload a valid audio/video file.';
+        } else if (error.message.includes('HTTP 401')) {
+          errorMessage = 'Authentication failed. Please check API configuration.';
+        } else if (error.message.includes('HTTP 413')) {
+          errorMessage = 'File too large. Please upload a smaller file.';
+        } else if (error.message.includes('HTTP 429')) {
+          errorMessage = 'Rate limit exceeded. Please wait a moment and try again.';
+        } else if (error.message.includes('HTTP 500')) {
+          errorMessage = 'Server error. Please try again later.';
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('Transcription failed')) {
+          errorMessage = 'Failed to transcribe audio. The audio quality might be too low.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       setFiles(prev => prev.map(f => 
         f.file === file ? { 
           ...f, 
           status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: errorMessage
         } : f
       ));
-      toast.error('Failed to process audio file. Please try again.');
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -233,7 +258,7 @@ export function AudioFactChecker() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground">Duration:</span>
-                    <p className="font-medium">{formatDuration(transcriptionResult.duration)}</p>
+                    <p className="font-medium">{formatDuration(transcriptionResult.end_time - transcriptionResult.start_time)}</p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Language:</span>
