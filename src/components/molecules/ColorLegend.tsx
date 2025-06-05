@@ -34,9 +34,9 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
       description: 'Conflicting or disputed information'
     },
     {
-      color: 'bg-gray-300',
-      label: 'Not checkable',
-      description: 'Opinions, questions, or no claims'
+      color: 'bg-gray-500',
+      label: 'No claims',
+      description: 'No factual claims found to check'
     },
     {
       color: 'bg-blue-500 animate-pulse',

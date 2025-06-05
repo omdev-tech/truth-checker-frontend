@@ -26,14 +26,20 @@ const SegmentMarker: React.FC<SegmentMarkerProps> = ({
     if (status === 'pending') return 'bg-gray-400';
     
     if (status === 'completed' && factCheckResult) {
+      // Check if there are any claims
+      if (!factCheckResult.claims || factCheckResult.claims.length === 0) {
+        return 'bg-gray-500'; // Gray for no claims
+      }
+      
+      // Color based on fact-check status
       switch (factCheckResult.status) {
         case 'true': return 'bg-green-500';
         case 'false': return 'bg-red-500';
         case 'uncertain': return 'bg-orange-500';
-        case 'not_checkable': return 'bg-gray-300';
-        case 'no_text': return 'bg-gray-300';
+        case 'not_checkable': return 'bg-gray-500';
+        case 'no_text': return 'bg-gray-500';
         case 'error': return 'bg-red-400';
-        default: return 'bg-gray-400';
+        default: return 'bg-gray-500';
       }
     }
     
@@ -46,6 +52,11 @@ const SegmentMarker: React.FC<SegmentMarkerProps> = ({
     if (status === 'pending') return 'Pending';
     
     if (status === 'completed' && factCheckResult) {
+      // Check if there are any claims
+      if (!factCheckResult.claims || factCheckResult.claims.length === 0) {
+        return 'No claims found';
+      }
+      
       switch (factCheckResult.status) {
         case 'true': return 'Accurate';
         case 'false': return 'Inaccurate';

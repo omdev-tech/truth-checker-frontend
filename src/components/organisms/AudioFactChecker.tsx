@@ -9,22 +9,33 @@ import { truthCheckerApi } from '@/lib/api';
 import { FactCheckResponse, TranscriptionResult, UploadedFile } from '@/lib/types';
 import { SUPPORTED_FILE_TYPES } from '@/lib/constants';
 import { formatDuration } from '@/lib/format';
-import { Mic, MicOff, Headphones, Video } from 'lucide-react';
+import { Upload, Video, FileAudio } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
-export function AudioFactChecker() {
+interface AudioFactCheckerProps {
+  onFileUpload?: (file: File) => void;
+}
+
+export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [transcriptionResult, setTranscriptionResult] = useState<TranscriptionResult | null>(null);
   const [factCheckResults, setFactCheckResults] = useState<FactCheckResponse | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleFileSelect = async (file: File) => {
+    // Check if it's a video or audio file that should use the new dashboard
+    const isVideoOrAudio = file.type.startsWith('video/') || 
+                          file.type.startsWith('audio/') ||
+                          SUPPORTED_FILE_TYPES.video.some(type => file.type === type) ||
+                          SUPPORTED_FILE_TYPES.audio.some(type => file.type === type);
+    
+    if (isVideoOrAudio && onFileUpload) {
+      // Use the new dashboard for video/audio files
+      onFileUpload(file);
+      return;
+    }
+
+    // Fallback to original processing for other files or when onFileUpload is not provided
     const uploadedFile: UploadedFile = {
       file,
       progress: 0,
@@ -78,12 +89,12 @@ export function AudioFactChecker() {
         } : f
       ));
 
-      toast.success('Audio fact-check completed!');
+      toast.success('Media fact-check completed!');
 
     } catch (error) {
-      console.error('Audio fact-check error:', error);
+      console.error('Media fact-check error:', error);
       
-      let errorMessage = 'Failed to process audio file. Please try again.';
+      let errorMessage = 'Failed to process media file. Please try again.';
       
       // Provide more specific error messages based on error type
       if (error instanceof Error) {
@@ -129,109 +140,26 @@ export function AudioFactChecker() {
     }
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      const chunks: Blob[] = [];
-
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        chunks.push(event.data);
-      };
-
-      mediaRecorderRef.current.onstop = async () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
-        const file = new File([blob], `recording-${Date.now()}.webm`, { type: 'audio/webm' });
-        handleFileSelect(file);
-      };
-
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-      setRecordingTime(0);
-
-      // Start timer
-      recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
-
-      toast.success('Recording started');
-    } catch (error) {
-      console.error('Recording error:', error);
-      toast.error('Failed to start recording. Please check microphone permissions.');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      streamRef.current?.getTracks().forEach(track => track.stop());
-      
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-      }
-
-      setIsRecording(false);
-      setRecordingTime(0);
-      toast.success('Recording stopped');
-    }
-  };
-
   const supportedTypes = [...SUPPORTED_FILE_TYPES.audio, ...SUPPORTED_FILE_TYPES.video];
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Headphones className="w-5 h-5 text-primary" />
-            Audio & Video Fact Checker
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Live Recording */}
-          <div className="space-y-4">
-            <h3 className="font-medium flex items-center gap-2">
-              <Mic className="w-4 h-4" />
-              Live Recording
-            </h3>
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={isRecording ? stopRecording : startRecording}
-                variant={isRecording ? "destructive" : "default"}
-                className="flex items-center gap-2"
-              >
-                {isRecording ? (
-                  <>
-                    <MicOff className="w-4 h-4" />
-                    Stop Recording
-                  </>
-                ) : (
-                  <>
-                    <Mic className="w-4 h-4" />
-                    Start Recording
-                  </>
-                )}
-              </Button>
-              
-              {isRecording && (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="text-sm font-mono">
-                    {formatDuration(recordingTime)}
-                  </span>
-                </div>
-              )}
+      {/* Main Upload Card */}
+      <Card className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors">
+        <CardContent className="p-8">
+          <div className="text-center space-y-6">
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
+                <Upload className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Upload Media Files</h3>
+                <p className="text-sm text-muted-foreground">
+                  Support for videos, audio files, and more formats
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* File Upload */}
-          <div className="space-y-4">
-            <h3 className="font-medium flex items-center gap-2">
-              <Video className="w-4 h-4" />
-              Upload Audio/Video
-            </h3>
             <FileUpload
               onFileSelect={handleFileSelect}
               onFileRemove={handleFileRemove}
@@ -239,6 +167,17 @@ export function AudioFactChecker() {
               files={files}
               maxFiles={1}
             />
+
+            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                <span>Video Files</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FileAudio className="w-4 h-4" />
+                <span>Audio Files</span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

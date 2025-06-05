@@ -86,6 +86,69 @@ export interface ChunkProcessingResponse {
   };
 }
 
+// Enhanced segment data for the new dashboard
+export interface EnhancedSegmentData {
+  id: number;
+  startTime: number;
+  endTime: number;
+  duration: number;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  transcription?: string;
+  factCheckResult?: ChunkProcessingResponse['fact_check'];
+  thumbnail?: string;
+  waveform?: number[];
+  processingTime?: number;
+  claimsCount: number;
+  accuracyScore?: number;
+  lastUpdated: Date;
+}
+
+// Dashboard state management
+export interface DashboardState {
+  mode: 'upload' | 'analysis';
+  file: File | null;
+  mediaUrl: string | null;
+  mediaType: 'video' | 'audio' | null;
+  duration: number;
+  segments: EnhancedSegmentData[];
+  processing: {
+    totalSegments: number;
+    completedSegments: number;
+    processingSegments: number;
+    errorSegments: number;
+    overallProgress: number;
+    estimatedTimeRemaining?: number;
+    startTime: Date | null;
+  };
+  playback: {
+    currentTime: number;
+    isPlaying: boolean;
+    volume: number;
+    playbackRate: number;
+    isMuted: boolean;
+  };
+  ui: {
+    selectedSegment: number | null;
+    showResultsPanel: boolean;
+    timelineZoom: number;
+    panelSize: number;
+    viewMode: 'timeline' | 'grid';
+    showProcessingDetails: boolean;
+  };
+}
+
+// Processing progress tracking
+export interface ProcessingProgress {
+  total: number;
+  completed: number;
+  processing: number;
+  error: number;
+  pending: number;
+  percentage: number;
+  estimatedTimeRemaining?: number;
+}
+
+// Segment data for original sequencer (keep for backward compatibility)
 export interface SegmentData {
   id: number;
   startTime: number;
@@ -117,4 +180,4 @@ export interface UploadedFile {
   error?: string;
 }
 
-export type TabType = 'text' | 'file' | 'audio'; 
+export type TabType = 'text' | 'file' | 'audio' | 'live'; 

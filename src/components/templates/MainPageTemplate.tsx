@@ -6,13 +6,27 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TextFactChecker } from '@/components/organisms/TextFactChecker';
 import { FileFactChecker } from '@/components/organisms/FileFactChecker';
 import { AudioFactChecker } from '@/components/organisms/AudioFactChecker';
+import { LiveRecording } from '@/components/organisms/LiveRecording';
+import FactCheckDashboard from '@/components/pages/FactCheckDashboard';
 import { Header } from '@/components/layout/Header';
 import { TabType } from '@/lib/types';
-import { MessageSquare, FileText, Headphones, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { MessageSquare, FileText, Play, Mic, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function MainPageTemplate() {
   const [activeTab, setActiveTab] = useState<TabType>('text');
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  const handleFileUpload = (file: File) => {
+    setUploadedFile(file);
+    setShowDashboard(true);
+  };
+
+  const handleCloseDashboard = () => {
+    setShowDashboard(false);
+    setUploadedFile(null);
+  };
 
   const tabVariants = {
     inactive: { scale: 0.95, opacity: 0.7 },
@@ -74,19 +88,6 @@ export function MainPageTemplate() {
                       </motion.div>
                     </TabsTrigger>
                     <TabsTrigger 
-                      value="file"
-                      className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground cursor-pointer"
-                    >
-                      <motion.div
-                        variants={tabVariants}
-                        animate={activeTab === 'file' ? 'active' : 'inactive'}
-                        className="flex items-center gap-2"
-                      >
-                        <FileText className="w-4 h-4" />
-                        <span className="hidden sm:inline">Files</span>
-                      </motion.div>
-                    </TabsTrigger>
-                    <TabsTrigger 
                       value="audio"
                       className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground cursor-pointer"
                     >
@@ -95,8 +96,21 @@ export function MainPageTemplate() {
                         animate={activeTab === 'audio' ? 'active' : 'inactive'}
                         className="flex items-center gap-2"
                       >
-                        <Headphones className="w-4 h-4" />
-                        <span className="hidden sm:inline">Audio</span>
+                        <Play className="w-4 h-4" />
+                        <span className="hidden sm:inline">Media</span>
+                      </motion.div>
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="live"
+                      className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground cursor-pointer"
+                    >
+                      <motion.div
+                        variants={tabVariants}
+                        animate={activeTab === 'live' ? 'active' : 'inactive'}
+                        className="flex items-center gap-2"
+                      >
+                        <Mic className="w-4 h-4" />
+                        <span className="hidden sm:inline">Live</span>
                       </motion.div>
                     </TabsTrigger>
                   </TabsList>
@@ -135,7 +149,19 @@ export function MainPageTemplate() {
                       exit={{ opacity: 0, x: 20 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <AudioFactChecker />
+                      <AudioFactChecker onFileUpload={handleFileUpload} />
+                    </motion.div>
+                  </TabsContent>
+
+                  <TabsContent value="live" className="mt-0">
+                    <motion.div
+                      key="live"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <LiveRecording />
                     </motion.div>
                   </TabsContent>
                 </div>
@@ -163,25 +189,53 @@ export function MainPageTemplate() {
 
           <Card className="text-center p-6 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <Play className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
-            <h3 className="font-semibold mb-2">Document Processing</h3>
+            <h3 className="font-semibold mb-2">Media Upload</h3>
             <p className="text-sm text-muted-foreground">
-              Upload documents and get comprehensive fact-checking results
+              Upload audio and video files for comprehensive fact-checking analysis
             </p>
           </Card>
 
           <Card className="text-center p-6 hover:shadow-lg transition-shadow cursor-pointer">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Headphones className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Mic className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="font-semibold mb-2">Audio & Video</h3>
+            <h3 className="font-semibold mb-2">Live Recording</h3>
             <p className="text-sm text-muted-foreground">
-              Transcribe and fact-check audio recordings and video content
+              Record audio in real-time with instant transcription and fact-checking
             </p>
           </Card>
         </motion.div>
       </main>
+
+      {/* Dashboard Overlay */}
+      <AnimatePresence>
+        {showDashboard && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={handleCloseDashboard}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="fixed inset-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <FactCheckDashboard 
+                initialFile={uploadedFile}
+                onClose={handleCloseDashboard}
+                className="h-full"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 } 
