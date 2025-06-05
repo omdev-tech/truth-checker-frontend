@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { SequencerState, SegmentData, ChunkProcessingResponse } from '@/lib/types';
 import { truthCheckerApi } from '@/lib/api';
+import { CONFIG } from '@/lib/config';
 import ColorLegend from '../../molecules/ColorLegend';
 
 // Temporary simple implementations - will be replaced with full components
@@ -154,8 +155,8 @@ interface VideoSequencerProps {
 
 const VideoSequencer: React.FC<VideoSequencerProps> = ({
   onError,
-  chunkDuration = 20,
-  maxParallelProcessing = 2,
+  chunkDuration = CONFIG.MEDIA.CHUNK_DURATION,
+  maxParallelProcessing = CONFIG.MEDIA.MAX_PARALLEL_PROCESSING,
 }) => {
   const [state, setState] = useState<SequencerState>({
     file: null,

@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { DashboardState, EnhancedSegmentData, ChunkProcessingResponse } from '@/lib/types';
 import { truthCheckerApi } from '@/lib/api';
+import { CONFIG } from '@/lib/config';
 import UploadScreen from './UploadScreen';
 import AnalysisScreen from './AnalysisScreen';
 import { toast } from 'sonner';
@@ -113,7 +114,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   const createSegments = useCallback(async (
     file: File, 
     duration: number, 
-    chunkDuration: number = 20
+    chunkDuration: number = CONFIG.MEDIA.CHUNK_DURATION
   ): Promise<EnhancedSegmentData[]> => {
     const segments: EnhancedSegmentData[] = [];
     const isVideo = file.type.startsWith('video/');
