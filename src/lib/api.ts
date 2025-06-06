@@ -5,7 +5,8 @@ import {
   TranscriptionResult,
   TranscriptionRequest,
   ChunkProcessingRequest,
-  ChunkProcessingResponse 
+  ChunkProcessingResponse,
+  StreamProcessingRequest 
 } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
@@ -142,6 +143,20 @@ export const truthCheckerApi = {
     return handleResponse<ChunkProcessingResponse>(response);
   },
 
+  // Stream URL processing for live fact-checking
+  async processStreamSegment(
+    request: StreamProcessingRequest
+  ): Promise<ChunkProcessingResponse> {
+    const response = await fetch(`${API_BASE_URL}/stt/process-stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+    return handleResponse<ChunkProcessingResponse>(response);
+  },
+
   // WebSocket connections
   createFactCheckWebSocket(): WebSocket {
     const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
@@ -154,4 +169,37 @@ export const truthCheckerApi = {
   },
 };
 
-export { ApiError }; 
+export { ApiError };
+
+export interface VideoInfo {
+  duration: number;
+  duration_formatted: string;
+  chunk_duration: number;
+  total_segments: number;
+  stream_type: string;
+  url: string;
+}
+
+export async function getVideoInfo(request: StreamProcessingRequest): Promise<VideoInfo> {
+  const response = await fetch(`${API_BASE_URL}/stt/video-info`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  return handleResponse<VideoInfo>(response);
+}
+
+export async function processStreamSegment(request: StreamProcessingRequest): Promise<ChunkProcessingResponse> {
+  const response = await fetch(`${API_BASE_URL}/stt/process-stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  return handleResponse<ChunkProcessingResponse>(response);
+} 

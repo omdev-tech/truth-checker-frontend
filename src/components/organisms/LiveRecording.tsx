@@ -9,12 +9,10 @@ import { FactCheckResponse } from '@/lib/types';
 import { formatDuration } from '@/lib/format';
 import { 
   Mic, 
-  MicOff, 
   Square,
   Play,
   Pause,
-  Volume2,
-  Settings
+  Volume2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';

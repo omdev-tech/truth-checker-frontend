@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { DashboardState, EnhancedSegmentData } from '@/lib/types';
 import PlayerControls from './PlayerControls';
 import PlayerOverlay from './PlayerOverlay';
@@ -14,6 +14,7 @@ interface VideoPlayerProps {
   currentSegment?: EnhancedSegmentData;
   onLoadedMetadata: (duration: number) => void;
   onPlaybackChange: (updates: Partial<DashboardState['playback']>) => void;
+  isStream?: boolean;
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -23,11 +24,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   currentSegment,
   onLoadedMetadata,
   onPlaybackChange,
+  isStream = false,
 }) => {
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [clickFeedback, setClickFeedback] = useState<'play' | 'pause' | null>(null);
+
+  // Detect if this is an embed URL (YouTube, Twitch, etc.)
+  const isEmbedUrl = useMemo(() => {
+    return isStream || 
+           mediaUrl.includes('youtube.com/embed/') || 
+           mediaUrl.includes('player.twitch.tv/');
+  }, [mediaUrl, isStream]);
+
+  // For streams/embeds, simulate duration and metadata
+  useEffect(() => {
+    if (isEmbedUrl) {
+      // Simulate loaded metadata for streams
+      setTimeout(() => {
+        onLoadedMetadata(3600); // Default to 1 hour for live streams
+      }, 1000);
+    }
+  }, [isEmbedUrl, onLoadedMetadata]);
 
   // Handle loaded metadata
   const handleLoadedMetadata = useCallback(() => {
@@ -43,9 +63,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   }, [onPlaybackChange]);
 
-  // Sync playback state with media element
+  // Sync playback state with media element (only for non-embed content)
   useEffect(() => {
-    if (!mediaRef.current) return;
+    if (!mediaRef.current || isEmbedUrl) return;
 
     const media = mediaRef.current;
     
@@ -67,7 +87,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (Math.abs(media.currentTime - playback.currentTime) > 0.5) {
       media.currentTime = playback.currentTime;
     }
-  }, [playback]);
+  }, [playback, isEmbedUrl]);
 
   // Handle play/pause
   const handlePlayPause = useCallback(() => {
@@ -176,8 +196,33 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       className="relative bg-black rounded-xl overflow-hidden shadow-2xl h-full group"
     >
-      {/* Media Element */}
-      {mediaType === 'video' ? (
+      {/* Media Element or Iframe */}
+      {isEmbedUrl ? (
+        // Stream/Embed Content (YouTube, Twitch, etc.)
+        <div className="w-full h-full relative">
+          <iframe
+            ref={iframeRef}
+            src={mediaUrl}
+            className="w-full h-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="Live Stream"
+          />
+          
+          {/* Stream Status Overlay */}
+          <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            LIVE STREAM
+          </div>
+
+          {/* Stream Info Overlay */}
+          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 text-white">
+            <div className="text-sm font-medium">Live Fact-Checking Active</div>
+            <div className="text-xs text-gray-300">Processing audio in real-time</div>
+          </div>
+        </div>
+      ) : mediaType === 'video' ? (
         <video
           ref={mediaRef as React.RefObject<HTMLVideoElement>}
           src={mediaUrl}
@@ -225,16 +270,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         </div>
       )}
 
-      {/* Segment Status Overlay */}
-      {currentSegment && (
+      {/* Segment Status Overlay - Hide for streams since they have their own overlay */}
+      {currentSegment && !isEmbedUrl && (
         <PlayerOverlay
           segment={currentSegment}
           isVisible={showControls}
         />
       )}
 
-      {/* Click Feedback Overlay */}
-      {clickFeedback && (
+      {/* Click Feedback Overlay - Hide for streams */}
+      {clickFeedback && !isEmbedUrl && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -262,35 +307,37 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         </motion.div>
       )}
 
-      {/* Player Controls */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ 
-          opacity: showControls ? 1 : 0,
-          y: showControls ? 0 : 20
-        }}
-        transition={{ duration: 0.2 }}
-        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6"
-      >
-        <PlayerControls
-          isPlaying={playback.isPlaying}
-          currentTime={playback.currentTime}
-          duration={mediaRef.current?.duration || 0}
-          volume={playback.volume}
-          isMuted={playback.isMuted}
-          playbackRate={playback.playbackRate}
-          onPlayPause={handlePlayPause}
-          onSeek={handleSeek}
-          onVolumeChange={handleVolumeChange}
-          onMuteToggle={handleMuteToggle}
-          onPlaybackRateChange={handlePlaybackRateChange}
-          isFullscreen={isFullscreen}
-          onFullscreenToggle={() => setIsFullscreen(!isFullscreen)}
-        />
-      </motion.div>
+      {/* Player Controls - Hide for streams as they have their own controls */}
+      {!isEmbedUrl && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ 
+            opacity: showControls ? 1 : 0,
+            y: showControls ? 0 : 20
+          }}
+          transition={{ duration: 0.2 }}
+          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6"
+        >
+          <PlayerControls
+            isPlaying={playback.isPlaying}
+            currentTime={playback.currentTime}
+            duration={mediaRef.current?.duration || 0}
+            volume={playback.volume}
+            isMuted={playback.isMuted}
+            playbackRate={playback.playbackRate}
+            onPlayPause={handlePlayPause}
+            onSeek={handleSeek}
+            onVolumeChange={handleVolumeChange}
+            onMuteToggle={handleMuteToggle}
+            onPlaybackRateChange={handlePlaybackRateChange}
+            isFullscreen={isFullscreen}
+            onFullscreenToggle={() => setIsFullscreen(!isFullscreen)}
+          />
+        </motion.div>
+      )}
 
-      {/* Loading indicator */}
-      {!mediaRef.current?.duration && (
+      {/* Loading indicator - Hide for streams */}
+      {!mediaRef.current?.duration && !isEmbedUrl && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50">
           <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         </div>

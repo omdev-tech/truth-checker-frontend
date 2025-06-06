@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { DashboardState } from '@/lib/types';
 import VideoPlayer from '../../organisms/VideoPlayer';
 import SequencerTimeline from '../../organisms/SequencerTimeline';
-import ProcessingDashboard from '../../organisms/ProcessingDashboard';
 import ResultsPanel from '../../organisms/ResultsPanel';
 import { ArrowLeft, Settings, Download, Share } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -117,6 +116,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({
                 )}
                 onLoadedMetadata={onMediaLoaded}
                 onPlaybackChange={onPlaybackChange}
+                isStream={state.mode === 'stream' && !!state.streamData}
               />
             </div>
           </div>
@@ -204,6 +204,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({
             // Update zoom level - placeholder for now
             console.log('Zoom changed to:', zoom);
           }}
+          isLiveStream={state.processing.isLiveStream}
         />
       </motion.div>
     </div>

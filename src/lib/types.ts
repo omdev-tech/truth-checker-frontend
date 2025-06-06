@@ -56,6 +56,16 @@ export interface ChunkProcessingRequest {
   end_time?: number;
 }
 
+export interface StreamProcessingRequest {
+  url: string;
+  stream_type: string; // 'youtube', 'twitch', 'direct-url'
+  start_time?: number;
+  duration?: number;
+  provider?: string;
+  language?: string;
+  fast_mode?: boolean;
+}
+
 export interface ChunkProcessingResponse {
   transcription: {
     text: string;
@@ -101,12 +111,19 @@ export interface EnhancedSegmentData {
   claimsCount: number;
   accuracyScore?: number;
   lastUpdated: Date;
+  metadata?: {
+    isLiveChunk?: boolean;
+    chunkNumber?: number;
+    actualProcessingTime?: string;
+    displayTime?: string;
+  };
 }
 
 // Dashboard state management
 export interface DashboardState {
-  mode: 'upload' | 'analysis';
+  mode: 'upload' | 'analysis' | 'stream';
   file: File | null;
+  streamData: StreamData | null;
   mediaUrl: string | null;
   mediaType: 'video' | 'audio' | null;
   duration: number;
@@ -119,6 +136,7 @@ export interface DashboardState {
     overallProgress: number;
     estimatedTimeRemaining?: number;
     startTime: Date | null;
+    isLiveStream?: boolean;
   };
   playback: {
     currentTime: number;
@@ -180,4 +198,21 @@ export interface UploadedFile {
   error?: string;
 }
 
-export type TabType = 'text' | 'file' | 'audio' | 'live'; 
+export type TabType = 'text' | 'file' | 'audio' | 'live' | 'stream';
+
+// Stream-related types for live fact-checking
+export type StreamType = 'youtube' | 'twitch' | 'direct-url' | 'hls' | 'dash';
+
+export interface StreamMetadata {
+  title?: string;
+  duration?: number;
+  quality?: string;
+  isLive?: boolean;
+  thumbnail?: string;
+}
+
+export interface StreamData {
+  url: string;
+  type: StreamType;
+  metadata?: StreamMetadata;
+} 

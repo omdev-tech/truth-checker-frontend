@@ -4,28 +4,41 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { TextFactChecker } from '@/components/organisms/TextFactChecker';
-import { FileFactChecker } from '@/components/organisms/FileFactChecker';
 import { AudioFactChecker } from '@/components/organisms/AudioFactChecker';
 import { LiveRecording } from '@/components/organisms/LiveRecording';
+import { StreamFactChecker } from '@/components/organisms/StreamFactChecker';
 import FactCheckDashboard from '@/components/pages/FactCheckDashboard';
 import { Header } from '@/components/layout/Header';
-import { TabType } from '@/lib/types';
-import { MessageSquare, FileText, Play, Mic, Sparkles } from 'lucide-react';
+import { TabType, StreamData, StreamMetadata } from '@/lib/types';
+import { MessageSquare, Play, Mic, Radio, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function MainPageTemplate() {
   const [activeTab, setActiveTab] = useState<TabType>('text');
   const [showDashboard, setShowDashboard] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [streamData, setStreamData] = useState<StreamData | null>(null);
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
+    setStreamData(null); // Clear stream data when uploading file
+    setShowDashboard(true);
+  };
+
+  const handleStreamReady = (streamUrl: string, streamType: string, metadata?: StreamMetadata) => {
+    setStreamData({ 
+      url: streamUrl, 
+      type: streamType as StreamData['type'],
+      metadata 
+    });
+    setUploadedFile(null); // Clear uploaded file when starting stream
     setShowDashboard(true);
   };
 
   const handleCloseDashboard = () => {
     setShowDashboard(false);
     setUploadedFile(null);
+    setStreamData(null);
   };
 
   const tabVariants = {
@@ -52,7 +65,7 @@ export function MainPageTemplate() {
             Verify Facts in Real-Time
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Our AI-powered fact-checking system analyzes text, documents, and audio to help you 
+            Our AI-powered fact-checking system analyzes text, documents, audio, and live streams to help you 
             verify information instantly with authoritative sources.
           </p>
         </motion.div>
@@ -73,7 +86,7 @@ export function MainPageTemplate() {
                 className="w-full"
               >
                 <div className="border-b bg-muted/30 px-6 pt-6">
-                  <TabsList className="grid w-full grid-cols-3 bg-background/80 backdrop-blur">
+                  <TabsList className="grid w-full grid-cols-4 bg-background/80 backdrop-blur">
                     <TabsTrigger 
                       value="text" 
                       className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground cursor-pointer"
@@ -98,6 +111,19 @@ export function MainPageTemplate() {
                       >
                         <Play className="w-4 h-4" />
                         <span className="hidden sm:inline">Media</span>
+                      </motion.div>
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="stream"
+                      className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground cursor-pointer"
+                    >
+                      <motion.div
+                        variants={tabVariants}
+                        animate={activeTab === 'stream' ? 'active' : 'inactive'}
+                        className="flex items-center gap-2"
+                      >
+                        <Radio className="w-4 h-4" />
+                        <span className="hidden sm:inline">Stream</span>
                       </motion.div>
                     </TabsTrigger>
                     <TabsTrigger 
@@ -129,18 +155,6 @@ export function MainPageTemplate() {
                     </motion.div>
                   </TabsContent>
 
-                  <TabsContent value="file" className="mt-0">
-                    <motion.div
-                      key="file"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <FileFactChecker />
-                    </motion.div>
-                  </TabsContent>
-
                   <TabsContent value="audio" className="mt-0">
                     <motion.div
                       key="audio"
@@ -150,6 +164,18 @@ export function MainPageTemplate() {
                       transition={{ duration: 0.3 }}
                     >
                       <AudioFactChecker onFileUpload={handleFileUpload} />
+                    </motion.div>
+                  </TabsContent>
+
+                  <TabsContent value="stream" className="mt-0">
+                    <motion.div
+                      key="stream"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <StreamFactChecker onStreamReady={handleStreamReady} />
                     </motion.div>
                   </TabsContent>
 
@@ -170,12 +196,12 @@ export function MainPageTemplate() {
           </Card>
         </motion.div>
 
-        {/* Features Section */}
+        {/* Features Section - Updated with Stream feature */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-16 grid md:grid-cols-3 gap-6 max-w-4xl mx-auto"
+          className="mt-16 grid md:grid-cols-4 gap-6 max-w-5xl mx-auto"
         >
           <Card className="text-center p-6 hover:shadow-lg transition-shadow cursor-pointer">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -194,6 +220,16 @@ export function MainPageTemplate() {
             <h3 className="font-semibold mb-2">Media Upload</h3>
             <p className="text-sm text-muted-foreground">
               Upload audio and video files for comprehensive fact-checking analysis
+            </p>
+          </Card>
+
+          <Card className="text-center p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Radio className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h3 className="font-semibold mb-2">Live Streams</h3>
+            <p className="text-sm text-muted-foreground">
+              Real-time fact-checking of YouTube, Twitch, and other live streams
             </p>
           </Card>
 
@@ -229,6 +265,7 @@ export function MainPageTemplate() {
             >
               <FactCheckDashboard 
                 initialFile={uploadedFile}
+                initialStream={streamData}
                 onClose={handleCloseDashboard}
                 className="h-full"
               />

@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { FileUpload } from '@/components/molecules/FileUpload';
 import { VerificationCard } from '@/components/molecules/VerificationCard';
 import { truthCheckerApi } from '@/lib/api';
@@ -157,8 +156,8 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
                 <p className="text-sm text-muted-foreground">
                   Support for videos, audio files, and more formats
                 </p>
-              </div>
             </div>
+          </div>
 
             <FileUpload
               onFileSelect={handleFileSelect}

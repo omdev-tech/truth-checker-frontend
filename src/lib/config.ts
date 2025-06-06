@@ -5,8 +5,17 @@
 
 // Media Processing Configuration
 export const MEDIA_CONFIG = {
-  // Duration of each audio/video chunk in seconds
-  CHUNK_DURATION: 30,
+  // Duration of each audio/video chunk in seconds for regular files
+  CHUNK_DURATION: 45,
+  
+  // Duration for live stream chunks (real-time processing)
+  LIVE_STREAM_CHUNK_DURATION: 30, // 30 seconds for live streams
+  
+  // Duration for regular video chunks (non-live YouTube/Twitch videos)
+  VIDEO_CHUNK_DURATION: 45, // 45 seconds for regular videos
+  
+  // Duration for long-form stream chunks (fallback/special cases)
+  STREAM_CHUNK_DURATION: 300, // 5 minutes for special long processing
   
   // Maximum number of parallel processing operations
   MAX_PARALLEL_PROCESSING: 2,

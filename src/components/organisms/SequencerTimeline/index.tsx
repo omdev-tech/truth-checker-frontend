@@ -14,6 +14,7 @@ interface SequencerTimelineProps {
   onSegmentSelect: (segmentId: number | null) => void;
   onTimeSeek: (time: number) => void;
   onZoomChange: (zoom: number) => void;
+  isLiveStream?: boolean;
 }
 
 const SequencerTimeline: React.FC<SequencerTimelineProps> = ({
@@ -25,6 +26,7 @@ const SequencerTimeline: React.FC<SequencerTimelineProps> = ({
   onSegmentSelect,
   onTimeSeek,
   onZoomChange,
+  isLiveStream = false,
 }) => {
   const getStatusColor = (segment: EnhancedSegmentData) => {
     switch (segment.status) {
@@ -52,19 +54,40 @@ const SequencerTimeline: React.FC<SequencerTimelineProps> = ({
   };
 
   const handleSegmentClick = (segment: EnhancedSegmentData) => {
+    // For live streams, don't allow seeking back in time (it's live!)
+    if (isLiveStream) {
+      console.log(`🔴 Live stream: Segment ${segment.id} selected (no seeking for live content)`);
+      onSegmentSelect(segment.id);
+      return;
+    }
+    
     // Select the segment
     onSegmentSelect(segment.id);
     
-    // Seek video to segment start time
+    // Seek video to segment start time (only for non-live content)
     onTimeSeek(segment.startTime);
     
     console.log(`🎯 Segment ${segment.id} clicked - seeking to ${segment.startTime}s`);
   };
 
+  // For live streams, calculate a dynamic duration based on segments
+  const effectiveDuration = isLiveStream && segments.length > 0 
+    ? Math.max(segments[segments.length - 1].endTime, duration)
+    : duration;
+
   return (
     <div className="h-full bg-gray-800 p-3">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-white font-medium text-sm">Timeline</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-white font-medium text-sm">
+            {isLiveStream ? '🔴 Live Timeline' : 'Timeline'}
+          </h3>
+          {isLiveStream && (
+            <span className="px-2 py-1 bg-red-600 text-white text-xs rounded-full animate-pulse">
+              LIVE
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <input
             type="range"
@@ -80,13 +103,14 @@ const SequencerTimeline: React.FC<SequencerTimelineProps> = ({
       </div>
       
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {segments.map((segment) => (
+        {segments.map((segment, index) => (
           <div
-            key={segment.id}
+            key={`segment-${segment.id}-${segment.lastUpdated.getTime()}`}
             className={`
               relative min-w-20 h-12 rounded-lg cursor-pointer transition-all
               ${getStatusColor(segment)}
               ${selectedSegmentId === segment.id ? 'ring-2 ring-white' : ''}
+              ${isLiveStream && index === segments.length - 1 && segment.status === 'processing' ? 'animate-pulse' : ''}
             `}
             onClick={() => handleSegmentClick(segment)}
           >
@@ -102,7 +126,7 @@ const SequencerTimeline: React.FC<SequencerTimelineProps> = ({
             
             <div className="absolute bottom-1 left-1 right-1">
               <div className="text-xs text-white font-medium">
-                {Math.floor(segment.startTime)}s
+                {isLiveStream ? `#${segment.id + 1}` : `${Math.floor(segment.startTime)}s`}
               </div>
               {segment.claimsCount > 0 && (
                 <div className="text-xs text-white/80">
@@ -116,21 +140,48 @@ const SequencerTimeline: React.FC<SequencerTimelineProps> = ({
                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
+            
+            {isLiveStream && index === segments.length - 1 && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
+            )}
           </div>
         ))}
+        
+        {isLiveStream && segments.length > 0 && (
+          <div className="relative min-w-20 h-12 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+            <div className="text-xs text-gray-400 text-center">
+              <div>Next</div>
+              <div>#{segments.length + 1}</div>
+            </div>
+          </div>
+        )}
       </div>
       
-      {/* Timeline ruler */}
       <div className="mt-3 relative h-6 bg-gray-700 rounded">
-        <div 
-          className="absolute top-0 bottom-0 w-0.5 bg-white"
-          style={{ left: `${(currentTime / duration) * 100}%` }}
-        />
+        {!isLiveStream && (
+          <div 
+            className="absolute top-0 bottom-0 w-0.5 bg-white"
+            style={{ left: `${(currentTime / effectiveDuration) * 100}%` }}
+          />
+        )}
         
         <div className="absolute inset-0 flex justify-between items-center px-2 text-xs text-gray-300">
-          <span>0:00</span>
-          <span>{Math.floor(duration / 60)}:{(Math.floor(duration) % 60).toString().padStart(2, '0')}</span>
+          {isLiveStream ? (
+            <>
+              <span>Live Stream</span>
+              <span>{segments.length} chunks processed</span>
+            </>
+          ) : (
+            <>
+              <span>0:00</span>
+              <span>{Math.floor(effectiveDuration / 60)}:{(Math.floor(effectiveDuration) % 60).toString().padStart(2, '0')}</span>
+            </>
+          )}
         </div>
+        
+        {isLiveStream && (
+          <div className="absolute top-0 bottom-0 right-0 w-1 bg-red-600 animate-pulse"></div>
+        )}
       </div>
     </div>
   );

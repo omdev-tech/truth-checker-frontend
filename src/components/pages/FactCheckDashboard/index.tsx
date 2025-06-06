@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { DashboardState, EnhancedSegmentData, ChunkProcessingResponse } from '@/lib/types';
-import { truthCheckerApi } from '@/lib/api';
+import { DashboardState, EnhancedSegmentData, ChunkProcessingResponse, StreamData } from '@/lib/types';
+import { truthCheckerApi, getVideoInfo, processStreamSegment, VideoInfo } from '@/lib/api';
 import { CONFIG } from '@/lib/config';
 import UploadScreen from './UploadScreen';
 import AnalysisScreen from './AnalysisScreen';
@@ -11,19 +11,22 @@ import { toast } from 'sonner';
 interface FactCheckDashboardProps {
   className?: string;
   initialFile?: File | null;
+  initialStream?: StreamData | null;
   onClose?: () => void;
 }
 
 export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   className = '',
   initialFile = null,
+  initialStream = null,
   onClose,
 }) => {
   const [state, setState] = useState<DashboardState>({
-    mode: initialFile ? 'analysis' : 'upload',
+    mode: initialFile ? 'analysis' : initialStream ? 'stream' : 'upload',
     file: initialFile,
-    mediaUrl: initialFile ? URL.createObjectURL(initialFile) : null,
-    mediaType: initialFile ? (initialFile.type.startsWith('video/') ? 'video' : 'audio') : null,
+    streamData: initialStream,
+    mediaUrl: initialFile ? URL.createObjectURL(initialFile) : initialStream?.url || null,
+    mediaType: initialFile ? (initialFile.type.startsWith('video/') ? 'video' : 'audio') : 'video', // Assume video for streams
     duration: 0,
     segments: [],
     processing: {
@@ -32,7 +35,8 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       processingSegments: 0,
       errorSegments: 0,
       overallProgress: 0,
-      startTime: initialFile ? new Date() : null,
+      startTime: (initialFile || initialStream) ? new Date() : null,
+      isLiveStream: !!initialStream,
     },
     playback: {
       currentTime: 0,
@@ -53,6 +57,17 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
 
   const processingStartedRef = useRef(false);
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Add a ref to track which segments are currently being processed
+  const processingSegmentsRef = useRef<Set<number>>(new Set());
+
+  // Initialize stream analysis if stream data is provided
+  useEffect(() => {
+    if (initialStream && state.mode === 'stream') {
+      console.log('🎥 Starting stream analysis:', initialStream);
+      toast.success(`Connected to ${initialStream.type} stream!`);
+      // TODO: Implement stream connection and real-time processing
+    }
+  }, [initialStream, state.mode]);
 
   // Generate video thumbnail
   const generateThumbnail = useCallback(async (videoFile: File, timeInSeconds: number): Promise<string> => {
@@ -110,36 +125,176 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     }
   }, []);
 
-  // Create segments from file duration
+  // Add helper function to detect stream type
+  const getStreamType = (url: string): string => {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      return 'youtube';
+    } else if (url.includes('twitch.tv')) {
+      return 'twitch';
+    } else {
+      return 'direct-url';
+    }
+  };
+
+  // Add helper function to detect if a stream is live
+  const isLiveStream = (streamData: StreamData | null): boolean => {
+    if (!streamData) return false;
+    
+    // For now, we'll detect live streams based on URL patterns
+    // This could be enhanced with API calls to check if the stream is currently live
+    const url = streamData.url.toLowerCase();
+    
+    // DEMO MODE: For testing, you can manually enable live stream simulation
+    // by adding "?simulate_live=true" to the URL or checking specific conditions
+    const forceSimulateLive = url.includes('simulate_live') || 
+                              process.env.NODE_ENV === 'development' && url.includes('ydrmtaig0we'); // Updated to match current test video
+    
+    if (forceSimulateLive) {
+      console.log('🔴 DEMO MODE: Forcing live stream simulation for testing');
+      return true;
+    }
+    
+    // YouTube live stream indicators
+    if (url.includes('youtube.com/watch') && url.includes('live')) {
+      return true;
+    }
+    if (url.includes('youtube.com/embed') && url.includes('live')) {
+      return true;
+    }
+    if (url.includes('youtube.com/channel') && url.includes('live')) {
+      return true;
+    }
+    
+    // Twitch live stream indicators
+    if (url.includes('twitch.tv') && !url.includes('/videos/')) {
+      return true; // Assume most Twitch URLs are live unless they're VODs
+    }
+    
+    console.log('🔍 Live stream detection:', {
+      url: url.substring(0, 50) + '...',
+      hasLiveIndicator: url.includes('live'),
+      isTwitchLive: url.includes('twitch.tv') && !url.includes('/videos/'),
+      isYoutubeLive: url.includes('youtube') && url.includes('live'),
+      forceSimulateLive,
+      result: forceSimulateLive // Using simulation mode for demo
+    });
+    
+    return forceSimulateLive; // For demo purposes
+  };
+
+  // Create segments from file duration or for live stream
   const createSegments = useCallback(async (
-    file: File, 
+    source: File | StreamData, 
     duration: number, 
     chunkDuration: number = CONFIG.MEDIA.CHUNK_DURATION
   ): Promise<EnhancedSegmentData[]> => {
     const segments: EnhancedSegmentData[] = [];
-    const isVideo = file.type.startsWith('video/');
+    const isFile = source instanceof File;
+    const isStreamData = !isFile; // StreamData object
+    const isVideo = isFile ? source.type.startsWith('video/') : true; // Assume video for streams
     
-    for (let i = 0; i < duration; i += chunkDuration) {
-      const startTime = i;
-      const endTime = Math.min(i + chunkDuration, duration);
+    // Determine the appropriate chunk duration based on content type
+    let effectiveChunkDuration: number;
+    
+    if (isFile) {
+      // Regular uploaded files use standard chunk duration
+      effectiveChunkDuration = CONFIG.MEDIA.CHUNK_DURATION;
+      console.log('📁 File processing mode: using chunk duration', effectiveChunkDuration + 's');
+    } else {
+      const streamData = source as StreamData;
+      const isLive = isLiveStream(streamData);
+      
+      if (isLive) {
+        // Live streams use shorter chunks for real-time processing
+        effectiveChunkDuration = CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION;
+        console.log('🔴 Live stream detected: using live chunk duration', effectiveChunkDuration + 's');
+      } else {
+        // Regular videos (non-live YouTube, Twitch VODs) use standard chunk duration
+        effectiveChunkDuration = CONFIG.MEDIA.VIDEO_CHUNK_DURATION;
+        console.log('🎬 Regular video detected: using video chunk duration', effectiveChunkDuration + 's');
+      }
+    }
+    
+    let actualDuration = duration;
+    
+    // For streams, get the actual video duration
+    if (isStreamData && (source as StreamData).url) {
+      try {
+        console.log('🔍 Getting video info for:', (source as StreamData).url);
+        
+        const streamType = getStreamType((source as StreamData).url);
+        const videoInfo: VideoInfo = await getVideoInfo({
+          url: (source as StreamData).url,
+          stream_type: streamType,
+          start_time: 0,
+          duration: effectiveChunkDuration,
+          provider: 'elevenlabs',
+          fast_mode: true
+        });
+        
+        console.log('📹 Video info received:', videoInfo);
+        actualDuration = videoInfo.duration;
+        
+        console.log(`✅ Adjusted to real video duration: ${videoInfo.duration_formatted} (${Math.ceil(actualDuration / effectiveChunkDuration)} segments expected)`);
+        
+      } catch (error) {
+        console.warn('⚠️ Could not get video info, using default duration:', error);
+        // Continue with provided duration
+      }
+    }
+    
+    // For live streams, only create the first segment - others will be created incrementally
+    const isLiveStreamData = isStreamData && isLiveStream(source as StreamData);
+    const segmentsToCreate = isLiveStreamData ? 1 : Math.ceil(actualDuration / effectiveChunkDuration);
+    
+    console.log('📦 Creating segments:', {
+      isStreamData,
+      isFile,
+      isLive: isLiveStreamData,
+      duration: `${actualDuration}s`,
+      configChunkDuration: `${CONFIG.MEDIA.CHUNK_DURATION}s`,
+      liveStreamChunkDuration: `${CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION}s`,
+      videoChunkDuration: `${CONFIG.MEDIA.VIDEO_CHUNK_DURATION}s`,
+      effectiveChunkDuration: `${effectiveChunkDuration}s`,
+      segmentsToCreate: isLiveStreamData ? '1 (live - incremental)' : segmentsToCreate,
+      totalEstimated: Math.ceil(actualDuration / effectiveChunkDuration)
+    });
+
+    for (let i = 0; i < segmentsToCreate; i++) {
+      const startTime = i * effectiveChunkDuration;
+      const endTime = Math.min(startTime + effectiveChunkDuration, actualDuration);
       const segmentDuration = endTime - startTime;
+      
+      // Debug logging for live streams
+      if (isLiveStreamData) {
+        console.log(`🔴 Creating initial live segment ${i}:`, {
+          startTime: `${startTime}s`,
+          endTime: `${endTime}s`,
+          segmentDuration: `${segmentDuration}s`,
+          effectiveChunkDuration: `${effectiveChunkDuration}s`,
+          note: 'Only first segment created - others will be added incrementally'
+        });
+      }
       
       let thumbnail: string | undefined;
       let waveform: number[] | undefined;
       
-      try {
-        if (isVideo) {
-          // Generate thumbnail at middle of segment
-          const midTime = startTime + segmentDuration / 2;
-          thumbnail = await generateThumbnail(file, midTime);
-        } else {
-          // Generate waveform for audio (simplified - in reality you'd want chunk-specific waveforms)
-          if (segments.length === 0) {
-            waveform = await generateWaveform(file);
+      // Only generate thumbnails/waveforms for uploaded files, not streams
+      if (isFile) {
+        try {
+          if (isVideo) {
+            // Generate thumbnail at middle of segment for uploaded files
+            const midTime = startTime + segmentDuration / 2;
+            thumbnail = await generateThumbnail(source as File, midTime);
+          } else {
+            // Generate waveform for audio files
+            if (segments.length === 0) {
+              waveform = await generateWaveform(source as File);
+            }
           }
+        } catch (error) {
+          console.error(`Failed to generate ${isVideo ? 'thumbnail' : 'waveform'} for segment ${segments.length}:`, error);
         }
-      } catch (error) {
-        console.error(`Failed to generate ${isVideo ? 'thumbnail' : 'waveform'} for segment ${segments.length}:`, error);
       }
       
       segments.push({
@@ -155,6 +310,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       });
     }
     
+    console.log(`✅ Created ${segments.length} segment${segments.length > 1 ? 's' : ''} for ${isStreamData ? (isLiveStreamData ? 'live stream' : 'stream') : 'file'} processing`);
     return segments;
   }, [generateThumbnail, generateWaveform]);
 
@@ -170,11 +326,13 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         ...prev,
         mode: 'analysis',
         file,
+        streamData: null, // Clear stream data when uploading file
         mediaUrl,
         mediaType,
         processing: {
           ...prev.processing,
           startTime: new Date(),
+          isLiveStream: false,
         },
       }));
 
@@ -185,13 +343,14 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     }
   }, []);
 
-  // Handle video metadata loaded
+  // Handle media loaded for both files and streams
   const handleMediaLoaded = useCallback(async (duration: number) => {
-    if (!state.file) return;
+    const source = state.file || state.streamData;
+    if (!source) return;
 
     try {
       // Create segments with thumbnails/waveforms
-      const segments = await createSegments(state.file, duration);
+      const segments = await createSegments(source, duration);
       
       setState(prev => ({
         ...prev,
@@ -204,12 +363,16 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       }));
 
       // Start processing segments
-      toast.info('Starting fact-check analysis...');
+      if (state.processing.isLiveStream) {
+        toast.info('Starting live stream fact-checking...');
+      } else {
+        toast.info('Starting fact-check analysis...');
+      }
     } catch (error) {
       console.error('Error creating segments:', error);
-      toast.error('Failed to create media segments');
+      toast.error('Failed to create segments');
     }
-  }, [state.file, createSegments]);
+  }, [state.file, state.streamData, state.processing.isLiveStream, createSegments]);
 
   // Extract actual audio/video chunk from media file using Web Audio API
   const extractAudioChunk = useCallback(async (
@@ -371,31 +534,86 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     return chunkFile;
   }, []);
 
-  const formatDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Function to create the next live segment when the previous one completes
+  const createNextLiveSegment = useCallback((streamData: StreamData) => {
+    setState(prev => {
+      // Get the next segment ID based on existing segments
+      const nextSegmentId = prev.segments.length;
+      const chunkDuration = CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION;
+      
+      // For display purposes: show progressive time ranges
+      const displayStartTime = nextSegmentId * chunkDuration;
+      const displayEndTime = displayStartTime + chunkDuration;
+      
+      console.log(`🆕 Creating live segment ${nextSegmentId}:`);
+      console.log(`  📺 Display time: ${displayStartTime}s-${displayEndTime}s (for UI)`);
+      console.log(`  🔴 Processing: will use 0s-${chunkDuration}s (current live position)`);
+      
+      const newSegment: EnhancedSegmentData = {
+        id: nextSegmentId,
+        startTime: displayStartTime, // For display in UI
+        endTime: displayEndTime,     // For display in UI
+        duration: chunkDuration,
+        status: 'pending',
+        claimsCount: 0,
+        lastUpdated: new Date(),
+      };
+      
+      return {
+        ...prev,
+        segments: [...prev.segments, newSegment],
+        processing: {
+          ...prev.processing,
+          totalSegments: prev.processing.totalSegments + 1,
+        },
+      };
+    });
+  }, []);
 
   // Process a single segment
   const processSegment = useCallback(async (segment: EnhancedSegmentData) => {
-    if (!state.file) return;
+    // Check if processing was cancelled (dashboard closed)
+    if (!processingStartedRef.current) {
+      console.log('🛑 Processing cancelled - dashboard was closed');
+      return;
+    }
+
+    // Check if this segment is already being processed (race condition protection)
+    if (processingSegmentsRef.current.has(segment.id)) {
+      console.log(`⚠️ SEGMENT ${segment.id} ALREADY BEING PROCESSED - SKIPPING DUPLICATE`);
+      return;
+    }
+
+    const source = state.file || state.streamData;
+    if (!source) {
+      console.log('❌ PROCESS SEGMENT CALLED BUT NO SOURCE (file or streamData)');
+      return;
+    }
+
+    const streamData = state.streamData;
+    const isLive = streamData ? isLiveStream(streamData) : false;
 
     console.log('\n🚀 PROCESSING SEGMENT START');
-    console.log('📊 Segment info:', {
+    console.log('📝 Segment info:', {
       id: segment.id,
       timeRange: `${segment.startTime}s - ${segment.endTime}s`,
       duration: `${segment.duration}s`,
       status: segment.status,
-      lastUpdated: segment.lastUpdated.toISOString()
+      isStream: !!state.streamData,
+      isLive: isLive,
+      sourceType: state.streamData ? state.streamData.type : 'file',
+      processingStartedRef: processingStartedRef.current,
+      currentlyProcessing: Array.from(processingSegmentsRef.current)
     });
 
     // Check if segment is already being processed or completed
     if (segment.status === 'processing' || segment.status === 'completed') {
       console.log('⚠️ SEGMENT ALREADY PROCESSED OR IN PROGRESS - SKIPPING');
-      console.log('Current status:', segment.status);
       return;
     }
+
+    // Mark this segment as being processed
+    processingSegmentsRef.current.add(segment.id);
 
     try {
       // Update segment status to processing
@@ -414,121 +632,167 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         },
       }));
 
-      // Double-check current segment status from state (safety check for concurrent processing)
-      const currentSegment = state.segments.find(s => s.id === segment.id);
-      if (currentSegment && (currentSegment.status === 'processing' || currentSegment.status === 'completed')) {
-        console.log('⚠️ SEGMENT STATUS CHANGED DURING PROCESSING SETUP - ABORTING');
-        console.log('Found status:', currentSegment.status);
-        return;
-      }
+      // Handle stream processing differently than file processing
+      if (state.streamData) {
+        console.log('🌊 PROCESSING STREAM SEGMENT');
+        console.log('📡 Stream type:', state.streamData.type);
+        console.log('🔗 Stream URL:', state.streamData.url);
+        
+        // For live streams, always process from current time (0) but track chunk number
+        let processStartTime: number;
+        let processDuration: number;
+        
+        if (isLive) {
+          // For live streams: always start from 0 (current live position)
+          processStartTime = 0;
+          processDuration = CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION; // Always use 30s for live streams
+          
+          console.log('🔴 LIVE STREAM PROCESSING:');
+          console.log(`  📊 Chunk #${segment.id + 1}`);
+          console.log(`  ⏱️ Processing: current live position (0s) for ${processDuration}s (LIVE_STREAM_CHUNK_DURATION)`);
+          console.log(`  🎯 Frontend segment: ${segment.startTime}s-${segment.endTime}s (for display only)`);
+          console.log(`  🔧 Backend will receive: 0s-${processDuration}s`);
+          
+        } else {
+          // For regular videos: use actual segment times
+          processStartTime = segment.startTime;
+          processDuration = segment.duration;
+          
+          console.log('🎬 REGULAR VIDEO PROCESSING:');
+          console.log(`  ⏱️ Processing: ${processStartTime}s-${segment.endTime}s`);
+        }
+        
+        // Use real backend processing for streams
+        console.log('🚀 CALLING BACKEND STREAM PROCESSING');
+        
+        const apiCallStart = Date.now();
+        const result: ChunkProcessingResponse = await processStreamSegment({
+          url: state.streamData.url,
+          stream_type: state.streamData.type,
+          start_time: processStartTime, // 0 for live, actual time for regular videos
+          duration: processDuration,
+          provider: 'elevenlabs',
+          fast_mode: true
+        });
+        const apiCallDuration = Date.now() - apiCallStart;
+        
+        console.log('📡 BACKEND API CALL DETAILS:');
+        console.log('  🔗 URL:', state.streamData.url.substring(0, 50) + '...');
+        console.log('  📊 Request params:', {
+          start_time: processStartTime,
+          duration: processDuration,
+          stream_type: state.streamData.type,
+          isLive: isLive ? 'YES' : 'NO'
+        });
+        
+        console.log('✅ STREAM SEGMENT PROCESSED');
+        console.log('⏱️ API call took:', `${apiCallDuration}ms`);
+        console.log('📝 Real result:', {
+          transcriptionLength: result.transcription.text?.length || 0,
+          claimsCount: result.fact_check.claims?.length || 0,
+          confidence: result.fact_check.overall_confidence,
+          isLiveChunk: isLive,
+          chunkNumber: isLive ? segment.id + 1 : undefined
+        });
 
-      console.log('📦 Creating media chunk...');
-      
-      // Try to extract actual chunk for video/audio, fallback if needed
-      let mediaChunk: File;
-      try {
-        // Use Web Audio API for both audio and video files (extracts audio track)
-        console.log('🎵 Using Web Audio API for chunk extraction');
-        mediaChunk = await extractAudioChunk(state.file, segment.startTime, segment.endTime);
-      } catch (chunkError) {
-        console.warn('⚠️ Web Audio API extraction failed, using fallback:', chunkError);
-        mediaChunk = createFileWithTimeParams(state.file, segment.startTime, segment.endTime);
-      }
+        // Calculate claims count and accuracy score
+        const claimsCount = result.fact_check.claims?.length || 0;
+        const accuracyScore = result.fact_check.overall_confidence * 100;
 
-      console.log('📡 Sending to backend...');
-      console.log('🔧 API call params:', {
-        fileName: mediaChunk.name,
-        fileSize: `${(mediaChunk.size / 1024 / 1024).toFixed(2)} MB`,
-        fileType: mediaChunk.type,
-        config: {
+        // Update segment with results
+        setState(prev => ({
+          ...prev,
+          segments: prev.segments.map(s => 
+            s.id === segment.id ? {
+              ...s,
+              status: 'completed',
+              transcription: result.transcription.text,
+              factCheckResult: result.fact_check,
+              processingTime: result.processing_time,
+              claimsCount,
+              accuracyScore,
+              lastUpdated: new Date(),
+              // Add metadata for live streams
+              ...(isLive && {
+                metadata: {
+                  isLiveChunk: true,
+                  chunkNumber: segment.id + 1,
+                  actualProcessingTime: `0s-${processDuration}s (live)`,
+                  displayTime: `${segment.startTime}s-${segment.endTime}s`
+                }
+              })
+            } : s
+          ),
+          processing: {
+            ...prev.processing,
+            processingSegments: prev.processing.processingSegments - 1,
+            completedSegments: prev.processing.completedSegments + 1,
+          },
+        }));
+
+        // For live streams, automatically create the next segment when current one completes
+        // Only call this once per segment completion by checking if this segment hasn't been processed yet
+        if (isLive && state.streamData && !processingSegmentsRef.current.has(segment.id + 1)) {
+          console.log('🔴 Live segment completed - creating next segment');
+          createNextLiveSegment(state.streamData);
+        }
+
+      } else if (state.file) {
+        console.log('📁 PROCESSING FILE SEGMENT');
+        
+        // Original file processing logic
+        let mediaChunk: File;
+        try {
+          console.log('🎵 Using Web Audio API for chunk extraction');
+          mediaChunk = await extractAudioChunk(state.file, segment.startTime, segment.endTime);
+        } catch (chunkError) {
+          console.warn('⚠️ Web Audio API extraction failed, using fallback:', chunkError);
+          mediaChunk = createFileWithTimeParams(state.file, segment.startTime, segment.endTime);
+        }
+
+        const apiCallStart = Date.now();
+        const result: ChunkProcessingResponse = await truthCheckerApi.transcribeAndFactCheckChunk(mediaChunk, {
           fast_mode: true,
           start_time: segment.startTime,
           end_time: segment.endTime,
           provider: 'elevenlabs'
-        }
-      });
-
-      const apiCallStart = Date.now();
-
-      // Send to backend for processing
-      const result: ChunkProcessingResponse = await truthCheckerApi.transcribeAndFactCheckChunk(mediaChunk, {
-        fast_mode: true,
-        start_time: segment.startTime,
-        end_time: segment.endTime,
-        provider: 'elevenlabs'
-      });
-
-      const apiCallDuration = Date.now() - apiCallStart;
-
-      console.log('✅ BACKEND RESPONSE RECEIVED');
-      console.log('⏱️ API call took:', `${apiCallDuration}ms`);
-      console.log('📝 Transcription result:', {
-        text: result.transcription.text?.substring(0, 100) + (result.transcription.text?.length > 100 ? '...' : ''),
-        textLength: result.transcription.text?.length || 0,
-        confidence: result.transcription.confidence,
-        language: result.transcription.language
-      });
-      console.log('🔍 Fact-check result:', {
-        claimsFound: result.fact_check.claims?.length || 0,
-        overallConfidence: result.fact_check.overall_confidence,
-        processingTime: result.processing_time
-      });
-
-      if (result.fact_check.claims && result.fact_check.claims.length > 0) {
-        console.log('📋 Claims details:');
-        result.fact_check.claims.forEach((claim, idx) => {
-          console.log(`  Claim ${idx + 1}:`, {
-            text: claim.text?.substring(0, 50) + (claim.text?.length > 50 ? '...' : ''),
-            status: claim.status,
-            confidence: claim.confidence
-          });
         });
+        const apiCallDuration = Date.now() - apiCallStart;
+
+        console.log('✅ FILE SEGMENT PROCESSED');
+        console.log('⏱️ API call took:', `${apiCallDuration}ms`);
+
+        const claimsCount = result.fact_check.claims?.length || 0;
+        const accuracyScore = result.fact_check.overall_confidence * 100;
+
+        setState(prev => ({
+          ...prev,
+          segments: prev.segments.map(s => 
+            s.id === segment.id ? {
+              ...s,
+              status: 'completed',
+              transcription: result.transcription.text,
+              factCheckResult: result.fact_check,
+              processingTime: result.processing_time,
+              claimsCount,
+              accuracyScore,
+              lastUpdated: new Date()
+            } : s
+          ),
+          processing: {
+            ...prev.processing,
+            processingSegments: prev.processing.processingSegments - 1,
+            completedSegments: prev.processing.completedSegments + 1,
+          },
+        }));
       }
 
-      // Calculate claims count and accuracy score
-      const claimsCount = result.fact_check.claims?.length || 0;
-      const accuracyScore = result.fact_check.overall_confidence * 100;
-
-      console.log('📊 Calculated metrics:', {
-        claimsCount,
-        accuracyScore: `${accuracyScore.toFixed(1)}%`
-      });
-
-      // Update segment with results
-      setState(prev => ({
-        ...prev,
-        segments: prev.segments.map(s => 
-          s.id === segment.id ? {
-            ...s,
-            status: 'completed',
-            transcription: result.transcription.text,
-            factCheckResult: result.fact_check,
-            processingTime: result.processing_time,
-            claimsCount,
-            accuracyScore,
-            lastUpdated: new Date()
-          } : s
-        ),
-        processing: {
-          ...prev.processing,
-          processingSegments: prev.processing.processingSegments - 1,
-          completedSegments: prev.processing.completedSegments + 1,
-        },
-      }));
-
       console.log('✅ SEGMENT PROCESSING COMPLETED');
-      console.log(`🎯 Segment ${segment.id} (${segment.startTime}s-${segment.endTime}s) processed successfully`);
 
     } catch (error) {
       console.error('\n❌ SEGMENT PROCESSING FAILED');
       console.error('💥 Error details:', error);
-      console.error('🔧 Failed segment:', {
-        id: segment.id,
-        timeRange: `${segment.startTime}s - ${segment.endTime}s`,
-        fileName: state.file?.name
-      });
       
-      // Update segment status to error
       setState(prev => ({
         ...prev,
         segments: prev.segments.map(s => 
@@ -545,64 +809,72 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         },
       }));
 
-      toast.error(`Failed to process segment ${segment.startTime}-${segment.endTime}s`);
+      const timeDisplay = isLive ? `chunk #${segment.id + 1}` : `${segment.startTime}-${segment.endTime}s`;
+      toast.error(`Failed to process ${timeDisplay}`);
+    } finally {
+      // Always remove the segment from processing set when done
+      processingSegmentsRef.current.delete(segment.id);
+      console.log(`🧹 Segment ${segment.id} removed from processing set`);
     }
     
     console.log('🏁 PROCESSING SEGMENT END\n');
-  }, [state.file, state.mediaType, extractAudioChunk, createFileWithTimeParams]);
-
-  // Process segments with controlled parallelism
-  const processSegments = useCallback(async (maxParallel: number = 1) => {
-    const pendingSegments = state.segments.filter(s => s.status === 'pending');
-    
-    console.log('🎬 STARTING BATCH PROCESSING');
-    console.log('📊 Processing strategy:', {
-      totalSegments: pendingSegments.length,
-      maxParallel,
-      processingMode: 'Sequential batches'
-    });
-    
-    for (let i = 0; i < pendingSegments.length; i += maxParallel) {
-      const batch = pendingSegments.slice(i, i + maxParallel);
-      
-      console.log(`\n📦 PROCESSING BATCH ${Math.floor(i/maxParallel) + 1}/${Math.ceil(pendingSegments.length/maxParallel)}`);
-      console.log('🎯 Batch segments:', batch.map(s => `${s.id} (${s.startTime}s-${s.endTime}s)`));
-      
-      // Process batch and wait for completion
-      await Promise.allSettled(batch.map(segment => processSegment(segment)));
-      
-      console.log('✅ Batch completed, waiting before next batch...');
-      
-      // Small delay between batches to prevent overwhelming
-      if (i + maxParallel < pendingSegments.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-    }
-    
-    console.log('🏁 ALL BATCHES COMPLETED');
-  }, [state.segments, processSegment]);
+  }, [state.file, state.streamData, extractAudioChunk, createFileWithTimeParams, createNextLiveSegment]);
 
   // Auto-start processing when segments are created
   useEffect(() => {
+    console.log('🔄 useEffect triggered:', {
+      segmentsLength: state.segments.length,
+      hasPendingSegments: state.segments.some(s => s.status === 'pending'),
+      processingStarted: processingStartedRef.current,
+      streamData: !!state.streamData,
+      file: !!state.file
+    });
+
     if (state.segments.length > 0 && 
         state.segments.some(s => s.status === 'pending') && 
         !processingStartedRef.current) {
       
+      const streamData = state.streamData;
+      const isStreamMode = !!streamData;
+      const isLive = isStreamMode ? isLiveStream(streamData) : false;
+      const pendingCount = state.segments.filter(s => s.status === 'pending').length;
+      
       console.log('\n🎬 SEGMENTS CREATED - READY FOR PROCESSING');
       console.log('📊 Processing setup:', {
+        mode: isStreamMode ? (isLive ? 'LIVE_STREAM' : 'STREAM') : 'FILE',
         totalSegments: state.segments.length,
-        pendingSegments: state.segments.filter(s => s.status === 'pending').length,
+        pendingSegments: pendingCount,
         processingSegments: state.segments.filter(s => s.status === 'processing').length,
         completedSegments: state.segments.filter(s => s.status === 'completed').length,
-        strategy: 'Web Audio API + Sequential Processing',
+        strategy: isLive ? 'Real-time Live Processing' : isStreamMode ? 'Regular Stream Processing' : 'Web Audio API + Sequential Processing',
         processingStarted: processingStartedRef.current
       });
+      
+      if (isStreamMode) {
+        console.log('🌊 STREAM PROCESSING MODE');
+        console.log('📡 Stream details:', {
+          type: streamData?.type,
+          url: streamData?.url?.substring(0, 50) + '...',
+          isLive: isLive,
+          processingMode: isLive ? 'continuous' : 'sequential'
+        });
+      } else {
+        console.log('📁 FILE PROCESSING MODE');
+        console.log('🎵 File details:', {
+          name: state.file?.name,
+          type: state.file?.type,
+          size: state.file ? `${(state.file.size / 1024 / 1024).toFixed(2)} MB` : 'N/A',
+          realProcessing: true
+        });
+      }
+      
       console.log('🧐 Detailed segment status:');
       state.segments.forEach(s => {
         console.log(`  Segment ${s.id}: ${s.status} (${s.startTime}s-${s.endTime}s)`);
       });
+      
       console.log('');
-      console.log('🚀 AUTO-STARTING PROCESSING IN 2 SECONDS...');
+      console.log(`🚀 AUTO-STARTING ${isLive ? 'LIVE STREAM' : isStreamMode ? 'STREAM' : 'FILE'} PROCESSING IN 2 SECONDS...`);
       console.log('💡 Check browser console for detailed progress logs');
       
       // Mark processing as started to prevent duplicates
@@ -613,25 +885,125 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         clearTimeout(processingTimeoutRef.current);
       }
       
-      // Start processing after a short delay
+      // Capture current segments in closure to avoid stale state
+      const segmentsToProcess = state.segments.filter(s => s.status === 'pending');
+      
+      // Create a stable reference to processSegment to avoid dependency issues
+      const processSegmentStable = (segment: EnhancedSegmentData) => {
+        // Check if this segment is already being processed
+        if (processingSegmentsRef.current.has(segment.id)) {
+          console.log(`⚠️ SEGMENT ${segment.id} ALREADY IN PROCESSING SET - SKIPPING`);
+          return Promise.resolve();
+        }
+        
+        // Call the actual processSegment function
+        return processSegment(segment);
+      };
+      
+      // Simplified timeout approach - directly call the processing function
       processingTimeoutRef.current = setTimeout(() => {
-        processSegments();
+        console.log('⏰ TIMEOUT FIRED - Starting processing now');
+        console.log('🔄 Segments to process:', {
+          totalSegments: segmentsToProcess.length,
+          processingStartedRef: processingStartedRef.current,
+          currentlyProcessing: Array.from(processingSegmentsRef.current)
+        });
+        
+        // Process the captured segments
+        if (segmentsToProcess.length > 0) {
+          console.log('🚀 STARTING SEGMENT PROCESSING');
+          
+          // For live streams, we might want to process in real-time
+          // For regular streams/files, process sequentially
+          if (isLive) {
+            console.log('🔴 LIVE STREAM: Starting continuous processing');
+            
+            // Process first segment and set up continuous processing
+            const processLiveSegments = async () => {
+              for (const segment of segmentsToProcess) {
+                console.log(`📦 Processing live segment ${segment.id}...`);
+                await processSegmentStable(segment);
+                
+                // For live streams, after processing first segment, 
+                // we should create new segments as time progresses
+                if (segment.id === 0 && streamData) {
+                  console.log('🔄 Setting up continuous segment creation for live stream');
+                  setupContinuousSegmentCreation(streamData, isLive);
+                }
+                
+                // Shorter delay between live segments
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+            };
+            
+            processLiveSegments().catch(error => {
+              console.error('❌ Error in live processing:', error);
+            });
+            
+          } else {
+            // Regular sequential processing for files and non-live streams
+            const processSequentially = async () => {
+              for (const segment of segmentsToProcess) {
+                console.log(`📦 Processing segment ${segment.id}...`);
+                await processSegmentStable(segment);
+                
+                // Small delay between segments
+                await new Promise(resolve => setTimeout(resolve, 1000));
+              }
+              console.log('🏁 ALL SEGMENTS PROCESSING INITIATED');
+            };
+            
+            processSequentially().catch(error => {
+              console.error('❌ Error in sequential processing:', error);
+            });
+          }
+          
+        } else {
+          console.log('⚠️ NO SEGMENTS TO PROCESS');
+        }
       }, 2000);
 
       // Cleanup timeout if component unmounts or dependencies change
       return () => {
+        console.log('🧹 Cleaning up timeout in useEffect');
         if (processingTimeoutRef.current) {
           clearTimeout(processingTimeoutRef.current);
         }
       };
     }
-  }, [state.segments.length]); // Remove processSegments from dependencies to prevent re-triggering
+  }, [state.segments.length, state.streamData, state.file]); // REMOVED processSegment from dependencies
 
-  // Manual start processing function
-  const startProcessing = useCallback(() => {
-    console.log('🔄 MANUAL PROCESSING START');
-    processSegments();
-  }, [processSegments]);
+  // Auto-process newly created live segments
+  useEffect(() => {
+    // Only for live streams
+    const streamData = state.streamData;
+    const isLive = streamData ? isLiveStream(streamData) : false;
+    
+    if (isLive && state.segments.length > 0) {
+      // Find the latest pending segment
+      const latestPendingSegment = state.segments
+        .filter(s => s.status === 'pending')
+        .sort((a, b) => b.id - a.id)[0]; // Get the highest ID pending segment
+      
+      if (latestPendingSegment && !processingSegmentsRef.current.has(latestPendingSegment.id)) {
+        console.log(`🔴 Auto-processing new live segment: ${latestPendingSegment.id}`);
+        
+        // Small delay to ensure state is stable
+        setTimeout(() => {
+          processSegment(latestPendingSegment);
+        }, 500);
+      }
+    }
+  }, [state.segments.length, state.streamData, processSegment]);
+
+  // Function to set up continuous segment creation for live streams
+  const setupContinuousSegmentCreation = useCallback((streamData: StreamData, isLive: boolean) => {
+    if (!isLive) return;
+    
+    console.log('🔴 Live stream setup: Segments will be created automatically as previous ones complete');
+    // No need for time-based intervals - segments are created when previous ones complete
+    
+  }, []);
 
   // Update overall progress
   useEffect(() => {
@@ -691,6 +1063,11 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
 
   // Reset to upload mode
   const handleReset = useCallback(() => {
+    console.log('🛑 DASHBOARD CLOSING - Stopping all processing');
+    
+    // Stop any ongoing processing
+    processingStartedRef.current = false;
+    
     if (state.mediaUrl) {
       URL.revokeObjectURL(state.mediaUrl);
     }
@@ -701,8 +1078,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       processingTimeoutRef.current = null;
     }
 
-    // Reset processing flag
-    processingStartedRef.current = false;
+    console.log('🧹 Cleanup completed - processing stopped, timeouts cleared');
     
     // If onClose is provided, use it instead of resetting to upload mode
     if (onClose) {
@@ -713,8 +1089,9 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     setState({
       mode: 'upload',
       file: null,
+      streamData: null,
       mediaUrl: null,
-      mediaType: null,
+      mediaType: 'video',
       duration: 0,
       segments: [],
       processing: {
@@ -724,6 +1101,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         errorSegments: 0,
         overallProgress: 0,
         startTime: null,
+        isLiveStream: false,
       },
       playback: {
         currentTime: 0,
@@ -742,6 +1120,17 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       },
     });
   }, [state.mediaUrl, onClose]);
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      console.log('🧹 FactCheckDashboard unmounting - cleaning up');
+      processingStartedRef.current = false;
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
