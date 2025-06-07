@@ -161,54 +161,54 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   };
 
   // Add helper function to detect if a stream is live using backend API
-  const isLiveStream = useCallback(async (streamData: StreamData | null): Promise<boolean> => {
-    if (!streamData) return false;
+  // const isLiveStream = useCallback(async (streamData: StreamData | null): Promise<boolean> => {
+  //   if (!streamData) return false;
     
-    // For streams, always check with backend API for authoritative live status
-    if (streamData.url) {
-      try {
-        console.log('🔍 Checking live status via backend API:', streamData.url.substring(0, 50) + '...');
+  //   // For streams, always check with backend API for authoritative live status
+  //   if (streamData.url) {
+  //     try {
+  //       console.log('🔍 Checking live status via backend API:', streamData.url.substring(0, 50) + '...');
         
-        const streamType = getStreamType(streamData.url);
-        const videoInfo: VideoInfo = await getVideoInfo({
-          url: streamData.url,
-          stream_type: streamType,
-          start_time: 0,
-          duration: CONFIG.MEDIA.CHUNK_DURATION,
-          provider: 'elevenlabs',
-          fast_mode: true
-        });
+  //       const streamType = getStreamType(streamData.url);
+  //       const videoInfo: VideoInfo = await getVideoInfo({
+  //         url: streamData.url,
+  //         stream_type: streamType,
+  //         start_time: 0,
+  //         duration: CONFIG.MEDIA.CHUNK_DURATION,
+  //         provider: 'elevenlabs',
+  //         fast_mode: true
+  //       });
         
-        console.log('📡 Backend video-info response:', {
-          is_live: videoInfo.is_live,
-          processing_mode: videoInfo.processing_mode,
-          method: videoInfo.live_status.method,
-          broadcast_content: videoInfo.live_status.live_broadcast_content,
-          source: 'Backend API (authoritative)'
-        });
+  //       console.log('📡 Backend video-info response:', {
+  //         is_live: videoInfo.is_live,
+  //         processing_mode: videoInfo.processing_mode,
+  //         method: videoInfo.live_status.method,
+  //         broadcast_content: videoInfo.live_status.live_broadcast_content,
+  //         source: 'Backend API (authoritative)'
+  //       });
         
-        return videoInfo.is_live;
+  //       return videoInfo.is_live;
         
-      } catch (error) {
-        console.warn('⚠️ Backend live status check failed, using frontend fallback:', error);
+  //     } catch (error) {
+  //       console.warn('⚠️ Backend live status check failed, using frontend fallback:', error);
         
-        // Fallback to frontend metadata if backend is unavailable
-        if (streamData.metadata?.isLive !== undefined) {
-          console.log('🔄 Using frontend metadata as fallback:', {
-            isLive: streamData.metadata.isLive,
-            source: 'StreamFactChecker metadata (fallback)',
-            reliable: false
-          });
-          return streamData.metadata.isLive;
-        }
-      }
-    }
+  //       // Fallback to frontend metadata if backend is unavailable
+  //       if (streamData.metadata?.isLive !== undefined) {
+  //         console.log('🔄 Using frontend metadata as fallback:', {
+  //           isLive: streamData.metadata.isLive,
+  //           source: 'StreamFactChecker metadata (fallback)',
+  //           reliable: false
+  //         });
+  //         return streamData.metadata.isLive;
+  //       }
+  //     }
+  //   }
     
-    // Last resort: URL-based detection
-    console.log('⚠️ Using URL-based live detection (last resort)');
-    const url = streamData.url.toLowerCase();
-    return url.includes('live=1') || url.includes('live=true') || url.includes('/live/');
-  }, []);
+  //   // Last resort: URL-based detection
+  //   console.log('⚠️ Using URL-based live detection (last resort)');
+  //   const url = streamData.url.toLowerCase();
+  //   return url.includes('live=1') || url.includes('live=true') || url.includes('/live/');
+  // }, []);
 
   // Synchronous version for immediate checks (uses cached result)
   const isLiveStreamSync = (streamData: StreamData | null): boolean => {
@@ -638,6 +638,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
 
   // Function to create the next live segment when the previous one completes
   const createNextLiveSegment = useCallback((streamData: StreamData) => {
+    console.log(streamData);
     // Prevent multiple simultaneous segment creation
     if (creatingLiveSegmentRef.current) {
       console.log('⚠️ Already creating a live segment - skipping duplicate creation');

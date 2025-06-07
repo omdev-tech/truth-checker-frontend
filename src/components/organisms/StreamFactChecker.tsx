@@ -43,11 +43,10 @@ interface StreamValidationResult {
 
 export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactCheckerProps) {
   const [streamUrl, setStreamUrl] = useState('');
-  const [isValidating, setIsValidating] = useState(false);
-  const [validationResult, setValidationResult] = useState<StreamValidationResult | null>(null);
+  const [isValidating] = useState(false);
+  const [validationResult] = useState<StreamValidationResult | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [manualLiveOverride, setManualLiveOverride] = useState(false);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Supported stream patterns
@@ -89,114 +88,114 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
     return null;
   }, [streamPatterns.youtube, streamPatterns.twitch, streamPatterns.direct]);
 
-  const validateStreamUrl = useCallback(async (url: string): Promise<StreamValidationResult> => {
-    try {
-      const streamType = detectStreamType(url);
+  // const validateStreamUrl = useCallback(async (url: string): Promise<StreamValidationResult> => {
+  //   try {
+  //     const streamType = detectStreamType(url);
       
-      if (!streamType) {
-        return {
-          isValid: false,
-          streamType: 'direct-url',
-          error: 'Unsupported stream format. Please provide a YouTube, Twitch, or direct stream URL.'
-        };
-      }
+  //     if (!streamType) {
+  //       return {
+  //         isValid: false,
+  //         streamType: 'direct-url',
+  //         error: 'Unsupported stream format. Please provide a YouTube, Twitch, or direct stream URL.'
+  //       };
+  //     }
 
-      let extractedUrl = url;
-      let metadata: StreamMetadata = {
-        title: 'Stream Preview',
-        isLive: false,
-        quality: 'Unknown'
-      };
+  //     let extractedUrl = url;
+  //     let metadata: StreamMetadata = {
+  //       title: 'Stream Preview',
+  //       isLive: false,
+  //       quality: 'Unknown'
+  //     };
 
-      // Handle YouTube URLs - convert to embed format
-      if (streamType === 'youtube') {
-        const videoId = extractYouTubeVideoId(url);
-        if (!videoId) {
-          return {
-            isValid: false,
-            streamType: 'youtube',
-            error: 'Invalid YouTube URL format.'
-          };
-        }
+  //     // Handle YouTube URLs - convert to embed format
+  //     if (streamType === 'youtube') {
+  //       const videoId = extractYouTubeVideoId(url);
+  //       if (!videoId) {
+  //         return {
+  //           isValid: false,
+  //           streamType: 'youtube',
+  //           error: 'Invalid YouTube URL format.'
+  //         };
+  //       }
         
-        // Check if the ORIGINAL URL indicates this is a live stream
-        const isLiveStream = url.includes('/live/') || 
-                           url.includes('/live?') ||
-                           url.includes('live=1') ||
-                           url.includes('live=true') ||
-                           url.includes('isLive=true') ||
-                           url.includes('&live') ||
-                           url.includes('?live') ||
-                           // Check for common live indicators in the full URL
-                           url.toLowerCase().includes('live') ||
-                           // Manual override by user
-                           manualLiveOverride;
+  //       // Check if the ORIGINAL URL indicates this is a live stream
+  //       const isLiveStream = url.includes('/live/') || 
+  //                          url.includes('/live?') ||
+  //                          url.includes('live=1') ||
+  //                          url.includes('live=true') ||
+  //                          url.includes('isLive=true') ||
+  //                          url.includes('&live') ||
+  //                          url.includes('?live') ||
+  //                          // Check for common live indicators in the full URL
+  //                          url.toLowerCase().includes('live') ||
+  //                          // Manual override by user
+  //                          manualLiveOverride;
         
-        // Use YouTube embed URL which bypasses CORS issues
-        // Add live indicator to embed URL if this is a live stream
-        let embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`;
-        if (isLiveStream) {
-          embedUrl += '&live=1&autoplay=0';
-          console.log('🔴 LIVE STREAM DETECTED - Added live=1 to embed URL');
-        }
+  //       // Use YouTube embed URL which bypasses CORS issues
+  //       // Add live indicator to embed URL if this is a live stream
+  //       let embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`;
+  //       if (isLiveStream) {
+  //         embedUrl += '&live=1&autoplay=0';
+  //         console.log('🔴 LIVE STREAM DETECTED - Added live=1 to embed URL');
+  //       }
         
-        extractedUrl = embedUrl;
-        metadata = {
-          title: `YouTube ${isLiveStream ? 'Live Stream' : 'Video'}: ${videoId}`,
-          isLive: isLiveStream,
-          quality: 'HD',
-          thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-        };
+  //       extractedUrl = embedUrl;
+  //       metadata = {
+  //         title: `YouTube ${isLiveStream ? 'Live Stream' : 'Video'}: ${videoId}`,
+  //         isLive: isLiveStream,
+  //         quality: 'HD',
+  //         thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+  //       };
         
-        console.log('🎥 YouTube URL conversion:', {
-          originalUrl: url,
-          videoId,
-          isLive: isLiveStream,
-          embedUrl: extractedUrl,
-          preservedLiveStatus: isLiveStream ? 'YES' : 'NO',
-          manualOverride: manualLiveOverride ? 'YES' : 'NO',
-          detectionMethod: manualLiveOverride ? 'Manual Override' : 'URL Analysis'
-        });
-      }
+  //       console.log('🎥 YouTube URL conversion:', {
+  //         originalUrl: url,
+  //         videoId,
+  //         isLive: isLiveStream,
+  //         embedUrl: extractedUrl,
+  //         preservedLiveStatus: isLiveStream ? 'YES' : 'NO',
+  //         manualOverride: manualLiveOverride ? 'YES' : 'NO',
+  //         detectionMethod: manualLiveOverride ? 'Manual Override' : 'URL Analysis'
+  //       });
+  //     }
 
-      // Handle Twitch URLs
-      if (streamType === 'twitch') {
-        const channelMatch = url.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
-        const channel = channelMatch?.[1];
-        if (!channel) {
-          return {
-            isValid: false,
-            streamType: 'twitch',
-            error: 'Invalid Twitch URL format.'
-          };
-        }
+  //     // Handle Twitch URLs
+  //     if (streamType === 'twitch') {
+  //       const channelMatch = url.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
+  //       const channel = channelMatch?.[1];
+  //       if (!channel) {
+  //         return {
+  //           isValid: false,
+  //           streamType: 'twitch',
+  //           error: 'Invalid Twitch URL format.'
+  //         };
+  //       }
         
-        // Use Twitch embed URL
-        extractedUrl = `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}`;
-        metadata = {
-          title: `Twitch Stream: ${channel}`,
-          isLive: true,
-          quality: 'Variable'
-        };
-      }
+  //       // Use Twitch embed URL
+  //       extractedUrl = `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}`;
+  //       metadata = {
+  //         title: `Twitch Stream: ${channel}`,
+  //         isLive: true,
+  //         quality: 'Variable'
+  //       };
+  //     }
 
-      // Mock validation delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  //     // Mock validation delay
+  //     await new Promise(resolve => setTimeout(resolve, 1000));
 
-      return {
-        isValid: true,
-        streamType,
-        extractedUrl,
-        metadata
-      };
-    } catch {
-      return {
-        isValid: false,
-        streamType: 'direct-url',
-        error: 'Failed to validate stream URL'
-      };
-    }
-  }, [detectStreamType, manualLiveOverride]);
+  //     return {
+  //       isValid: true,
+  //       streamType,
+  //       extractedUrl,
+  //       metadata
+  //     };
+  //   } catch {
+  //     return {
+  //       isValid: false,
+  //       streamType: 'direct-url',
+  //       error: 'Failed to validate stream URL'
+  //     };
+  //   }
+  // }, [detectStreamType, manualLiveOverride]);
 
   // Extract YouTube video ID from various URL formats
   const extractYouTubeVideoId = (url: string): string | null => {
@@ -245,40 +244,10 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
     streamType: StreamType;
     metadata: StreamMetadata & {
       detectionMethod?: string;
-      apiStatus?: any;
+      apiStatus?: Record<string, unknown>;
       manualOverride?: boolean;
     };
   }
-
-  const handleUrlValidation = useCallback(async () => {
-    if (!streamUrl.trim()) {
-      toast.error('Please enter a stream URL');
-      return;
-    }
-
-    setIsValidating(true);
-    setValidationResult(null);
-
-    try {
-      const result = await validateStreamUrl(streamUrl.trim());
-      setValidationResult(result);
-
-      if (result.isValid) {
-        toast.success('Stream URL validated successfully!');
-      } else {
-        toast.error(result.error || 'Invalid stream URL');
-      }
-    } catch {
-      toast.error('Failed to validate stream');
-      setValidationResult({
-        isValid: false,
-        streamType: 'direct-url',
-        error: 'Validation failed'
-      });
-    } finally {
-      setIsValidating(false);
-    }
-  }, [streamUrl, validateStreamUrl]);
 
   const handleStartFactChecking = useCallback(() => {
     if (!validationResult?.isValid || !validationResult.extractedUrl) {
@@ -310,11 +279,10 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
     e.preventDefault();
     
     if (!streamUrl.trim()) {
-      setError('Please enter a valid stream URL');
+      toast.error('Please enter a valid stream URL');
       return;
     }
 
-    setError('');
     setIsLoading(true);
 
     try {
@@ -409,7 +377,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
       );
     } catch (err) {
       console.error('❌ Stream validation error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to validate stream URL');
+      toast.error(err instanceof Error ? err.message : 'Failed to validate stream URL');
     } finally {
       setIsLoading(false);
     }
@@ -469,7 +437,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                 Force Live Stream Mode
               </label>
               <div className="text-xs text-muted-foreground ml-auto">
-                Use when URL doesn't show live indicators
+                {"Use when URL doesn't show live indicators"}
               </div>
             </div>
 
@@ -485,84 +453,20 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
               </div>
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-blue-500" />
-                <span>Direct HLS/DASH URLs</span>
+                <span>Direct Stream URLs</span>
               </div>
             </div>
           </div>
 
-          {/* Validation Result */}
-          <AnimatePresence>
-            {validationResult && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-3"
-              >
-                <Alert className={validationResult.isValid ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30'}>
-                  <div className="flex items-center gap-2">
-                    {validationResult.isValid ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-red-600" />
-                    )}
-                    <AlertDescription className="flex-1">
-                      {validationResult.isValid ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">Stream validated successfully!</span>
-                            {getStreamTypeBadge(validationResult.streamType)}
-                          </div>
-                          {validationResult.metadata && (
-                            <div className="text-sm space-y-1">
-                              {validationResult.metadata.title && (
-                                <div>Title: {validationResult.metadata.title}</div>
-                              )}
-                              <div className="flex items-center gap-4">
-                                {validationResult.metadata.isLive && (
-                                  <Badge className="bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300">
-                                    🔴 LIVE {manualLiveOverride ? '(Manual)' : '(Auto)'}
-                                  </Badge>
-                                )}
-                                {validationResult.metadata.quality && (
-                                  <span>Quality: {validationResult.metadata.quality}</span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        validationResult.error
-                      )}
-                    </AlertDescription>
-                  </div>
-                </Alert>
-
-                {validationResult.isValid && (
-                  <div className="flex justify-center">
-                    <Button 
-                      onClick={handleStartFactChecking}
-                      size="lg"
-                      className="px-8 py-3 text-lg font-medium"
-                    >
-                      <Radio className="w-5 h-5 mr-2" />
-                      Start Live Fact-Checking
-                    </Button>
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Advanced Options */}
-          <div className="border-t pt-4">
+          <div className="space-y-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-muted-foreground"
+              className="text-muted-foreground hover:text-foreground"
             >
-              Advanced Options {showAdvanced ? '−' : '+'}
+              Advanced Options {showAdvanced ? '▲' : '▼'}
             </Button>
 
             <AnimatePresence>
@@ -571,65 +475,109 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 space-y-4 text-sm"
+                  className="space-y-4 p-4 bg-muted/30 rounded-lg"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-medium">Chunk Duration</label>
-                      <p className="text-muted-foreground text-xs">Time segments for processing (seconds)</p>
-                      <Input type="number" defaultValue="30" min="15" max="120" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Quality Preference</label>
+                      <select className="w-full p-2 border rounded-md bg-background">
+                        <option value="auto">Auto (Best Available)</option>
+                        <option value="1080p">1080p HD</option>
+                        <option value="720p">720p HD</option>
+                        <option value="480p">480p SD</option>
+                      </select>
                     </div>
-                    <div>
-                      <label className="font-medium">Processing Quality</label>
-                      <p className="text-muted-foreground text-xs">Balance between speed and accuracy</p>
-                      <select className="w-full p-2 border rounded">
-                        <option value="fast">Fast (Real-time focus)</option>
-                        <option value="balanced" selected>Balanced</option>
-                        <option value="accurate">Accurate (Quality focus)</option>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Buffer Duration</label>
+                      <select className="w-full p-2 border rounded-md bg-background">
+                        <option value="5">5 seconds</option>
+                        <option value="10">10 seconds</option>
+                        <option value="15">15 seconds</option>
+                        <option value="30">30 seconds</option>
                       </select>
                     </div>
                   </div>
-                  
-                  <Alert>
-                    <AlertCircle className="w-4 h-4" />
-                    <AlertDescription className="text-xs">
-                      Live stream fact-checking requires significant processing power. 
-                      Performance may vary based on stream quality and connection speed.
-                    </AlertDescription>
-                  </Alert>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          {/* Sample URLs for Testing */}
-          <div className="border-t pt-4">
-            <details className="text-sm">
-              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                Sample URLs for Testing
-              </summary>
-              <div className="mt-3 space-y-2 text-xs">
-                <div className="space-y-1">
-                  <div className="font-medium">YouTube:</div>
-                  <code className="block bg-muted p-2 rounded text-xs">
-                    https://youtube.com/watch?v=dQw4w9WgXcQ
-                  </code>
+          {/* Validation Result */}
+          <AnimatePresence>
+            {validationResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-4"
+              >
+                <Alert className={validationResult.isValid ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'}>
+                  <div className="flex items-center gap-2">
+                    {validationResult.isValid ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                    )}
+                    <AlertDescription className={validationResult.isValid ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}>
+                      {validationResult.isValid ? 'Stream validated successfully!' : validationResult.error}
+                    </AlertDescription>
+                  </div>
+                </Alert>
+
+                {validationResult.isValid && validationResult.metadata && (
+                  <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Stream Information</h4>
+                      {getStreamTypeBadge(validationResult.streamType)}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Title:</span>
+                        <span className="ml-2 font-medium">{validationResult.metadata.title}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Quality:</span>
+                        <span className="ml-2 font-medium">{validationResult.metadata.quality}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Type:</span>
+                        <span className="ml-2 font-medium">
+                          {validationResult.metadata.isLive ? 'Live Stream' : 'Video'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {validationResult.isValid && (
+                  <Button 
+                    onClick={handleStartFactChecking}
+                    className="w-full"
+                    size="lg"
+                  >
+                    Start Fact-Checking
+                  </Button>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Loading State */}
+          <AnimatePresence>
+            {isValidating && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center justify-center py-8"
+              >
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Validating stream...</span>
                 </div>
-                <div className="space-y-1">
-                  <div className="font-medium">Twitch:</div>
-                  <code className="block bg-muted p-2 rounded text-xs">
-                    https://twitch.tv/example_channel
-                  </code>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-medium">HLS Stream:</div>
-                  <code className="block bg-muted p-2 rounded text-xs">
-                    https://example.com/stream/playlist.m3u8
-                  </code>
-                </div>
-              </div>
-            </details>
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     </div>
