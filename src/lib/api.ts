@@ -169,7 +169,7 @@ export const truthCheckerApi = {
   },
 };
 
-export { ApiError };
+export { ApiError }; 
 
 export interface VideoInfo {
   duration: number;
@@ -178,6 +178,18 @@ export interface VideoInfo {
   total_segments: number;
   stream_type: string;
   url: string;
+  is_live: boolean;
+  live_status: {
+    is_live: boolean;
+    live_broadcast_content: string;
+    method: string;
+    title?: string;
+    concurrent_viewers?: number;
+    error?: string;
+  };
+  note?: string;
+  recommended_chunk_duration?: number;
+  processing_mode: "live" | "regular";
 }
 
 export async function getVideoInfo(request: StreamProcessingRequest): Promise<VideoInfo> {

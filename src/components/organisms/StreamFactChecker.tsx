@@ -46,6 +46,9 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
   const [isValidating, setIsValidating] = useState(false);
   const [validationResult, setValidationResult] = useState<StreamValidationResult | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [manualLiveOverride, setManualLiveOverride] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Supported stream patterns
   const streamPatterns = {
@@ -116,14 +119,44 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
           };
         }
         
+        // Check if the ORIGINAL URL indicates this is a live stream
+        const isLiveStream = url.includes('/live/') || 
+                           url.includes('/live?') ||
+                           url.includes('live=1') ||
+                           url.includes('live=true') ||
+                           url.includes('isLive=true') ||
+                           url.includes('&live') ||
+                           url.includes('?live') ||
+                           // Check for common live indicators in the full URL
+                           url.toLowerCase().includes('live') ||
+                           // Manual override by user
+                           manualLiveOverride;
+        
         // Use YouTube embed URL which bypasses CORS issues
-        extractedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`;
+        // Add live indicator to embed URL if this is a live stream
+        let embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`;
+        if (isLiveStream) {
+          embedUrl += '&live=1&autoplay=0';
+          console.log('🔴 LIVE STREAM DETECTED - Added live=1 to embed URL');
+        }
+        
+        extractedUrl = embedUrl;
         metadata = {
-          title: `YouTube Video: ${videoId}`,
-          isLive: url.includes('/live/'),
+          title: `YouTube ${isLiveStream ? 'Live Stream' : 'Video'}: ${videoId}`,
+          isLive: isLiveStream,
           quality: 'HD',
           thumbnail: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
         };
+        
+        console.log('🎥 YouTube URL conversion:', {
+          originalUrl: url,
+          videoId,
+          isLive: isLiveStream,
+          embedUrl: extractedUrl,
+          preservedLiveStatus: isLiveStream ? 'YES' : 'NO',
+          manualOverride: manualLiveOverride ? 'YES' : 'NO',
+          detectionMethod: manualLiveOverride ? 'Manual Override' : 'URL Analysis'
+        });
       }
 
       // Handle Twitch URLs
@@ -163,7 +196,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
         error: 'Failed to validate stream URL'
       };
     }
-  }, [detectStreamType]);
+  }, [detectStreamType, manualLiveOverride]);
 
   // Extract YouTube video ID from various URL formats
   const extractYouTubeVideoId = (url: string): string | null => {
@@ -179,6 +212,43 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
     
     return null;
   };
+
+  const convertToEmbedUrl = (url: string, isLive: boolean): string => {
+    const streamType = detectStreamType(url);
+    
+    if (streamType === 'youtube') {
+      const videoId = extractYouTubeVideoId(url);
+      if (!videoId) return url;
+      
+      let embedUrl = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}`;
+      if (isLive) {
+        embedUrl += '&live=1&autoplay=0';
+      }
+      return embedUrl;
+    }
+    
+    if (streamType === 'twitch') {
+      const channelMatch = url.match(/twitch\.tv\/([a-zA-Z0-9_]+)/);
+      const channel = channelMatch?.[1];
+      if (channel) {
+        return `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}`;
+      }
+    }
+    
+    return url;
+  };
+
+  interface StreamData {
+    url: string;
+    originalUrl: string;
+    title: string;
+    streamType: StreamType;
+    metadata: StreamMetadata & {
+      detectionMethod?: string;
+      apiStatus?: any;
+      manualOverride?: boolean;
+    };
+  }
 
   const handleUrlValidation = useCallback(async () => {
     if (!streamUrl.trim()) {
@@ -236,6 +306,115 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
     return <Badge className={className}>{label}</Badge>;
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!streamUrl.trim()) {
+      setError('Please enter a valid stream URL');
+      return;
+    }
+
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Step 1: Check live status using YouTube Data API (if YouTube)
+      let apiLiveStatus = null;
+      const streamType = detectStreamType(streamUrl);
+      
+      if (!streamType) {
+        throw new Error('Unsupported stream format. Please provide a YouTube, Twitch, or direct stream URL.');
+      }
+      
+      if (streamType === 'youtube') {
+        try {
+          console.log('🔍 Checking live status via YouTube Data API...');
+          const liveResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/stt/check-live-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              url: streamUrl,
+              stream_type: streamType
+            })
+          });
+          
+          if (liveResponse.ok) {
+            apiLiveStatus = await liveResponse.json();
+            console.log('📡 YouTube API live status:', apiLiveStatus);
+          } else {
+            console.warn('⚠️ Live status check failed, using fallback detection');
+          }
+        } catch (error) {
+          console.warn('⚠️ Live status API error, using fallback detection:', error);
+        }
+      }
+
+      // Step 2: Enhanced live detection logic
+      let isLive = false;
+      let detectionMethod = 'url_fallback';
+      
+      if (manualLiveOverride) {
+        isLive = true;
+        detectionMethod = 'manual_override';
+        console.log('🔧 Manual live override enabled - treating as live stream');
+      } else if (apiLiveStatus && apiLiveStatus.method === 'youtube_data_api') {
+        // Use authoritative YouTube Data API result
+        isLive = apiLiveStatus.is_live;
+        detectionMethod = 'youtube_data_api';
+        console.log(`✅ Using YouTube Data API result: isLive=${isLive}, status=${apiLiveStatus.live_broadcast_content}`);
+      } else {
+        // Fallback to URL-based detection for YouTube embed URLs or other platforms
+        const urlLower = streamUrl.toLowerCase();
+        isLive = (
+          urlLower.includes('/live/') ||
+          urlLower.includes('live=1') ||
+          urlLower.includes('live=true') ||
+          urlLower.includes('&live') ||
+          urlLower.includes('?live')
+        );
+        console.log(`🔗 URL-based detection: isLive=${isLive}`);
+      }
+
+      // Step 3: Convert URL to embed format if needed
+      const convertedUrl = convertToEmbedUrl(streamUrl, isLive);
+      console.log('🔄 URL conversion completed:', {
+        original: streamUrl,
+        converted: convertedUrl,
+        preservedLiveStatus: isLive ? 'YES' : 'NO',
+        detectionMethod,
+        videoId: extractYouTubeVideoId(streamUrl)
+      });
+
+      // Step 4: Create stream data with live status
+      const streamData: StreamData = {
+        url: convertedUrl,
+        originalUrl: streamUrl,
+        title: apiLiveStatus?.title || `${streamType.charAt(0).toUpperCase() + streamType.slice(1)} Stream`,
+        streamType: streamType,
+        metadata: { 
+          isLive,
+          detectionMethod,
+          apiStatus: apiLiveStatus,
+          manualOverride: manualLiveOverride
+        }
+      };
+
+      // Log final stream data for debugging
+      console.log('📊 Final stream data:', streamData);
+
+      onStreamReady(
+        streamData.url,
+        streamData.streamType,
+        streamData.metadata
+      );
+    } catch (err) {
+      console.error('❌ Stream validation error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to validate stream URL');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={`w-full max-w-4xl mx-auto ${className}`}>
       <Card className="shadow-lg border-0 bg-gradient-to-br from-background via-background to-primary/5">
@@ -264,16 +443,33 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                   disabled={isValidating}
                 />
                 <Button 
-                  onClick={handleUrlValidation}
+                  onClick={handleSubmit}
                   disabled={isValidating || !streamUrl.trim()}
                   className="px-6"
                 >
-                  {isValidating ? (
+                  {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     'Validate'
                   )}
                 </Button>
+              </div>
+            </div>
+
+            {/* Manual Live Override Toggle */}
+            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+              <input
+                type="checkbox"
+                id="liveOverride"
+                checked={manualLiveOverride}
+                onChange={(e) => setManualLiveOverride(e.target.checked)}
+                className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
+              />
+              <label htmlFor="liveOverride" className="text-sm font-medium cursor-pointer">
+                Force Live Stream Mode
+              </label>
+              <div className="text-xs text-muted-foreground ml-auto">
+                Use when URL doesn't show live indicators
               </div>
             </div>
 
@@ -325,7 +521,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                               <div className="flex items-center gap-4">
                                 {validationResult.metadata.isLive && (
                                   <Badge className="bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300">
-                                    🔴 LIVE
+                                    🔴 LIVE {manualLiveOverride ? '(Manual)' : '(Auto)'}
                                   </Badge>
                                 )}
                                 {validationResult.metadata.quality && (

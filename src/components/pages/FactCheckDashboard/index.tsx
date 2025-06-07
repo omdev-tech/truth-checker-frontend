@@ -59,15 +59,39 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Add a ref to track which segments are currently being processed
   const processingSegmentsRef = useRef<Set<number>>(new Set());
+  // Add a ref to prevent multiple simultaneous segment creation for live streams
+  const creatingLiveSegmentRef = useRef(false);
 
-  // Initialize stream analysis if stream data is provided
-  useEffect(() => {
-    if (initialStream && state.mode === 'stream') {
-      console.log('🎥 Starting stream analysis:', initialStream);
-      toast.success(`Connected to ${initialStream.type} stream!`);
-      // TODO: Implement stream connection and real-time processing
+  // Handle media loaded for both files and streams
+  const handleMediaLoaded = useCallback(async (duration: number) => {
+    const source = state.file || state.streamData;
+    if (!source) return;
+
+    try {
+      // Create segments with thumbnails/waveforms
+      const segments = await createSegments(source, duration);
+      
+      setState(prev => ({
+        ...prev,
+        duration,
+        segments,
+        processing: {
+          ...prev.processing,
+          totalSegments: segments.length,
+        },
+      }));
+
+      // Start processing segments
+      if (state.processing.isLiveStream) {
+        toast.info('Starting live stream fact-checking...');
+      } else {
+        toast.info('Starting fact-check analysis...');
+      }
+    } catch (error) {
+      console.error('Error creating segments:', error);
+      toast.error('Failed to create segments');
     }
-  }, [initialStream, state.mode]);
+  }, [state.file, state.streamData, state.processing.isLiveStream]);
 
   // Generate video thumbnail
   const generateThumbnail = useCallback(async (videoFile: File, timeInSeconds: number): Promise<string> => {
@@ -136,50 +160,81 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     }
   };
 
-  // Add helper function to detect if a stream is live
-  const isLiveStream = (streamData: StreamData | null): boolean => {
+  // Add helper function to detect if a stream is live using backend API
+  const isLiveStream = useCallback(async (streamData: StreamData | null): Promise<boolean> => {
     if (!streamData) return false;
     
-    // For now, we'll detect live streams based on URL patterns
-    // This could be enhanced with API calls to check if the stream is currently live
+    // For streams, always check with backend API for authoritative live status
+    if (streamData.url) {
+      try {
+        console.log('🔍 Checking live status via backend API:', streamData.url.substring(0, 50) + '...');
+        
+        const streamType = getStreamType(streamData.url);
+        const videoInfo: VideoInfo = await getVideoInfo({
+          url: streamData.url,
+          stream_type: streamType,
+          start_time: 0,
+          duration: CONFIG.MEDIA.CHUNK_DURATION,
+          provider: 'elevenlabs',
+          fast_mode: true
+        });
+        
+        console.log('📡 Backend video-info response:', {
+          is_live: videoInfo.is_live,
+          processing_mode: videoInfo.processing_mode,
+          method: videoInfo.live_status.method,
+          broadcast_content: videoInfo.live_status.live_broadcast_content,
+          source: 'Backend API (authoritative)'
+        });
+        
+        return videoInfo.is_live;
+        
+      } catch (error) {
+        console.warn('⚠️ Backend live status check failed, using frontend fallback:', error);
+        
+        // Fallback to frontend metadata if backend is unavailable
+        if (streamData.metadata?.isLive !== undefined) {
+          console.log('🔄 Using frontend metadata as fallback:', {
+            isLive: streamData.metadata.isLive,
+            source: 'StreamFactChecker metadata (fallback)',
+            reliable: false
+          });
+          return streamData.metadata.isLive;
+        }
+      }
+    }
+    
+    // Last resort: URL-based detection
+    console.log('⚠️ Using URL-based live detection (last resort)');
     const url = streamData.url.toLowerCase();
+    return url.includes('live=1') || url.includes('live=true') || url.includes('/live/');
+  }, []);
+
+  // Synchronous version for immediate checks (uses cached result)
+  const isLiveStreamSync = (streamData: StreamData | null): boolean => {
+    if (!streamData) return false;
     
-    // DEMO MODE: For testing, you can manually enable live stream simulation
-    // by adding "?simulate_live=true" to the URL or checking specific conditions
-    const forceSimulateLive = url.includes('simulate_live') || 
-                              process.env.NODE_ENV === 'development' && url.includes('ydrmtaig0we'); // Updated to match current test video
+    // Check environment variables for testing configuration
+    const forceLiveSimulation = process.env.NEXT_PUBLIC_FORCE_LIVE_SIMULATION === 'true';
     
-    if (forceSimulateLive) {
-      console.log('🔴 DEMO MODE: Forcing live stream simulation for testing');
+    // Force simulation mode (only if explicitly enabled via environment variable)
+    if (streamData.url.toLowerCase().includes('simulate_live') || forceLiveSimulation) {
+      console.log('🔴 LIVE SIMULATION MODE ACTIVE:', {
+        reason: streamData.url.includes('simulate_live') ? 'URL contains simulate_live' : 'NEXT_PUBLIC_FORCE_LIVE_SIMULATION=true',
+        forceLiveSimulation,
+        url: streamData.url.substring(0, 50) + '...'
+      });
       return true;
     }
-    
-    // YouTube live stream indicators
-    if (url.includes('youtube.com/watch') && url.includes('live')) {
-      return true;
-    }
-    if (url.includes('youtube.com/embed') && url.includes('live')) {
-      return true;
-    }
-    if (url.includes('youtube.com/channel') && url.includes('live')) {
-      return true;
+
+    // Fallback to frontend metadata for immediate sync checks
+    if (streamData.metadata?.isLive !== undefined) {
+      return streamData.metadata.isLive;
     }
     
-    // Twitch live stream indicators
-    if (url.includes('twitch.tv') && !url.includes('/videos/')) {
-      return true; // Assume most Twitch URLs are live unless they're VODs
-    }
-    
-    console.log('🔍 Live stream detection:', {
-      url: url.substring(0, 50) + '...',
-      hasLiveIndicator: url.includes('live'),
-      isTwitchLive: url.includes('twitch.tv') && !url.includes('/videos/'),
-      isYoutubeLive: url.includes('youtube') && url.includes('live'),
-      forceSimulateLive,
-      result: forceSimulateLive // Using simulation mode for demo
-    });
-    
-    return forceSimulateLive; // For demo purposes
+    // Last resort: URL-based detection
+    const url = streamData.url.toLowerCase();
+    return url.includes('live=1') || url.includes('live=true') || url.includes('/live/');
   };
 
   // Create segments from file duration or for live stream
@@ -202,7 +257,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       console.log('📁 File processing mode: using chunk duration', effectiveChunkDuration + 's');
     } else {
       const streamData = source as StreamData;
-      const isLive = isLiveStream(streamData);
+      const isLive = isLiveStreamSync(streamData);
       
       if (isLive) {
         // Live streams use shorter chunks for real-time processing
@@ -217,10 +272,73 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     
     let actualDuration = duration;
     
-    // For streams, get the actual video duration
+    // For streams, always call backend API to get authoritative info (including live status)
     if (isStreamData && (source as StreamData).url) {
       try {
-        console.log('🔍 Getting video info for:', (source as StreamData).url);
+        console.log('🔍 Getting authoritative video info from backend:', (source as StreamData).url);
+        
+        const streamType = getStreamType((source as StreamData).url);
+        const videoInfo: VideoInfo = await getVideoInfo({
+          url: (source as StreamData).url,
+          stream_type: streamType,
+          start_time: 0,
+          duration: effectiveChunkDuration,
+          provider: 'elevenlabs',
+          fast_mode: true
+        });
+        
+        console.log('📡 Backend video-info response:', {
+          is_live: videoInfo.is_live,
+          processing_mode: videoInfo.processing_mode,
+          duration: videoInfo.duration,
+          method: videoInfo.live_status.method,
+          broadcast_content: videoInfo.live_status.live_broadcast_content,
+          source: 'Backend API (authoritative)'
+        });
+        
+        // Update frontend metadata with backend's authoritative result
+        const streamData = source as StreamData;
+        if (streamData.metadata) {
+          streamData.metadata.isLive = videoInfo.is_live;
+        } else {
+          streamData.metadata = { isLive: videoInfo.is_live };
+        }
+        
+        // Use backend's authoritative live status
+        const backendIsLive = videoInfo.is_live;
+        
+        // Update chunk duration based on authoritative live status
+        if (backendIsLive) {
+          effectiveChunkDuration = CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION;
+          console.log('🔴 Backend confirmed live stream: using live chunk duration', effectiveChunkDuration + 's');
+          actualDuration = effectiveChunkDuration; // Just use one chunk for live
+        } else {
+          effectiveChunkDuration = CONFIG.MEDIA.VIDEO_CHUNK_DURATION;
+          console.log('🎬 Backend confirmed regular video: using video chunk duration', effectiveChunkDuration + 's');
+          actualDuration = videoInfo.duration; // Use actual video duration
+        }
+        
+        console.log(`✅ Backend analysis complete: ${videoInfo.duration_formatted} (${backendIsLive ? 'live - incremental' : Math.ceil(actualDuration / effectiveChunkDuration) + ' segments'})`);
+        
+      } catch (error) {
+        console.warn('⚠️ Backend video-info API failed, using frontend fallback:', error);
+        
+        // Fallback to original logic if backend is unavailable
+        const isLiveStreamData = isLiveStreamSync(source as StreamData);
+        if (isLiveStreamData) {
+          actualDuration = effectiveChunkDuration;
+        }
+      }
+    }
+    
+    // Final determination of live status for segment creation
+    const finalIsLive = isStreamData ? isLiveStreamSync(source as StreamData) : false;
+    
+    // For regular streams (not live), get the actual video duration
+    // For live streams, we don't need the full duration since we process incrementally
+    if (isStreamData && !finalIsLive && (source as StreamData).url) {
+      try {
+        console.log('🔍 Getting video info for regular stream:', (source as StreamData).url);
         
         const streamType = getStreamType((source as StreamData).url);
         const videoInfo: VideoInfo = await getVideoInfo({
@@ -235,29 +353,44 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         console.log('📹 Video info received:', videoInfo);
         actualDuration = videoInfo.duration;
         
+        // Update live status based on backend response
+        if (videoInfo.is_live && !finalIsLive) {
+          console.log('🔄 Backend detected live stream - updating local detection');
+          // Re-run with updated live status
+          const streamData = source as StreamData;
+          if (streamData.metadata) {
+            streamData.metadata.isLive = true;
+          }
+          return createSegments(source, duration, chunkDuration); // Retry with updated metadata
+        }
+        
         console.log(`✅ Adjusted to real video duration: ${videoInfo.duration_formatted} (${Math.ceil(actualDuration / effectiveChunkDuration)} segments expected)`);
         
       } catch (error) {
         console.warn('⚠️ Could not get video info, using default duration:', error);
         // Continue with provided duration
       }
+    } else if (finalIsLive) {
+      console.log('🔴 Live stream detected - skipping duration API call, will process incrementally');
+      // For live streams, we don't need the actual duration since we process in real-time
+      actualDuration = effectiveChunkDuration; // Just use one chunk duration for the first segment
     }
     
     // For live streams, only create the first segment - others will be created incrementally
-    const isLiveStreamData = isStreamData && isLiveStream(source as StreamData);
-    const segmentsToCreate = isLiveStreamData ? 1 : Math.ceil(actualDuration / effectiveChunkDuration);
+    const segmentsToCreate = finalIsLive ? 1 : Math.ceil(actualDuration / effectiveChunkDuration);
     
     console.log('📦 Creating segments:', {
       isStreamData,
       isFile,
-      isLive: isLiveStreamData,
+      isLive: finalIsLive,
       duration: `${actualDuration}s`,
       configChunkDuration: `${CONFIG.MEDIA.CHUNK_DURATION}s`,
       liveStreamChunkDuration: `${CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION}s`,
       videoChunkDuration: `${CONFIG.MEDIA.VIDEO_CHUNK_DURATION}s`,
       effectiveChunkDuration: `${effectiveChunkDuration}s`,
-      segmentsToCreate: isLiveStreamData ? '1 (live - incremental)' : segmentsToCreate,
-      totalEstimated: Math.ceil(actualDuration / effectiveChunkDuration)
+      segmentsToCreate: finalIsLive ? '1 (live - incremental)' : segmentsToCreate,
+      totalEstimated: finalIsLive ? 'N/A (incremental)' : Math.ceil(actualDuration / effectiveChunkDuration),
+      note: finalIsLive ? 'Live stream - only creating first segment' : 'Regular processing - creating all segments'
     });
 
     for (let i = 0; i < segmentsToCreate; i++) {
@@ -266,7 +399,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       const segmentDuration = endTime - startTime;
       
       // Debug logging for live streams
-      if (isLiveStreamData) {
+      if (finalIsLive) {
         console.log(`🔴 Creating initial live segment ${i}:`, {
           startTime: `${startTime}s`,
           endTime: `${endTime}s`,
@@ -310,7 +443,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       });
     }
     
-    console.log(`✅ Created ${segments.length} segment${segments.length > 1 ? 's' : ''} for ${isStreamData ? (isLiveStreamData ? 'live stream' : 'stream') : 'file'} processing`);
+    console.log(`✅ Created ${segments.length} segment${segments.length > 1 ? 's' : ''} for ${isStreamData ? (finalIsLive ? 'live stream' : 'stream') : 'file'} processing`);
     return segments;
   }, [generateThumbnail, generateWaveform]);
 
@@ -342,37 +475,6 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       toast.error('Failed to process uploaded file');
     }
   }, []);
-
-  // Handle media loaded for both files and streams
-  const handleMediaLoaded = useCallback(async (duration: number) => {
-    const source = state.file || state.streamData;
-    if (!source) return;
-
-    try {
-      // Create segments with thumbnails/waveforms
-      const segments = await createSegments(source, duration);
-      
-      setState(prev => ({
-        ...prev,
-        duration,
-        segments,
-        processing: {
-          ...prev.processing,
-          totalSegments: segments.length,
-        },
-      }));
-
-      // Start processing segments
-      if (state.processing.isLiveStream) {
-        toast.info('Starting live stream fact-checking...');
-      } else {
-        toast.info('Starting fact-check analysis...');
-      }
-    } catch (error) {
-      console.error('Error creating segments:', error);
-      toast.error('Failed to create segments');
-    }
-  }, [state.file, state.streamData, state.processing.isLiveStream, createSegments]);
 
   // Extract actual audio/video chunk from media file using Web Audio API
   const extractAudioChunk = useCallback(async (
@@ -536,6 +638,14 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
 
   // Function to create the next live segment when the previous one completes
   const createNextLiveSegment = useCallback((streamData: StreamData) => {
+    // Prevent multiple simultaneous segment creation
+    if (creatingLiveSegmentRef.current) {
+      console.log('⚠️ Already creating a live segment - skipping duplicate creation');
+      return;
+    }
+
+    creatingLiveSegmentRef.current = true;
+
     setState(prev => {
       // Get the next segment ID based on existing segments
       const nextSegmentId = prev.segments.length;
@@ -548,6 +658,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       console.log(`🆕 Creating live segment ${nextSegmentId}:`);
       console.log(`  📺 Display time: ${displayStartTime}s-${displayEndTime}s (for UI)`);
       console.log(`  🔴 Processing: will use 0s-${chunkDuration}s (current live position)`);
+      console.log(`  📊 Total segments after creation: ${nextSegmentId + 1}`);
       
       const newSegment: EnhancedSegmentData = {
         id: nextSegmentId,
@@ -559,6 +670,11 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         lastUpdated: new Date(),
       };
       
+      // Reset the creation flag
+      setTimeout(() => {
+        creatingLiveSegmentRef.current = false;
+      }, 100); // Small delay to prevent rapid creation
+      
       return {
         ...prev,
         segments: [...prev.segments, newSegment],
@@ -569,6 +685,21 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       };
     });
   }, []);
+
+  // Initialize stream analysis if stream data is provided
+  useEffect(() => {
+    if (initialStream && state.mode === 'stream') {
+      console.log('🎥 Starting stream analysis:', initialStream);
+      toast.success(`Connected to ${initialStream.type} stream!`);
+      
+      // For streams, we need to manually trigger segment creation since there's no media element duration event
+      // Use a default duration for live streams (will be adjusted in createSegments based on live status)
+      const defaultStreamDuration = CONFIG.MEDIA.LIVE_STREAM_CHUNK_DURATION; // 30 seconds for live streams
+      
+      console.log('🔧 Triggering handleMediaLoaded for stream with duration:', defaultStreamDuration + 's');
+      handleMediaLoaded(defaultStreamDuration);
+    }
+  }, [initialStream, state.mode, handleMediaLoaded]);
 
   // Process a single segment
   const processSegment = useCallback(async (segment: EnhancedSegmentData) => {
@@ -591,7 +722,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     }
 
     const streamData = state.streamData;
-    const isLive = streamData ? isLiveStream(streamData) : false;
+    const isLive = streamData ? isLiveStreamSync(streamData) : false;
 
     console.log('\n🚀 PROCESSING SEGMENT START');
     console.log('📝 Segment info:', {
@@ -663,7 +794,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         }
         
         // Use real backend processing for streams
-        console.log('🚀 CALLING BACKEND STREAM PROCESSING');
+        console.log('🔗 CALLING BACKEND STREAM PROCESSING');
         
         const apiCallStart = Date.now();
         const result: ChunkProcessingResponse = await processStreamSegment({
@@ -733,8 +864,35 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         // For live streams, automatically create the next segment when current one completes
         // Only call this once per segment completion by checking if this segment hasn't been processed yet
         if (isLive && state.streamData && !processingSegmentsRef.current.has(segment.id + 1)) {
-          console.log('🔴 Live segment completed - creating next segment');
-          createNextLiveSegment(state.streamData);
+          console.log('🔴 Live segment completed - checking if next segment should be created');
+          console.log('🔍 Current state:', {
+            completedSegmentId: segment.id,
+            nextSegmentId: segment.id + 1,
+            isAlreadyProcessingNext: processingSegmentsRef.current.has(segment.id + 1),
+            isCreatingSegment: creatingLiveSegmentRef.current,
+            totalSegments: state.segments ? state.segments.length : 'unknown'
+          });
+          
+          // Additional check: make sure the next segment doesn't already exist
+          const nextSegmentExists = state.segments && state.segments.some(s => s.id === segment.id + 1);
+          
+          if (!nextSegmentExists && !creatingLiveSegmentRef.current) {
+            console.log('✅ Creating next live segment');
+            createNextLiveSegment(state.streamData);
+          } else {
+            console.log('⏭️ Skipping segment creation:', {
+              nextSegmentExists,
+              isCreatingSegment: creatingLiveSegmentRef.current,
+              reason: nextSegmentExists ? 'Next segment already exists' : 'Already creating a segment'
+            });
+          }
+        } else if (isLive) {
+          console.log('⏭️ Not creating next segment:', {
+            hasStreamData: !!state.streamData,
+            isAlreadyProcessingNext: processingSegmentsRef.current.has(segment.id + 1),
+            completedSegmentId: segment.id,
+            nextSegmentId: segment.id + 1
+          });
         }
 
       } else if (state.file) {
@@ -836,7 +994,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       
       const streamData = state.streamData;
       const isStreamMode = !!streamData;
-      const isLive = isStreamMode ? isLiveStream(streamData) : false;
+      const isLive = isStreamMode ? isLiveStreamSync(streamData) : false;
       const pendingCount = state.segments.filter(s => s.status === 'pending').length;
       
       console.log('\n🎬 SEGMENTS CREATED - READY FOR PROCESSING');
@@ -977,7 +1135,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   useEffect(() => {
     // Only for live streams
     const streamData = state.streamData;
-    const isLive = streamData ? isLiveStream(streamData) : false;
+    const isLive = streamData ? isLiveStreamSync(streamData) : false;
     
     if (isLive && state.segments.length > 0) {
       // Find the latest pending segment
@@ -1068,6 +1226,9 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     // Stop any ongoing processing
     processingStartedRef.current = false;
     
+    // Reset live segment creation flag
+    creatingLiveSegmentRef.current = false;
+    
     if (state.mediaUrl) {
       URL.revokeObjectURL(state.mediaUrl);
     }
@@ -1078,7 +1239,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       processingTimeoutRef.current = null;
     }
 
-    console.log('🧹 Cleanup completed - processing stopped, timeouts cleared');
+    console.log('🧹 Cleanup completed - processing stopped, timeouts cleared, creation flags reset');
     
     // If onClose is provided, use it instead of resetting to upload mode
     if (onClose) {
@@ -1126,6 +1287,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     return () => {
       console.log('🧹 FactCheckDashboard unmounting - cleaning up');
       processingStartedRef.current = false;
+      creatingLiveSegmentRef.current = false;
       if (processingTimeoutRef.current) {
         clearTimeout(processingTimeoutRef.current);
       }

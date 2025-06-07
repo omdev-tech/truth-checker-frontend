@@ -23,10 +23,60 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
         return 'text-green-400 bg-green-400/10';
       case 'false':
         return 'text-red-400 bg-red-400/10';
+      case 'partially_true':
+        return 'text-yellow-400 bg-yellow-400/10';
       case 'uncertain':
         return 'text-orange-400 bg-orange-400/10';
+      case 'misleading':
+        return 'text-orange-400 bg-orange-400/10';
+      case 'unverifiable':
+        return 'text-gray-400 bg-gray-400/10';
+      case 'disputed':
+        return 'text-purple-400 bg-purple-400/10';
       default:
         return 'text-gray-400 bg-gray-400/10';
+    }
+  };
+
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case 'true':
+        return 'True';
+      case 'false':
+        return 'False';
+      case 'partially_true':
+        return 'Partially True';
+      case 'uncertain':
+        return 'Uncertain';
+      case 'misleading':
+        return 'Misleading';
+      case 'unverifiable':
+        return 'Unverifiable';
+      case 'disputed':
+        return 'Disputed';
+      case 'not_checkable':
+        return 'Not Checkable';
+      case 'no_text':
+        return 'No Text';
+      case 'error':
+        return 'Error';
+      default:
+        return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown';
+    }
+  };
+
+  const getConfidenceLabel = (confidence?: string) => {
+    switch (confidence) {
+      case 'high':
+        return 'High';
+      case 'medium':
+        return 'Medium';
+      case 'low':
+        return 'Low';
+      case 'insufficient':
+        return 'Insufficient';
+      default:
+        return confidence ? confidence.charAt(0).toUpperCase() + confidence.slice(1) : 'Unknown';
     }
   };
 
@@ -79,7 +129,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
             {/* Overall Status */}
             <div className={`rounded-lg p-3 mb-3 ${getStatusColor(segment.factCheckResult.status)}`}>
               <div className="flex items-center justify-between">
-                <span className="font-medium capitalize">{segment.factCheckResult.status}</span>
+                <span className="font-medium">{getStatusLabel(segment.factCheckResult.status)}</span>
                 <span className="text-sm">
                   {Math.round(segment.factCheckResult.overall_confidence * 100)}% confidence
                 </span>
@@ -96,9 +146,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
                   <div key={index} className="bg-gray-700 rounded-lg p-3">
                     <div className="flex items-start justify-between mb-2">
                       <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(claim.status)}`}>
-                        {claim.status}
+                        {getStatusLabel(claim.status)}
                       </span>
-                      <span className="text-xs text-gray-400">{claim.confidence}</span>
+                      <span className="text-xs text-gray-400">{getConfidenceLabel(claim.confidence)}</span>
                     </div>
                     
                     <p className="text-gray-300 text-sm mb-2">{claim.text}</p>

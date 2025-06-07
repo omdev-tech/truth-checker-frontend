@@ -75,11 +75,11 @@ export interface ChunkProcessingResponse {
     metadata: Record<string, unknown>;
   };
   fact_check: {
-    status: 'true' | 'false' | 'uncertain' | 'not_checkable' | 'error' | 'no_text';
+    status: 'true' | 'false' | 'partially_true' | 'misleading' | 'unverifiable' | 'disputed' | 'uncertain' | 'not_checkable' | 'error' | 'no_text';
     claims: Array<{
       text: string;
-      status: string;
-      confidence: string;
+      status: 'true' | 'false' | 'partially_true' | 'misleading' | 'unverifiable' | 'disputed' | 'uncertain';
+      confidence: 'high' | 'medium' | 'low' | 'insufficient';
       explanation: string;
     }>;
     overall_confidence: number;

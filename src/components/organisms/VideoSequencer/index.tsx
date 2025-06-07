@@ -111,10 +111,23 @@ const FactCheckModal: React.FC<FactCheckModalProps> = ({ segment, isOpen, onClos
                     px-2 py-1 rounded text-sm
                     ${segment.factCheckResult.status === 'true' ? 'bg-green-100 text-green-800' : ''}
                     ${segment.factCheckResult.status === 'false' ? 'bg-red-100 text-red-800' : ''}
+                    ${segment.factCheckResult.status === 'partially_true' ? 'bg-yellow-100 text-yellow-800' : ''}
                     ${segment.factCheckResult.status === 'uncertain' ? 'bg-orange-100 text-orange-800' : ''}
+                    ${segment.factCheckResult.status === 'misleading' ? 'bg-orange-100 text-orange-800' : ''}
+                    ${segment.factCheckResult.status === 'unverifiable' ? 'bg-gray-100 text-gray-800' : ''}
+                    ${segment.factCheckResult.status === 'disputed' ? 'bg-purple-100 text-purple-800' : ''}
                     ${segment.factCheckResult.status === 'not_checkable' || segment.factCheckResult.status === 'no_text' ? 'bg-gray-100 text-gray-800' : ''}
                   `}>
-                    {segment.factCheckResult.status}
+                    {segment.factCheckResult.status === 'true' ? 'True' :
+                     segment.factCheckResult.status === 'false' ? 'False' :
+                     segment.factCheckResult.status === 'partially_true' ? 'Partially True' :
+                     segment.factCheckResult.status === 'uncertain' ? 'Uncertain' :
+                     segment.factCheckResult.status === 'misleading' ? 'Misleading' :
+                     segment.factCheckResult.status === 'unverifiable' ? 'Unverifiable' :
+                     segment.factCheckResult.status === 'disputed' ? 'Disputed' :
+                     segment.factCheckResult.status === 'not_checkable' ? 'Not Checkable' :
+                     segment.factCheckResult.status === 'no_text' ? 'No Text' :
+                     segment.factCheckResult.status}
                   </span>
                 </div>
                 
@@ -126,7 +139,18 @@ const FactCheckModal: React.FC<FactCheckModalProps> = ({ segment, isOpen, onClos
                         <li key={index} className="bg-gray-50 p-3 rounded">
                           <div className="font-medium">{claim.text}</div>
                           <div className="text-sm text-gray-600 mt-1">
-                            Status: {claim.status} | Confidence: {claim.confidence}
+                            Status: {claim.status === 'true' ? 'True' :
+                                   claim.status === 'false' ? 'False' :
+                                   claim.status === 'partially_true' ? 'Partially True' :
+                                   claim.status === 'uncertain' ? 'Uncertain' :
+                                   claim.status === 'misleading' ? 'Misleading' :
+                                   claim.status === 'unverifiable' ? 'Unverifiable' :
+                                   claim.status === 'disputed' ? 'Disputed' :
+                                   claim.status} | Confidence: {claim.confidence === 'high' ? 'High' :
+                                                               claim.confidence === 'medium' ? 'Medium' :
+                                                               claim.confidence === 'low' ? 'Low' :
+                                                               claim.confidence === 'insufficient' ? 'Insufficient' :
+                                                               claim.confidence}
                           </div>
                           {claim.explanation && (
                             <div className="text-sm text-gray-700 mt-1">
