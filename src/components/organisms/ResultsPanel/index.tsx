@@ -158,8 +158,76 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
                         {claim.explanation}
                       </div>
                     )}
+                    
+                    {/* Sources for individual claims */}
+                    {claim.sources && claim.sources.length > 0 && (
+                      <div className="text-xs text-gray-400 border-t border-gray-600 pt-2 mt-2">
+                        <div className="font-medium text-gray-300 mb-1">Sources:</div>
+                        <div className="space-y-1">
+                          {claim.sources.map((source, sourceIndex) => (
+                            <a
+                              key={sourceIndex}
+                              href={source}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors group cursor-pointer"
+                            >
+                              <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                              <span className="truncate group-hover:underline">
+                                {new URL(source).hostname}
+                              </span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Overall Sources Section */}
+            {segment.factCheckResult.sources && segment.factCheckResult.sources.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-600">
+                <h5 className="text-sm text-gray-400 font-medium mb-2">
+                  All Sources ({segment.factCheckResult.sources.length})
+                </h5>
+                <div className="space-y-2">
+                  {segment.factCheckResult.sources.map((source, index) => (
+                    <a
+                      key={index}
+                      href={source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-2 bg-gray-700 rounded hover:bg-gray-600 transition-colors group cursor-pointer"
+                    >
+                      <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm text-blue-400 group-hover:text-blue-300 group-hover:underline truncate">
+                          {new URL(source).hostname}
+                        </div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {source}
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No Sources Message */}
+            {segment.factCheckResult.claims && segment.factCheckResult.claims.length > 0 && 
+             (!segment.factCheckResult.sources || segment.factCheckResult.sources.length === 0) &&
+             !segment.factCheckResult.claims.some(claim => claim.sources && claim.sources.length > 0) && (
+              <div className="mt-4 pt-3 border-t border-gray-600">
+                <div className="text-xs text-gray-500 italic text-center py-2">
+                  No sources available for this segment
+                </div>
               </div>
             )}
           </div>

@@ -81,10 +81,12 @@ export interface ChunkProcessingResponse {
       status: 'true' | 'false' | 'partially_true' | 'misleading' | 'unverifiable' | 'disputed' | 'uncertain';
       confidence: 'high' | 'medium' | 'low' | 'insufficient';
       explanation: string;
+      sources?: string[]; // Added sources to match backend response
     }>;
     overall_confidence: number;
     total_claims?: number;
     processed_claims?: number;
+    sources?: string[]; // Added overall sources field
     error?: string;
   };
   processing_time: number;

@@ -163,23 +163,42 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
         chunks: chunksRef.current.length
       });
 
-      // Transcribe the recording
-      const transcription = await truthCheckerApi.transcribeFile(file, {
+      // Use the combined transcribe and fact-check endpoint (following hexagonal architecture)
+      const result = await truthCheckerApi.transcribeAndFactCheckChunk(file, {
         provider: 'elevenlabs',
-        language: 'en'
+        language: 'en',
+        fast_mode: true
       });
 
-      setCurrentTranscript(transcription.text || '');
+      // Handle ChunkProcessingResponse format
+      setCurrentTranscript(result.transcription.text || '');
 
-      // If transcription successful, fact-check the text
-      if (transcription.text) {
-        const factCheck = await truthCheckerApi.checkText({
-          text: transcription.text,
-          language: 'en'
-        });
+      // Convert ChunkProcessingResponse to FactCheckResponse format for UI consistency
+      if (result.fact_check && result.fact_check.claims) {
+        const convertedResult: FactCheckResponse = {
+          claims: result.fact_check.claims.map(claim => ({
+            text: claim.text,
+            source: claim.sources?.[0] || '',
+            context: '',
+            timestamp: new Date().toISOString(),
+            metadata: {}
+          })),
+          results: result.fact_check.claims.map(claim => ({
+            claim_text: claim.text,
+            status: claim.status as any,
+            confidence: claim.confidence as any,
+            explanation: claim.explanation,
+            sources: claim.sources || [],
+            timestamp: new Date().toISOString(),
+            metadata: {}
+          }))
+        };
 
-        setFactCheckResults(factCheck);
+        setFactCheckResults(convertedResult);
         toast.success('Live recording processed and fact-checked!');
+      } else {
+        // Handle case where no claims were found
+        toast.info('Recording processed but no verifiable claims found');
       }
 
     } catch (error) {
