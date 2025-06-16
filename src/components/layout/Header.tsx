@@ -3,10 +3,20 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
+import { useAuth } from '@/hooks/useAuth';
 import { truthCheckerApi } from '@/lib/api';
 import { HealthStatus } from '@/lib/types';
-import { Shield, Sun, Moon, Activity } from 'lucide-react';
+import { Shield, Sun, Moon, Activity, User, LogOut, Settings, CreditCard } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 
@@ -14,6 +24,14 @@ export function Header() {
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
   const [isLoadingHealth, setIsLoadingHealth] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { 
+    isAuthenticated, 
+    user, 
+    signOut, 
+    getDisplayName, 
+    getUserInitials,
+    isLoading: authLoading 
+  } = useAuth();
 
   useEffect(() => {
     checkHealth();
@@ -69,6 +87,16 @@ export function Header() {
     );
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      // Redirect to home page after logout
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    }
+  };
+
   return (
     <motion.header 
       initial={{ y: -100 }}
@@ -116,6 +144,69 @@ export function Header() {
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
+
+          {/* User Menu */}
+          {!authLoading && (
+            <>
+              {isAuthenticated && user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.image || ''} alt={getDisplayName() || ''} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                          {getUserInitials()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {getDisplayName()}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Usage & Billing</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="cursor-pointer text-red-600 focus:text-red-600"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => window.location.href = '/'}
+                  className="text-sm"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
+              )}
+            </>
+          )}
         </motion.div>
       </div>
     </motion.header>

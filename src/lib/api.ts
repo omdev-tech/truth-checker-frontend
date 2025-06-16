@@ -8,6 +8,7 @@ import {
   ChunkProcessingResponse,
   StreamProcessingRequest 
 } from './types';
+import { getSession } from 'next-auth/react';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.truth.omdev.tech';
 
@@ -16,6 +17,64 @@ class ApiError extends Error {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+/**
+ * Get authentication headers for API requests
+ */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const session = await getSession();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (session?.accessToken) {
+    headers['Authorization'] = `Bearer ${session.accessToken}`;
+  }
+  
+  return headers;
+}
+
+/**
+ * Make authenticated API request
+ */
+async function makeAuthenticatedRequest(
+  url: string, 
+  options: RequestInit = {}
+): Promise<Response> {
+  const authHeaders = await getAuthHeaders();
+  
+  // Merge auth headers with existing headers
+  const headers = {
+    ...authHeaders,
+    ...options.headers,
+  };
+  
+  return fetch(url, {
+    ...options,
+    headers,
+  });
+}
+
+/**
+ * Make authenticated FormData request (for file uploads)
+ */
+async function makeAuthenticatedFormDataRequest(
+  url: string,
+  formData: FormData
+): Promise<Response> {
+  const session = await getSession();
+  const headers: Record<string, string> = {};
+  
+  if (session?.accessToken) {
+    headers['Authorization'] = `Bearer ${session.accessToken}`;
+  }
+  
+  return fetch(url, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -61,32 +120,26 @@ export const truthCheckerApi = {
     return handleResponse<HealthStatus>(response);
   },
 
-  // Text fact checking
+  // Text fact checking (with optional authentication)
   async checkText(request: FactCheckRequest): Promise<FactCheckResponse> {
-    const response = await fetch(`${API_BASE_URL}/fact-check/text`, {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/fact-check/text`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(request),
     });
     return handleResponse<FactCheckResponse>(response);
   },
 
-  // File fact checking
+  // File fact checking (with optional authentication)
   async checkFile(file: File, language = 'en'): Promise<FactCheckResponse> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('language', language);
 
-    const response = await fetch(`${API_BASE_URL}/fact-check/file`, {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await makeAuthenticatedFormDataRequest(`${API_BASE_URL}/fact-check/file`, formData);
     return handleResponse<FactCheckResponse>(response);
   },
 
-  // Audio/Video transcription
+  // Audio/Video transcription (with optional authentication)
   async transcribeFile(
     file: File, 
     config: TranscriptionRequest = {}
@@ -105,14 +158,11 @@ export const truthCheckerApi = {
       formData.append('language', config.language);
     }
 
-    const response = await fetch(`${API_BASE_URL}/stt/transcribe`, {
-      method: 'POST',
-      body: formData,
-    });
+    const response = await makeAuthenticatedFormDataRequest(`${API_BASE_URL}/stt/transcribe`, formData);
     return handleResponse<TranscriptionResult>(response);
   },
 
-  // Audio/Video chunk processing for sequencer
+  // Audio/Video chunk processing for sequencer (with optional authentication)
   async transcribeAndFactCheckChunk(
     file: File,
     config: ChunkProcessingRequest = {}
@@ -136,25 +186,30 @@ export const truthCheckerApi = {
       formData.append('end_time', String(config.end_time));
     }
 
-    const response = await fetch(`${API_BASE_URL}/stt/transcribe-chunk`, {
+    const response = await makeAuthenticatedFormDataRequest(`${API_BASE_URL}/stt/transcribe-chunk`, formData);
+    return handleResponse<ChunkProcessingResponse>(response);
+  },
+
+  // Stream URL processing for live fact-checking (with optional authentication)
+  async processStreamSegment(
+    request: StreamProcessingRequest
+  ): Promise<ChunkProcessingResponse> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/stt/process-stream`, {
       method: 'POST',
-      body: formData,
+      body: JSON.stringify(request),
     });
     return handleResponse<ChunkProcessingResponse>(response);
   },
 
-  // Stream URL processing for live fact-checking
-  async processStreamSegment(
-    request: StreamProcessingRequest
-  ): Promise<ChunkProcessingResponse> {
-    const response = await fetch(`${API_BASE_URL}/stt/process-stream`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    });
-    return handleResponse<ChunkProcessingResponse>(response);
+  // User-specific API endpoints (requires authentication)
+  async getUserProfile(): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/me`);
+    return handleResponse<any>(response);
+  },
+
+  async getUserUsageStats(): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/usage-stats`);
+    return handleResponse<any>(response);
   },
 
   // WebSocket connections

@@ -218,3 +218,18 @@ export interface StreamData {
   type: StreamType;
   metadata?: StreamMetadata;
 } 
+
+// Re-export landing page types for convenience
+export type { 
+  HeroSectionProps,
+  FeatureItem,
+  ProcessStep,
+  TrustMetric,
+  FeaturesSectionProps,
+  HowItWorksSectionProps,
+  TrustSectionProps,
+  CTASectionProps,
+  GuestSession,
+  LandingPageProps,
+  LandingPageConfig
+} from './types/landing';
