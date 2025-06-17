@@ -219,6 +219,116 @@ export interface StreamData {
   metadata?: StreamMetadata;
 } 
 
+// Plans and Subscription Types
+export interface PlanConfig {
+  id: string;
+  name: string;
+  type: string;
+  pricing: {
+    monthly: number;
+    annual: number;
+    annual_discount: number;
+    currency: string;
+  };
+  limits: {
+    requests_per_month: number;
+    hours_per_month: number;
+  };
+  features: string[];
+  stripe_ids: {
+    monthly: string;
+    annual: string;
+  };
+}
+
+export interface UsageStats {
+  current_period: {
+    requests_used: number;
+    requests_limit: number;
+    hours_used: number;
+    hours_limit: number;
+    credits_remaining: number;
+  };
+  usage_percentage: {
+    requests: number;
+    hours: number;
+    credits: number;
+  };
+  plan_info: {
+    name: string;
+    tier: string;
+    billing_cycle: string;
+    next_reset: string | null;
+    currency: string;
+  };
+  recommendations: string[];
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url?: string;
+  plan: string;
+  credits_remaining: number;
+  subscription_status: string;
+  billing_cycle: string;
+  preferred_currency: string;
+  usage_percentage: {
+    requests: number;
+    hours: number;
+    credits: number;
+  };
+}
+
+export interface PlanComparisonResponse {
+  current_plan: {
+    name: string;
+    limits: {
+      requests: number;
+      hours: number;
+    };
+  };
+  upgrade_options: Array<{
+    plan_id: string;
+    name: string;
+    price_difference: number;
+    additional_features: string[];
+  }>;
+}
+
+export interface UpgradeResponse {
+  success: boolean;
+  checkout_url?: string;
+  message: string;
+}
+
+export interface UsagePermissionResponse {
+  can_perform: boolean;
+  reasons: {
+    has_credits: boolean;
+    within_request_limit: boolean;
+    within_hours_limit: boolean;
+    subscription_valid: boolean;
+  };
+  limits: {
+    credits_remaining: number;
+    requests_remaining: number;
+    hours_remaining: number;
+  };
+}
+
+export interface UsageTrackingResponse {
+  success: boolean;
+  usage_log_id?: string;
+  remaining_limits: {
+    credits_remaining: number;
+    requests_remaining: number;
+    hours_remaining: number;
+  };
+  error?: string;
+} 
+
 // Re-export landing page types for convenience
 export type { 
   HeroSectionProps,

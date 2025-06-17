@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,6 +25,7 @@ export function Header() {
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
   const [isLoadingHealth, setIsLoadingHealth] = useState(false);
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
   const { 
     isAuthenticated, 
     user, 
@@ -95,6 +97,19 @@ export function Header() {
     } catch (error) {
       console.error('Sign out failed:', error);
     }
+  };
+
+  const handleProfileClick = () => {
+    router.push('/profile');
+  };
+
+  const handleBillingClick = () => {
+    router.push('/plans');
+  };
+
+  const handleSettingsClick = () => {
+    // For now, redirect to profile until we have a dedicated settings page
+    router.push('/profile');
   };
 
   return (
@@ -172,15 +187,15 @@ export function Header() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleBillingClick}>
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Usage & Billing</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>

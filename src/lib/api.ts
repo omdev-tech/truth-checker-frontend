@@ -6,7 +6,11 @@ import {
   TranscriptionRequest,
   ChunkProcessingRequest,
   ChunkProcessingResponse,
-  StreamProcessingRequest 
+  StreamProcessingRequest,
+  UserProfile,
+  UsageStats,
+  PlanConfig,
+  UpgradeResponse
 } from './types';
 import { getSession } from 'next-auth/react';
 
@@ -202,13 +206,48 @@ export const truthCheckerApi = {
   },
 
   // User-specific API endpoints (requires authentication)
-  async getUserProfile(): Promise<any> {
+  async getUserProfile(): Promise<UserProfile> {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/me`);
+    return handleResponse<UserProfile>(response);
+  },
+
+  async getUserUsageStats(): Promise<UsageStats> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/usage-stats`);
+    return handleResponse<UsageStats>(response);
+  },
+
+  // Plans and subscription management
+  async getAvailablePlans(currency = 'EUR'): Promise<PlanConfig[]> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/plans?currency=${currency}`);
+    return handleResponse<PlanConfig[]>(response);
+  },
+
+  async getPlanComparison(currentPlan: string, currency = 'EUR'): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/plans/comparison?plan=${currentPlan}&currency=${currency}`);
     return handleResponse<any>(response);
   },
 
-  async getUserUsageStats(): Promise<any> {
-    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/usage-stats`);
+  async upgradePlan(planId: string, billingCycle: 'monthly' | 'annual'): Promise<UpgradeResponse> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/upgrade-plan`, {
+      method: 'POST',
+      body: JSON.stringify({ plan_id: planId, billing_cycle: billingCycle }),
+    });
+    return handleResponse<UpgradeResponse>(response);
+  },
+
+  async checkUsagePermission(action: string, creditsNeeded = 1, hoursNeeded = 0): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/usage/check`, {
+      method: 'POST',
+      body: JSON.stringify({ action, credits_needed: creditsNeeded, hours_needed: hoursNeeded }),
+    });
+    return handleResponse<any>(response);
+  },
+
+  async trackUsage(action: string, credits = 1, hours = 0, processingTime?: number): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/usage/track`, {
+      method: 'POST',
+      body: JSON.stringify({ action, credits, hours, processing_time: processingTime }),
+    });
     return handleResponse<any>(response);
   },
 
