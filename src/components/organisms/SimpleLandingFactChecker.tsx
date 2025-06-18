@@ -108,168 +108,175 @@ export function SimpleLandingFactChecker({
 
   return (
     <div className={`w-full max-w-2xl mx-auto ${className}`}>
-      <Card className="shadow-xl border-0 bg-gradient-to-br from-background via-background to-primary/5">
-        <CardContent className="p-6">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-primary/10 rounded-full text-sm text-primary font-medium">
-              <Sparkles className="w-4 h-4" />
-              Try AI Fact-Checking Free
-            </div>
-            <h3 className="text-xl font-bold mb-2">
-              Verify Any Claim Instantly
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              Enter any statement or claim below and see our AI fact-checker in action
-            </p>
-          </div>
-
-          {/* Fact Check Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Enter a claim to fact-check... e.g., 'The Earth is flat' or 'Vaccines cause autism'"
-                className="min-h-[100px] resize-none text-base"
-                maxLength={MAX_TEXT_LENGTH}
-                disabled={!hasUsageRemaining}
-              />
-              
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground">
-                  {text.length} / {MAX_TEXT_LENGTH} characters
-                </span>
-                <span className="text-primary font-medium">
-                  {usageStats?.remaining || 0} free fact-checks remaining
-                </span>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+      >
+        <Card className="shadow-xl border-0 bg-gradient-to-br from-background via-background to-primary/5">
+          <CardContent className="p-6">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-primary/10 rounded-full text-sm text-primary font-medium">
+                <Sparkles className="w-4 h-4" />
+                Try AI Fact-Checking Free
               </div>
+              <h3 className="text-xl font-bold mb-2">
+                Verify Any Claim Instantly
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Enter any statement or claim below and see our AI fact-checker in action
+              </p>
             </div>
 
-            <Button
-              type="submit"
-              disabled={!canSubmit}
-              className="w-full h-12 text-base font-semibold"
-              size="lg"
-            >
-              {isLoading ? (
-                <>
-                  <LoadingSpinner size="sm" className="mr-2" />
-                  Fact-Checking...
-                </>
-              ) : hasUsageRemaining ? (
-                <>
-                  <Search className="w-5 h-5 mr-2" />
-                  Fact-Check This Claim
-                </>
-              ) : (
-                <>
-                  Sign Up for Free Access
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </>
-              )}
-            </Button>
-          </form>
-
-          {/* Results */}
-          <AnimatePresence>
-            {results && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="mt-6 space-y-4"
-              >
-                <div className="border-t pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-lg">Verification Results</h4>
-                    <span className="text-sm text-muted-foreground">
-                      {results.results.length} result{results.results.length !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-
-                  {results.results.length === 0 ? (
-                    <div className="p-6 text-center bg-muted/30 rounded-lg">
-                      <p className="text-muted-foreground">
-                        No verifiable claims found in the provided text.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {results.results.slice(0, 2).map((result, index) => (
-                        <VerificationCard
-                          key={index}
-                          result={result}
-                          index={index}
-                        />
-                      ))}
-                      
-                      {results.results.length > 2 && (
-                        <div className="text-center p-3 bg-muted/20 rounded-lg">
-                          <p className="text-sm text-muted-foreground">
-                            + {results.results.length - 2} more results available in full app
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
+            {/* Fact Check Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Enter a claim to fact-check... e.g., 'The Earth is flat' or 'Vaccines cause autism'"
+                  className="min-h-[100px] resize-none text-base"
+                  maxLength={MAX_TEXT_LENGTH}
+                  disabled={!hasUsageRemaining}
+                />
+                
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground">
+                    {text.length} / {MAX_TEXT_LENGTH} characters
+                  </span>
+                  <span className="text-primary font-medium">
+                    {usageStats?.remaining || 0} free fact-checks remaining
+                  </span>
                 </div>
+              </div>
 
-                {/* Conversion CTA after showing results */}
+              <Button
+                type="submit"
+                disabled={!canSubmit}
+                className="w-full h-12 text-base font-semibold"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    Fact-Checking...
+                  </>
+                ) : hasUsageRemaining ? (
+                  <>
+                    <Search className="w-5 h-5 mr-2" />
+                    Fact-Check This Claim
+                  </>
+                ) : (
+                  <>
+                    Sign Up for Free Access
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            {/* Results */}
+            <AnimatePresence>
+              {results && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-lg p-6 text-center"
+                  exit={{ opacity: 0, y: -20 }}
+                  className="mt-6 space-y-4"
                 >
-                  <h4 className="font-bold text-lg mb-2">
-                    🎉 See how powerful AI fact-checking can be?
-                  </h4>
-                  <p className="text-muted-foreground mb-4 text-sm">
-                    Join thousands of users fighting misinformation with unlimited fact-checking, 
-                    audio/video analysis, and real-time verification.
-                  </p>
-                  <Button 
-                    onClick={handleSignUpAfterTrial}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90 font-semibold"
+                  <div className="border-t pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="font-semibold text-lg">Verification Results</h4>
+                      <span className="text-sm text-muted-foreground">
+                        {results.results.length} result{results.results.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+
+                    {results.results.length === 0 ? (
+                      <div className="p-6 text-center bg-muted/30 rounded-lg">
+                        <p className="text-muted-foreground">
+                          No verifiable claims found in the provided text.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {results.results.slice(0, 2).map((result, index) => (
+                          <VerificationCard
+                            key={index}
+                            result={result}
+                            index={index}
+                          />
+                        ))}
+                        
+                        {results.results.length > 2 && (
+                          <div className="text-center p-3 bg-muted/20 rounded-lg">
+                            <p className="text-sm text-muted-foreground">
+                              + {results.results.length - 2} more results available in full app
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Conversion CTA after showing results */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-lg p-6 text-center"
                   >
-                    Get Full Access - Sign Up Free
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    No credit card required • Instant access • Cancel anytime
-                  </p>
+                    <h4 className="font-bold text-lg mb-2">
+                      🎉 See how powerful AI fact-checking can be?
+                    </h4>
+                    <p className="text-muted-foreground mb-4 text-sm">
+                      Join thousands of users fighting misinformation with unlimited fact-checking, 
+                      audio/video analysis, and real-time verification.
+                    </p>
+                    <Button 
+                      onClick={handleSignUpAfterTrial}
+                      size="lg"
+                      className="bg-primary hover:bg-primary/90 font-semibold"
+                    >
+                      Get Full Access - Sign Up Free
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      No credit card required • Instant access • Cancel anytime
+                    </p>
+                  </motion.div>
                 </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Usage exhausted state */}
+            {!hasUsageRemaining && !results && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6 text-center"
+              >
+                <h4 className="font-semibold text-lg mb-2">
+                  You've tried all your free fact-checks!
+                </h4>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Ready to unlock unlimited AI-powered fact-checking?
+                </p>
+                <Button 
+                  onClick={handleSignUpAfterTrial}
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Sign Up Free - Unlimited Access
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               </motion.div>
             )}
-          </AnimatePresence>
-
-          {/* Usage exhausted state */}
-          {!hasUsageRemaining && !results && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-6 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6 text-center"
-            >
-              <h4 className="font-semibold text-lg mb-2">
-                You've tried all your free fact-checks!
-              </h4>
-              <p className="text-muted-foreground mb-4 text-sm">
-                Ready to unlock unlimited AI-powered fact-checking?
-              </p>
-              <Button 
-                onClick={handleSignUpAfterTrial}
-                size="lg"
-                className="bg-primary hover:bg-primary/90"
-              >
-                Sign Up Free - Unlimited Access
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </motion.div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 } 

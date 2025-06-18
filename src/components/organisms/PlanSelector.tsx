@@ -15,12 +15,14 @@ interface PlanSelectorProps {
   currentPlan?: string;
   onPlanSelect?: (planId: string, billingCycle: 'monthly' | 'annual') => void;
   className?: string;
+  earlyDevelopmentDiscount?: number;
 }
 
 export const PlanSelector: React.FC<PlanSelectorProps> = ({
   currentPlan,
   onPlanSelect,
   className,
+  earlyDevelopmentDiscount = 0,
 }) => {
   const [plans, setPlans] = useState<PlanConfig[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,6 +158,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
                 billingCycle={billingCycle}
                 onUpgrade={() => handlePlanUpgrade(plan.id)}
                 upgrading={upgradingPlan === plan.id}
+                earlyDevelopmentDiscount={earlyDevelopmentDiscount}
               />
             ))}
           </div>
@@ -168,6 +171,11 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
             <p className="text-sm text-muted-foreground">
               Upgrade or downgrade at any time. Unused credits don't expire.
             </p>
+            {earlyDevelopmentDiscount > 0 && (
+              <p className="text-sm text-orange-600 font-medium">
+                🎉 Early adopter pricing - Save {earlyDevelopmentDiscount}% on all plans!
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

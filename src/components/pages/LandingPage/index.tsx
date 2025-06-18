@@ -26,7 +26,14 @@ export function LandingPage({ className }: LandingPageProps) {
 
   // Handle different CTA actions
   const handleTryDemo = useCallback(() => {
-    setShowGuestModal(true);
+    // Scroll to the fact checking section instead of opening modal
+    const factCheckSection = document.getElementById('fact-check-demo');
+    if (factCheckSection) {
+      factCheckSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
   }, []);
 
   const handleSignUp = useCallback(async () => {
@@ -83,8 +90,6 @@ export function LandingPage({ className }: LandingPageProps) {
     }
   }, []);
 
-
-
   const closeGuestModal = useCallback(() => {
     setShowGuestModal(false);
   }, []);
@@ -118,7 +123,10 @@ export function LandingPage({ className }: LandingPageProps) {
         />
 
         {/* Simple Landing Fact Checker */}
-        <section className="py-16 bg-gradient-to-br from-background via-background to-muted/20">
+        <section 
+          id="fact-check-demo"
+          className="py-16 bg-gradient-to-br from-background via-background to-muted/20"
+        >
           <div className="container mx-auto px-4">
             <SimpleLandingFactChecker onSignUpClick={handleSignUp} />
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,7 +17,7 @@ import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { useAuth } from '@/hooks/useAuth';
 import { truthCheckerApi } from '@/lib/api';
 import { HealthStatus } from '@/lib/types';
-import { Shield, Sun, Moon, Activity, User, LogOut, Settings, CreditCard } from 'lucide-react';
+import { Shield, Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 
@@ -26,6 +26,7 @@ export function Header() {
   const [isLoadingHealth, setIsLoadingHealth] = useState(false);
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
   const { 
     isAuthenticated, 
     user, 
@@ -73,18 +74,36 @@ export function Header() {
       );
     }
 
+    // If we receive a health response, the server is online
+    // Provider initialization status should not affect the server health indicator
+    const hasAnyProviders = [
+      ...Object.values(healthStatus.ai_providers),
+      ...Object.values(healthStatus.mcp_providers)
+    ].some(Boolean);
+
     const allProvidersHealthy = [
       ...Object.values(healthStatus.ai_providers),
       ...Object.values(healthStatus.mcp_providers)
     ].every(Boolean);
 
+    // Show "Online" if server responds (regardless of provider status)
+    // Show "Partial" only if server is responding but some providers are initialized and others aren't
+    // This provides more meaningful status information
+    const statusVariant = allProvidersHealthy ? "default" : "secondary";
+    const statusText = hasAnyProviders && !allProvidersHealthy ? "Partial" : "Online";
+    const statusClass = allProvidersHealthy 
+      ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
+      : hasAnyProviders 
+        ? 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800'
+        : 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
+
     return (
       <Badge 
-        variant={allProvidersHealthy ? "default" : "secondary"} 
-        className={`gap-1 ${allProvidersHealthy ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' : ''}`}
+        variant={statusVariant} 
+        className={`gap-1 ${statusClass}`}
       >
         <Activity className="w-3 h-3" />
-        {allProvidersHealthy ? 'Online' : 'Partial'}
+        {statusText}
       </Badge>
     );
   };
@@ -103,14 +122,16 @@ export function Header() {
     router.push('/profile');
   };
 
-  const handleBillingClick = () => {
+  const handlePlansClick = () => {
     router.push('/plans');
   };
 
-  const handleSettingsClick = () => {
-    // For now, redirect to profile until we have a dedicated settings page
-    router.push('/profile');
+  const handleBackToApp = () => {
+    router.push('/app');
   };
+
+  // Check if we're on a secondary page that should show "Back to App"
+  const isOnSecondaryPage = pathname === '/profile' || pathname === '/plans';
 
   return (
     <motion.header 
@@ -123,7 +144,8 @@ export function Header() {
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-3"
+          className={`flex items-center gap-3 ${isOnSecondaryPage ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+          onClick={isOnSecondaryPage ? handleBackToApp : undefined}
         >
           <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
             <Shield className="w-6 h-6 text-primary" />
@@ -142,6 +164,31 @@ export function Header() {
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-3"
         >
+          {/* Back to App Button */}
+          {isAuthenticated && isOnSecondaryPage && (
+            <>
+              {/* Desktop version */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBackToApp}
+                className="hidden sm:flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to App
+              </Button>
+              {/* Mobile version */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackToApp}
+                className="sm:hidden p-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+
           {/* Health Status */}
           <div className="hidden sm:flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Status:</span>
@@ -191,13 +238,9 @@ export function Header() {
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer" onClick={handleBillingClick}>
+                    <DropdownMenuItem className="cursor-pointer" onClick={handlePlansClick}>
                       <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Usage & Billing</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Settings</span>
+                      <span>Plans</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 

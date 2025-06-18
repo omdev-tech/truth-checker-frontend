@@ -216,6 +216,11 @@ export const truthCheckerApi = {
     return handleResponse<UsageStats>(response);
   },
 
+  async getUserUsageHistory(days: number = 30): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/usage/history?days=${days}`);
+    return handleResponse<any>(response);
+  },
+
   // Plans and subscription management
   async getAvailablePlans(currency = 'EUR'): Promise<PlanConfig[]> {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/plans?currency=${currency}`);
