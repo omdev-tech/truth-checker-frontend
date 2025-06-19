@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Menu, X } from 'lucide-react';
 import { NAVIGATION_CONFIG } from '@/lib/config/landing';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/atoms/Logo';
 
 interface LandingNavigationProps {
   onSignIn: () => void;
@@ -46,8 +47,10 @@ export function LandingNavigation({
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <Search className="h-6 w-6 text-primary" />
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg overflow-hidden">
+              <Logo width={32} height={32} priority className="w-full h-full" />
+            </div>
             <span className="text-xl font-bold text-foreground">
               {NAVIGATION_CONFIG.logo.text}
             </span>

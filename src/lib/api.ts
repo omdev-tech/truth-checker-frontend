@@ -10,7 +10,10 @@ import {
   UserProfile,
   UsageStats,
   PlanConfig,
-  UpgradeResponse
+  UpgradeResponse,
+  FactCheckHistoryResponse,
+  SessionDetailsResponse,
+  HistoryFilters
 } from './types';
 import { getSession } from 'next-auth/react';
 
@@ -256,6 +259,34 @@ export const truthCheckerApi = {
     return handleResponse<any>(response);
   },
 
+  // Fact-Check History API methods
+  async getFactCheckHistory(filters: HistoryFilters = {}): Promise<FactCheckHistoryResponse> {
+    const params = new URLSearchParams();
+    
+    if (filters.limit) params.append('limit', filters.limit.toString());
+    if (filters.offset) params.append('offset', filters.offset.toString());
+    if (filters.source_type_filter) params.append('source_type_filter', filters.source_type_filter);
+    if (filters.status_filter) params.append('status_filter', filters.status_filter);
+    if (filters.date_from) params.append('date_from', filters.date_from);
+    if (filters.date_to) params.append('date_to', filters.date_to);
+    
+    const queryString = params.toString();
+    const url = `${API_BASE_URL}/api/users/fact-check-history${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await makeAuthenticatedRequest(url);
+    return handleResponse<FactCheckHistoryResponse>(response);
+  },
+
+  async getSessionDetails(sessionId: string): Promise<SessionDetailsResponse> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/fact-check-history/sessions/${sessionId}`);
+    return handleResponse<SessionDetailsResponse>(response);
+  },
+
+  async getFactCheckStatistics(): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/fact-check-history/statistics`);
+    return handleResponse<any>(response);
+  },
+
   // WebSocket connections
   createFactCheckWebSocket(): WebSocket {
     const wsUrl = API_BASE_URL.replace(/^http/, 'ws');
@@ -303,14 +334,4 @@ export async function getVideoInfo(request: StreamProcessingRequest): Promise<Vi
   return handleResponse<VideoInfo>(response);
 }
 
-export async function processStreamSegment(request: StreamProcessingRequest): Promise<ChunkProcessingResponse> {
-  const response = await fetch(`${API_BASE_URL}/stt/process-stream`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  });
-
-  return handleResponse<ChunkProcessingResponse>(response);
-} 
+ 

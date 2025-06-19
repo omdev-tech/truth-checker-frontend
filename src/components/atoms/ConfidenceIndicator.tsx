@@ -19,7 +19,7 @@ export function ConfidenceIndicator({
   return (
     <div className={cn('space-y-1', className)}>
       {showLabel && (
-        <div className="flex justify-between items-center text-sm">
+        <div className="flex justify-between items-center text-sm gap-2">
           <span className="text-muted-foreground">Confidence</span>
           <span className={cn('font-medium', config.color)}>
             {config.label}

@@ -323,7 +323,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                 <div className="text-2xl font-bold text-purple-600">
                   {data.summary.total_hours.toFixed(1)}h
                 </div>
-                <div className="text-xs text-muted-foreground">Total Hours</div>
+                <div className="text-xs text-muted-foreground">Hours Consumed</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-orange-600">

@@ -17,9 +17,10 @@ import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { useAuth } from '@/hooks/useAuth';
 import { truthCheckerApi } from '@/lib/api';
 import { HealthStatus } from '@/lib/types';
-import { Shield, Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft } from 'lucide-react';
+import { Shield, Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft, FileText } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
+import { Logo } from '@/components/atoms/Logo';
 
 export function Header() {
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
@@ -126,6 +127,10 @@ export function Header() {
     router.push('/plans');
   };
 
+  const handleHistoryClick = () => {
+    router.push('/history');
+  };
+
   const handleBackToApp = () => {
     router.push('/app');
   };
@@ -147,8 +152,8 @@ export function Header() {
           className={`flex items-center gap-3 ${isOnSecondaryPage ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
           onClick={isOnSecondaryPage ? handleBackToApp : undefined}
         >
-          <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
-            <Shield className="w-6 h-6 text-primary" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden">
+            <Logo width={40} height={40} priority className="w-full h-full" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">TruthChecker</h1>
@@ -237,6 +242,10 @@ export function Header() {
                     <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer" onClick={handleHistoryClick}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>History</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer" onClick={handlePlansClick}>
                       <CreditCard className="mr-2 h-4 w-4" />

@@ -329,6 +329,76 @@ export interface UsageTrackingResponse {
   error?: string;
 } 
 
+// Fact-Check History Types
+export interface FactCheckClaim {
+  id: string;
+  session_id: string;
+  claim_text: string;
+  original_input: string;
+  source_type: 'text_prompt' | 'media_file' | 'live_stream' | 'live_recording';
+  verification_status: 'true' | 'false' | 'partially_true' | 'misleading' | 'unverifiable' | 'disputed';
+  confidence_level: 'high' | 'medium' | 'low' | 'insufficient';
+  explanation: string;
+  sources_used: string[];
+  metadata: Record<string, string>;
+  processing_time_seconds?: number;
+  file_size_mb?: number;
+  created_at: string;
+  verified_at: string;
+}
+
+export interface FactCheckSession {
+  id: string;
+  user_id: string;
+  title: string;
+  source_type: 'text_prompt' | 'media_file' | 'live_stream' | 'live_recording';
+  total_claims: number;
+  verified_claims: number;
+  true_claims: number;
+  false_claims: number;
+  partially_true_claims: number;
+  misleading_claims: number;
+  unverifiable_claims: number;
+  disputed_claims: number;
+  total_processing_time_seconds?: number;
+  original_file_name?: string;
+  original_file_size_mb?: number;
+  stream_url?: string;
+  metadata: Record<string, string>;
+  accuracy_percentage: number;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}
+
+export interface FactCheckHistoryResponse {
+  sessions: FactCheckSession[];
+  claims: FactCheckClaim[];
+  statistics: {
+    total_sessions: number;
+    total_claims: number;
+    total_processing_time_seconds: number;
+    average_processing_time_per_claim: number;
+    status_breakdown: Record<string, number>;
+    source_type_breakdown: Record<string, number>;
+  };
+}
+
+export interface SessionDetailsResponse {
+  session: FactCheckSession;
+  claims: FactCheckClaim[];
+}
+
+export interface HistoryFilters {
+  limit?: number;
+  offset?: number;
+  source_type_filter?: string;
+  status_filter?: string;
+  date_from?: string;
+  date_to?: string;
+} 
+
 // Re-export landing page types for convenience
 export type { 
   HeroSectionProps,

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { DashboardState, EnhancedSegmentData, ChunkProcessingResponse, StreamData } from '@/lib/types';
-import { truthCheckerApi, getVideoInfo, processStreamSegment, VideoInfo } from '@/lib/api';
+import { truthCheckerApi, getVideoInfo, VideoInfo } from '@/lib/api';
 import { CONFIG } from '@/lib/config';
 import UploadScreen from './UploadScreen';
 import AnalysisScreen from './AnalysisScreen';
@@ -798,7 +798,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         console.log('🔗 CALLING BACKEND STREAM PROCESSING');
         
         const apiCallStart = Date.now();
-        const result: ChunkProcessingResponse = await processStreamSegment({
+        const result: ChunkProcessingResponse = await truthCheckerApi.processStreamSegment({
           url: state.streamData.url,
           stream_type: state.streamData.type,
           start_time: processStartTime, // 0 for live, actual time for regular videos

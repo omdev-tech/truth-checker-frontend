@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,14 +11,199 @@ import { useGuestSession } from '@/hooks/useGuestSession';
 import { truthCheckerApi } from '@/lib/api';
 import { FactCheckResponse } from '@/lib/types';
 import { MAX_TEXT_LENGTH } from '@/lib/constants';
-import { Search, Wand2, AlertTriangle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Wand2, AlertTriangle, CheckCircle, Clock, Database, Brain, Shield, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+
+// Processing steps for engaging loading experience
+const PROCESSING_STEPS = [
+  {
+    id: 1,
+    title: "Extracting Claims",
+    description: "Identifying verifiable statements using NLP",
+    icon: Brain,
+    duration: 2500
+  },
+  {
+    id: 2,
+    title: "Accessing Data Sources",
+    description: "Connecting to 50+ trusted databases",
+    icon: Database,
+    duration: 3000
+  },
+  {
+    id: 3,
+    title: "Cross-Referencing Evidence",
+    description: "Analyzing credibility across multiple sources",
+    icon: Shield,
+    duration: 3000
+  },
+  {
+    id: 4,
+    title: "AI Reasoning Analysis",
+    description: "Applying advanced logic verification",
+    icon: Zap,
+    duration: 2500
+  },
+  {
+    id: 5,
+    title: "Generating Results",
+    description: "Compiling comprehensive fact-check report",
+    icon: CheckCircle,
+    duration: 1500
+  }
+];
+
+interface ProcessingStepDisplayProps {
+  isVisible: boolean;
+  onComplete?: () => void;
+}
+
+function ProcessingStepDisplay({ isVisible, onComplete }: ProcessingStepDisplayProps) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setCurrentStep(0);
+      setCompletedSteps([]);
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout;
+    let stepIndex = 0;
+
+    const progressToNextStep = () => {
+      if (stepIndex < PROCESSING_STEPS.length) {
+        setCurrentStep(stepIndex);
+        
+        timeoutId = setTimeout(() => {
+          setCompletedSteps(prev => [...prev, stepIndex]);
+          stepIndex++;
+          
+          if (stepIndex < PROCESSING_STEPS.length) {
+            progressToNextStep();
+          } else if (onComplete) {
+            setTimeout(onComplete, 500);
+          }
+        }, PROCESSING_STEPS[stepIndex].duration);
+      }
+    };
+
+    progressToNextStep();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isVisible, onComplete]);
+
+  if (!isVisible) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="mt-6 space-y-4"
+    >
+      <div className="border border-primary/20 rounded-lg p-6 bg-gradient-to-br from-primary/5 to-primary/10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+            <LoadingSpinner size="sm" className="text-primary" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-lg">AI Fact-Checking in Progress</h4>
+            <p className="text-sm text-muted-foreground">
+              Advanced verification using multiple data sources
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {PROCESSING_STEPS.map((step, index) => {
+            const isActive = currentStep === index;
+            const isCompleted = completedSteps.includes(index);
+            const isPending = index > currentStep;
+            const Icon = step.icon;
+
+            return (
+              <motion.div
+                key={step.id}
+                initial={{ opacity: 0.3 }}
+                animate={{
+                  opacity: isPending ? 0.4 : 1,
+                  scale: isActive ? 1.02 : 1
+                }}
+                transition={{ duration: 0.3 }}
+                className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-primary/10 border border-primary/30' 
+                    : isCompleted 
+                    ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800' 
+                    : 'bg-muted/30'
+                }`}
+              >
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                  isCompleted 
+                    ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
+                    : isActive 
+                    ? 'bg-primary/20 text-primary' 
+                    : 'bg-muted text-muted-foreground'
+                }`}>
+                  {isCompleted ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : isActive ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    <Icon className="w-5 h-5" />
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h5 className={`font-medium transition-colors duration-300 ${
+                      isCompleted 
+                        ? 'text-green-700 dark:text-green-300' 
+                        : isActive 
+                        ? 'text-primary' 
+                        : 'text-foreground'
+                    }`}>
+                      {step.title}
+                    </h5>
+                    {isActive && (
+                      <Clock className="w-4 h-4 text-primary animate-pulse" />
+                    )}
+                  </div>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isCompleted 
+                      ? 'text-green-600 dark:text-green-400' 
+                      : isActive 
+                      ? 'text-primary/80' 
+                      : 'text-muted-foreground'
+                  }`}>
+                    {step.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+            💡 This comprehensive analysis typically takes 10-15 seconds for accuracy
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function TextFactChecker() {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<FactCheckResponse | null>(null);
+  const [showProcessing, setShowProcessing] = useState(false);
   
   const { isAuthenticated } = useAuth();
   const { 
@@ -65,19 +250,28 @@ export function TextFactChecker() {
     }
 
     setIsLoading(true);
+    setShowProcessing(true);
+    setResults(null); // Clear previous results
+    
     try {
       const response = await truthCheckerApi.checkText({
         text: text.trim(),
         language: 'en',
       });
-      setResults(response);
       
-      if (isAuthenticated) {
-        toast.success('Fact-check completed!');
-      }
+      // Wait for processing animation to complete before showing results
+      setTimeout(() => {
+        setResults(response);
+        setShowProcessing(false);
+        
+        if (isAuthenticated) {
+          toast.success('Fact-check completed!');
+        }
+      }, 500);
     } catch (error) {
       console.error('Fact-check error:', error);
       toast.error('Failed to fact-check text. Please try again.');
+      setShowProcessing(false);
       
       // If API call failed and we're a guest user, refund the credit
       if (!isAuthenticated) {
@@ -140,7 +334,7 @@ export function TextFactChecker() {
                 placeholder="Enter any statement, claim, or information you'd like to verify..."
                 className="min-h-[120px] resize-none"
                 maxLength={MAX_TEXT_LENGTH}
-                disabled={!isAuthenticated && !hasUsageRemaining}
+                disabled={(!isAuthenticated && !hasUsageRemaining) || isLoading}
               />
               <div className="flex justify-between items-center text-xs text-muted-foreground">
                 <span>
@@ -169,7 +363,7 @@ export function TextFactChecker() {
                 {isLoading ? (
                   <>
                     <LoadingSpinner size="sm" className="mr-2" />
-                    Checking Facts...
+                    Processing with AI...
                   </>
                 ) : (
                   <>
@@ -196,10 +390,19 @@ export function TextFactChecker() {
               )}
             </div>
           </form>
+
+          {/* Processing Steps Display */}
+          <ProcessingStepDisplay 
+            isVisible={showProcessing}
+            onComplete={() => {
+              // Processing animation completed, results should be ready
+            }}
+          />
         </CardContent>
       </Card>
 
-      {results && (
+      {/* Results */}
+      {results && !showProcessing && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -233,29 +436,30 @@ export function TextFactChecker() {
           )}
 
           {/* Guest upgrade prompt after results */}
-          {!isAuthenticated && shouldShowUpgradePrompt && (
+          {!isAuthenticated && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-6"
+              transition={{ delay: 0.5 }}
+              className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-lg p-6 text-center"
             >
-              <Card className="border-primary/20 bg-primary/5">
-                <CardContent className="p-6 text-center">
-                  <h3 className="font-semibold text-lg mb-2">
-                    Unlock Unlimited Fact-Checking
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    You've experienced our AI-powered fact-checking. Sign up for free to get unlimited access!
-                  </p>
-                  <Button 
-                    onClick={() => window.location.href = '/'}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    Sign Up Free - No Credit Card Required
-                  </Button>
-                </CardContent>
-              </Card>
+              <h3 className="font-bold text-lg mb-2">
+                🚀 Want unlimited fact-checking?
+              </h3>
+              <p className="text-muted-foreground mb-4 text-sm">
+                Join thousands fighting misinformation with unlimited access, 
+                audio/video analysis, and priority support.
+              </p>
+              <Button 
+                onClick={() => window.location.href = '/'}
+                size="lg"
+                className="bg-primary hover:bg-primary/90 font-semibold"
+              >
+                Sign Up Free - Unlimited Access
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                No credit card required • Instant access • Cancel anytime
+              </p>
             </motion.div>
           )}
         </motion.div>
