@@ -41,10 +41,10 @@ export function Logo({
     );
   }
 
-  // Future-ready: When truth_logo_darktheme.png is added, this will automatically switch
-  // For now, both themes use the light logo (black on transparent)
+  // Use appropriate logo for each theme
+  // Light theme: black logo, Dark theme: white logo
   const logoSrc = resolvedTheme === 'dark' 
-    ? '/truth_logo_lightTheme.png' // Will be '/truth_logo_darktheme.png' when available
+    ? '/truth_logo_darkTheme.png'
     : '/truth_logo_lightTheme.png';
 
   return (
