@@ -1,0 +1,433 @@
+{
+  "title": "Tableau de bord",
+  "subtitle": "Aperçu de votre activité de vérification des faits et des informations",
+  "overview": {
+    "title": "Aperçu",
+    "thisMonth": "Ce mois",
+    "allTime": "Depuis le début",
+    "lastUpdated": "Dernière mise à jour : {{time}}"
+  },
+  "stats": {
+    "factsChecked": "Faits vérifiés",
+    "accuracy": "Taux de précision", 
+    "timesSaved": "Temps économisé",
+    "sourcesUsed": "Sources utilisées",
+    "requestsUsed": "Requêtes utilisées",
+    "hoursProcessed": "Heures traitées",
+    "remainingRequests": "Requêtes restantes",
+    "remainingHours": "Heures restantes",
+    "unlimited": "Illimité"
+  },
+  "recentActivity": {
+    "title": "Activité récente",
+    "noActivity": "Aucune activité récente",
+    "viewAll": "Voir tout l'historique"
+  },
+  "quickActions": {
+    "title": "Actions rapides",
+    "newFactCheck": "Nouvelle vérification",
+    "uploadFile": "Téléverser un fichier",
+    "viewHistory": "Voir l'historique",
+    "managePlans": "Gérer les plans"
+  },
+  "profile": {
+    "title": "Profil",
+    "loading": "Chargement du profil...",
+    "loadingUsage": "Chargement des statistiques d'utilisation...",
+    "loginRequired": "Veuillez vous connecter pour voir votre profil.",
+    "loadError": "Échec du chargement du profil",
+    "paymentSuccess": "🎉 Paiement réussi ! Votre plan a été mis à niveau. Actualisation de votre profil...",
+    "memberSince": "Membre depuis {{date}}",
+    "currentPlan": "Plan actuel : {{plan}}",
+    "accountStatus": "Statut du compte",
+    "statusActive": "Actif",
+    "quickActions": "Actions rapides",
+    "exportData": "Exporter les données",
+    "upgradePlan": "Mettre à niveau le plan",
+    "statistics": {
+      "title": "Statistiques du compte",
+      "requestsThisMonth": "Requêtes ce mois",
+      "hoursProcessed": "Heures traitées"
+    },
+    "billing": {
+      "title": "Informations de facturation",
+      "currentPlan": "Plan actuel",
+      "billingCycle": "Cycle de facturation",
+      "nextReset": "Prochaine réinitialisation",
+      "currency": "Devise",
+      "viewHistory": "Voir l'historique de facturation"
+    }
+  },
+  "history": {
+    "title": "Historique de vérification",
+    "subtitle": "Consultez vos sessions de vérification passées et leurs résultats",
+    "loading": "Chargement de votre historique...",
+    "search": "Rechercher des vérifications...",
+    "filter": "Filtrer",
+    "views": {
+      "title": "Vue",
+      "sessions": "Sessions",
+      "claims": "Affirmations"
+    },
+    "filters": {
+      "sourceType": "Type de source",
+      "verificationStatus": "Statut de vérification"
+    },
+    "empty": {
+      "title": "Aucun historique pour l'instant",
+      "description": "Commencez à vérifier des faits pour construire votre historique et suivre votre précision au fil du temps.",
+      "startButton": "Commencer la vérification"
+    },
+    "stats": {
+      "totalSessions": "Sessions totales",
+      "claimsProcessed": "{{count}} affirmations traitées",
+      "processingTime": "Temps de traitement",
+      "averagePerClaim": "Moy : {{avg}} par affirmation",
+      "accuracyTrends": "Tendances de précision",
+      "sourceTypes": "Types de sources"
+    }
+  },
+  "usage": {
+    "title": "Aperçu d'utilisation",
+    "period": {
+      "week": "Semaine",
+      "month": "Mois", 
+      "year": "Année"
+    },
+    "metrics": {
+      "requests": "Requêtes",
+      "hours": "Heures",
+      "accuracy": "Précision"
+    },
+    "creditsRemaining": "Crédits restants",
+    "ofTotal": "sur {{total}}",
+    "recommendations": "Recommandations",
+    "recommendationMessages": {
+      "upgradeHighUsage": "Envisagez de mettre à niveau votre plan - vous utilisez plus de 80% de vos requêtes mensuelles",
+      "upgradeToPaid": "Passez à un plan payant pour des capacités de vérification des faits illimitées"
+    }
+  },
+  "statistics": {
+    "title": "Statistiques",
+    "totalChecks": "Vérifications totales",
+    "accuracyAverage": "Précision moyenne",
+    "processingTimeAverage": "Temps de traitement moyen",
+    "claimsVerified": "Affirmations vérifiées",
+    "thisMonth": "Ce mois-ci",
+    "lastMonth": "Le mois dernier",
+    "improvement": "{{percent}}% d'amélioration"
+  },
+  "currentPlan": {
+    "title": "Plan actuel",
+    "usage": "Utilisation",
+    "requestsUsed": "{{used}}/{{limit}} requêtes",
+    "hoursUsed": "{{used}}/{{limit}} heures",
+    "upgrade": "Mettre à niveau le plan",
+    "managePlan": "Gérer le plan"
+  },
+  "processing": {
+    "title": "File de traitement",
+    "noProcessing": "Aucun élément en traitement",
+    "item": "{{filename}} - {{status}}",
+    "eta": "ETA : {{time}}",
+    "startLiveStream": "Démarrage de la vérification en direct...",
+    "startAnalysis": "Démarrage de l'analyse de vérification...",
+    "segmentCreationFailed": "Échec de la création des segments",
+    "failed": "Échec du traitement de {{time}}"
+  },
+  "tabs": {
+    "text": "Texte",
+    "media": "Média",
+    "stream": "Stream",
+    "live": "Direct"
+  },
+  "textAnalysis": "Analyse de texte",
+  "mediaUpload": "Téléchargement de média",
+  "liveStreams": "Streams en direct",
+  "liveRecording": "Enregistrement en direct",
+  "analytics": {
+    "title": "Analyses d'Utilisation",
+    "loading": "Chargement des analyses...",
+    "loadError": "Échec du chargement des données d'analyse",
+    "noData": "Aucune donnée disponible",
+    "period": {
+      "sevenDays": "7 Jours",
+      "thirtyDays": "30 Jours",
+      "ninetyDays": "90 Jours"
+    },
+    "tabs": {
+      "timeline": "Chronologie d'Utilisation",
+      "breakdown": "Répartition des Actions",
+      "performance": "Performance"
+    },
+    "chart": {
+      "requests": "Requêtes",
+      "credits": "Crédits",
+      "dailyRequests": "Requêtes Quotidiennes",
+      "creditsUsed": "Crédits Utilisés",
+      "count": "Nombre",
+      "avgProcessingTime": "Temps de Traitement Moyen",
+      "hoursUsed": "Heures Utilisées",
+      "processingTimeSeconds": "Temps de Traitement (s)"
+    },
+    "charts": {
+      "actionsByCount": "Actions par Nombre",
+      "creditsByAction": "Crédits par Type d'Action"
+    },
+    "summary": {
+      "totalRequests": "Requêtes Totales",
+      "hoursConsumed": "Heures Consommées",
+      "avgProcessing": "Traitement Moyen",
+      "topAction": "Action Principale"
+    }
+  },
+  "upload": {
+    "success": "{{mediaType}} téléversé avec succès !",
+    "failed": "Échec du traitement du fichier téléversé",
+    "invalidFileType": "Veuillez téléverser un fichier vidéo ou audio",
+    "title": "Studio de vérification vidéo",
+    "subtitle": "Téléversez votre contenu vidéo ou audio et obtenez une analyse de vérification en temps réel avec des contrôles de timeline professionnels et une vérification détaillée des affirmations.",
+    "aiPowered": "Vérification IA des faits",
+    "processing": "Traitement de votre fichier...",
+    "preparingAnalysis": "Création des segments et préparation de l'analyse",
+    "dropZoneTitle": "Déposez votre fichier média ici",
+    "dropZoneSubtitle": "ou cliquez pour parcourir et sélectionner un fichier vidéo ou audio",
+    "chooseFile": "Choisir un fichier",
+    "supportedFormats": "Formats supportés : MP4, AVI, MOV, WebM, MP3, WAV, M4A",
+    "maxFileSize": "Taille de fichier maximale : 500 MB",
+    "features": {
+      "timeline": {
+        "title": "Timeline professionnelle",
+        "description": "Timeline de style éditeur vidéo avec miniatures de segments et mises à jour de statut en temps réel"
+      },
+      "analysis": {
+        "title": "Analyse IA",
+        "description": "Vérification avancée des faits avec scores de confiance et explications détaillées"
+      },
+      "formats": {
+        "title": "Support multi-formats",
+        "description": "Fonctionne avec tous les formats vidéo et audio populaires avec transcription automatique"
+      }
+    }
+  },
+  "stream": {
+    "connected": "Connecté au flux {{type}} !",
+    "connectionFailed": "Échec de la connexion au flux"
+  },
+  "mediaTypes": {
+    "video": "Vidéo",
+    "audio": "Audio"
+  },
+  "hero": {
+    "poweredBy": "Alimenté par l'IA de nouvelle génération",
+    "title": "Débusquez les fake news instantanément",
+    "subtitle": "Notre service de fact checking IA analyse en temps réel vos textes, documents, audio et flux live pour démêler le vrai du faux avec des sources de référence."
+  },
+  "features": {
+    "title": "Un arsenal complet contre la désinformation",
+    "subtitle": "L'intelligence artificielle de pointe rencontre la rigueur journalistique pour un fact checking exhaustif sur tous vos contenus.",
+    "cta": "Prêt à découvrir la puissance du fact checking IA ?",
+    "tryNow": "Testez gratuitement dès maintenant",
+    "learnMore": "En savoir plus",
+    "textAnalysis": {
+      "title": "Analyse textuelle", 
+      "description": "Vérifiez instantanément n'importe quelle affirmation avec notre IA d'analyse textuelle",
+      "benefits": [
+        "Analyse de documents textuels",
+        "Transcription audio et vérification",
+        "Fact checking de contenus vidéo",
+        "Surveillance de flux en temps réel"
+      ]
+    },
+    "mediaUpload": {
+      "title": "Upload de contenus",
+      "description": "Uploadez vos fichiers audio et vidéo pour un fact checking complet et détaillé",
+      "benefits": [
+        "Temps de réponse ultra-rapides",
+        "Surveillance de flux live",
+        "Traitement par lots supporté",
+        "Notifications temps réel"
+      ]
+    },
+    "liveStreams": {
+      "title": "Flux en direct",
+      "description": "Fact checking en temps réel sur YouTube, Twitch et autres plateformes live",
+      "benefits": [
+        "Citations de sources crédibles",
+        "Transparence méthodologique",
+        "Scoring de confiance",
+        "Traçabilité d'audit"
+      ]
+    },
+    "liveRecording": {
+      "title": "Enregistrement live", 
+      "description": "Capturez l'audio en direct avec transcription instantanée et fact checking immédiat",
+      "benefits": [
+        "Vérification basée sur les preuves",
+        "Méthodes peer-reviewed",
+        "Algorithmes de détection de biais",
+        "Amélioration continue des modèles"
+      ]
+    }
+  },
+  "howItWorks": {
+    "title": "Comment ça fonctionne",
+    "subtitle": "Obtenez vos résultats de fact checking en trois étapes ultra-simples. Notre IA s'occupe de tout pendant que vous vous concentrez sur l'essentiel : la vérité.",
+    "steps": {
+      "upload": {
+        "title": "Soumettez votre contenu",
+        "description": "Saisissez votre texte, uploadez vos fichiers ou collez l'URL de vos flux et vidéos."
+      },
+      "analyze": {
+        "title": "Analyse par IA", 
+        "description": "Notre IA extrait les déclarations clés et les confronte à nos sources vérifiées."
+      },
+      "results": {
+        "title": "Récupérez vos résultats",
+        "description": "Obtenez un rapport de fact checking détaillé avec sources et indices de fiabilité."
+      }
+    },
+    "metrics": {
+      "processingTime": "< 10s",
+      "processingTimeLabel": "Temps de traitement moyen",
+      "accuracyRate": "94%",
+      "accuracyLabel": "Taux de fiabilité",
+      "availability": "24h/24",
+      "availabilityLabel": "Service disponible en continu"
+    }
+  },
+  "trust": {
+    "title": "Fiabilité et transparence",
+    "subtitle": "Notre engagement pour une rigueur scientifique et une transparence totale dans le fact checking IA. Chaque résultat s'appuie sur des sources vérifiables et une méthodologie éprouvée.",
+    "cta": {
+      "title": "Prêt à fact checker en toute confiance ?",
+      "subtitle": "Rejoignez des milliers d'utilisateurs qui font confiance à notre IA pour démêler la vérité de la désinformation.",
+      "benefits": {
+        "noCard": "Sans engagement ni CB",
+        "freeTrial": "Test gratuit inclus", 
+        "cancelAnytime": "Résiliation à tout moment"
+      }
+    },
+    "pillars": {
+      "scientific": {
+        "title": "Méthode scientifique",
+        "description": "Basé sur la recherche académique peer-reviewed et les méthodologies de fact checking utilisées par les journalistes et chercheurs professionnels."
+      },
+      "transparency": {
+        "title": "Sources transparentes",
+        "description": "Chaque fact check inclut ses sources détaillées et indices de confiance. Notre méthodologie est transparente et auditée en permanence."
+      },
+      "community": {
+        "title": "Communauté engagée", 
+        "description": "Nos modèles s'améliorent continuellement grâce aux retours d'experts et contributions de fact checkers du monde entier."
+      }
+    },
+    "metrics": {
+      "accuracy": {
+        "value": "94%",
+        "label": "Taux de fiabilité",
+        "description": "Validé vs fact checkers humains"
+      },
+      "sources": {
+        "value": "10 000+",
+        "label": "Sources vérifiées", 
+        "description": "Bases de données fiables et publications"
+      },
+      "claims": {
+        "value": "1M+",
+        "label": "Déclarations analysées",
+        "description": "Fact checks réalisés avec succès"
+      },
+      "responseTime": {
+        "value": "< 10s",
+        "label": "Temps de réponse",
+        "description": "Fact checking ultra-rapide"
+      }
+    }
+  },
+  "analysis": {
+    "closeDashboard": "Fermer le tableau de bord",
+    "backToUpload": "Retour à l'upload",
+    "analysisActive": "Analyse active"
+  },
+  "player": {
+    "liveFactCheckingActive": "Fact checking en direct actif",
+    "processingAudioRealTime": "Traitement audio en temps réel",
+    "audioAnalysis": "Analyse audio",
+    "processingFailed": "Échec du traitement"
+  },
+  "results": {
+    "transcription": "Transcription",
+    "factCheckResults": "Résultats du fact checking",
+    "claims": "Affirmations",
+    "sources": "Sources",
+    "allSources": "Toutes les sources",
+    "noSourcesAvailable": "Aucune source disponible pour ce segment",
+    "metadata": "Métadonnées",
+    "processingTime": "Temps de traitement",
+    "lastUpdated": "Dernière mise à jour"
+  },
+  "plans": {
+    "title": "Choisissez votre abonnement",
+    "loadingPlans": "Chargement des abonnements...",
+    "tryAgain": "Réessayer",
+    "currency": "Devise",
+    "billingCycle": {
+      "monthly": "Mensuel",
+      "annual": "Annuel",
+      "annualDiscount": "20% DE RÉDUCTION"
+    },
+    "pricing": {
+      "free": "Gratuit",
+      "perMonth": "par mois",
+      "billedAnnually": "facturé annuellement",
+      "billedMonthly": "facturé mensuellement",
+      "save": "Économisez {{amount}} ({{percent}}% de réduction)",
+      "saveAnnually": "Économisez {{percent}}% annuellement",
+      "earlyAdopterPrice": "🚀 Prix Adopteur Précoce"
+    },
+    "badges": {
+      "mostPopular": "Le Plus Populaire",
+      "currentPlan": "Abonnement Actuel",
+      "discount": "{{percent}}% DE RÉDUCTION"
+    },
+    "features": {
+      "whatsIncluded": "Ce qui est inclus :",
+      "requestsPerMonth": "{{count}} requêtes/mois",
+      "hoursProcessing": "{{count}} heures de traitement",
+      "features": "Fonctionnalités :",
+      "earlyAdopterBonus": "🎁 Bonus Adopteur Précoce :",
+      "priceLockedForLife": "Prix verrouillé à vie",
+      "prioritySupport": "Support prioritaire",
+      "exclusiveBetaFeatures": "Fonctionnalités bêta exclusives",
+      "planFeatures": {
+        "tenKRequests": "10 000 requêtes par mois",
+        "fiveHourProcessing": "5h de temps de traitement",
+        "commercialLicense": "Licence commerciale",
+        "emailSupport": "Support par e-mail",
+        "unlimitedRequests": "Requêtes illimitées",
+        "priorityProcessing": "Traitement prioritaire",
+        "dedicatedSupport": "Support dédié",
+        "apiAccess": "Accès API",
+        "advancedAnalytics": "Analyses avancées",
+        "customIntegrations": "Intégrations personnalisées",
+        "fiveHundredKRequests": "500 000 requêtes par mois",
+        "twoFiftyHourProcessing": "250h de temps de traitement",
+        "instantCallSupport": "Support téléphonique instantané",
+        "fasterProcessing": "Traitement plus rapide",
+        "earlyAccessFeatures": "Accès anticipé aux nouvelles fonctionnalités"
+      }
+    },
+    "actions": {
+      "yourCurrentPlan": "Votre abonnement actuel",
+      "getStarted": "Commencer",
+      "upgradeNow": "Mettre à niveau maintenant",
+      "getDiscount": "Obtenez {{percent}}% de réduction"
+    },
+    "info": {
+      "allPlansInclude": "Tous les abonnements incluent nos fonctionnalités de vérification des faits et l'accès API.",
+      "flexibleBilling": "Mettez à niveau ou rétrogradez à tout moment. Les crédits inutilisés n'expirent pas.",
+      "earlyAdopterPricing": "🎉 Prix adopteur précoce - Économisez {{percent}}% sur tous les abonnements !"
+    }
+  }
+} 

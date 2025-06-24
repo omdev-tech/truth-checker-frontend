@@ -9,6 +9,7 @@ import { ClaimHistoryCard } from '@/components/molecules/ClaimHistoryCard';
 import { FactCheckSession, FactCheckClaim, HistoryFilters } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Search, Filter, Calendar, FileText, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface FactCheckHistoryListProps {
   sessions: FactCheckSession[];
@@ -35,11 +36,13 @@ export function FactCheckHistoryList({
   hasMore,
   className,
 }: FactCheckHistoryListProps) {
+  const { t } = useTranslation(['dashboard', 'factCheck']);
   const [viewMode, setViewMode] = useState<ViewMode>('sessions');
   const [searchQuery, setSearchQuery] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false); // Track initialization
 
   // Filter data based on search and filters
   const filteredSessions = sessions.filter(session => {
@@ -57,15 +60,24 @@ export function FactCheckHistoryList({
     return matchesSearch && matchesSource && matchesStatus;
   });
 
-  // Apply filters when they change
+  // Initialize component to avoid triggering filters on mount
   useEffect(() => {
-    if (onFiltersChange) {
+    setIsInitialized(true);
+  }, []);
+
+  // Apply filters when they change, but only after initialization
+  useEffect(() => {
+    if (!isInitialized || !onFiltersChange) return;
+    
+    // Only send filters if they're not default values
+    const hasActiveFilters = sourceFilter !== 'all' || statusFilter !== 'all';
+    if (hasActiveFilters) {
       const filters: HistoryFilters = {};
       if (sourceFilter !== 'all') filters.source_type_filter = sourceFilter;
       if (statusFilter !== 'all') filters.status_filter = statusFilter;
       onFiltersChange(filters);
     }
-  }, [sourceFilter, statusFilter, onFiltersChange]);
+  }, [sourceFilter, statusFilter, onFiltersChange, isInitialized]);
 
   return (
     <Card className={cn('w-full', className)}>
@@ -73,7 +85,7 @@ export function FactCheckHistoryList({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Fact-Check History
+{t('dashboard:history.title')}
           </CardTitle>
           <Button
             variant="outline"
@@ -81,7 +93,7 @@ export function FactCheckHistoryList({
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="w-4 h-4 mr-2" />
-            Filters
+{t('dashboard:history.filter')}
           </Button>
         </div>
 
@@ -91,7 +103,7 @@ export function FactCheckHistoryList({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search sessions or claims..."
+              placeholder={t('dashboard:history.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-background border-border"
@@ -100,7 +112,7 @@ export function FactCheckHistoryList({
 
           {/* View mode selector */}
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-foreground">View:</span>
+            <span className="text-sm font-medium text-foreground">{t('dashboard:history.views.title', 'View')}:</span>
             <div className="flex items-center bg-muted rounded-lg p-1">
               <Button
                 variant={viewMode === 'sessions' ? 'default' : 'ghost'}
@@ -108,7 +120,7 @@ export function FactCheckHistoryList({
                 onClick={() => setViewMode('sessions')}
                 className="text-xs"
               >
-                Sessions ({filteredSessions.length})
+{t('dashboard:history.views.sessions')} ({filteredSessions.length})
               </Button>
               <Button
                 variant={viewMode === 'claims' ? 'default' : 'ghost'}
@@ -116,7 +128,7 @@ export function FactCheckHistoryList({
                 onClick={() => setViewMode('claims')}
                 className="text-xs"
               >
-                Claims ({filteredClaims.length})
+{t('dashboard:history.views.claims')} ({filteredClaims.length})
               </Button>
               <Button
                 variant={viewMode === 'all' ? 'default' : 'ghost'}
@@ -124,7 +136,7 @@ export function FactCheckHistoryList({
                 onClick={() => setViewMode('all')}
                 className="text-xs"
               >
-                All
+{t('common:general.all')}
               </Button>
             </div>
           </div>
@@ -133,50 +145,50 @@ export function FactCheckHistoryList({
           {showFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Source Type</label>
+                <label className="text-sm font-medium text-foreground">{t('dashboard:history.filters.sourceType')}</label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="w-full justify-between bg-background border-border">
-                      {sourceFilter === 'all' ? 'All Sources' : 
-                       sourceFilter === 'text_prompt' ? 'Text Prompt' :
-                       sourceFilter === 'media_file' ? 'Media File' :
-                       sourceFilter === 'live_stream' ? 'Live Stream' :
-                       sourceFilter === 'live_recording' ? 'Live Recording' : 'All Sources'}
+                      {sourceFilter === 'all' ? t('factCheck:sources.all') : 
+                       sourceFilter === 'text_prompt' ? t('factCheck:sources.textPrompt') :
+                       sourceFilter === 'media_file' ? t('factCheck:sources.mediaFile') :
+                       sourceFilter === 'live_stream' ? t('factCheck:sources.liveStream') :
+                       sourceFilter === 'live_recording' ? t('factCheck:sources.liveRecording') : t('factCheck:sources.all')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-full">
-                    <DropdownMenuItem onClick={() => setSourceFilter('all')}>All Sources</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSourceFilter('text_prompt')}>Text Prompt</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSourceFilter('media_file')}>Media File</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSourceFilter('live_stream')}>Live Stream</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setSourceFilter('live_recording')}>Live Recording</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSourceFilter('all')}>{t('factCheck:sources.all')}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSourceFilter('text_prompt')}>{t('factCheck:sources.textPrompt')}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSourceFilter('media_file')}>{t('factCheck:sources.mediaFile')}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSourceFilter('live_stream')}>{t('factCheck:sources.liveStream')}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSourceFilter('live_recording')}>{t('factCheck:sources.liveRecording')}</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
 
               {viewMode !== 'sessions' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Verification Status</label>
+                  <label className="text-sm font-medium text-foreground">{t('dashboard:history.filters.verificationStatus')}</label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" className="w-full justify-between bg-background border-border">
-                        {statusFilter === 'all' ? 'All Statuses' : 
-                         statusFilter === 'true' ? 'True' :
-                         statusFilter === 'false' ? 'False' :
-                         statusFilter === 'partially_true' ? 'Partially True' :
-                         statusFilter === 'misleading' ? 'Misleading' :
-                         statusFilter === 'unverifiable' ? 'Unverifiable' :
-                         statusFilter === 'disputed' ? 'Disputed' : 'All Statuses'}
+                        {statusFilter === 'all' ? t('factCheck:statuses.all') : 
+                         statusFilter === 'true' ? t('factCheck:status.true') :
+                         statusFilter === 'false' ? t('factCheck:status.false') :
+                         statusFilter === 'partially_true' ? t('factCheck:status.partially_true') :
+                         statusFilter === 'misleading' ? t('factCheck:status.misleading') :
+                         statusFilter === 'unverifiable' ? t('factCheck:status.unverifiable') :
+                         statusFilter === 'disputed' ? t('factCheck:status.disputed') : t('factCheck:statuses.all')}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-full">
-                      <DropdownMenuItem onClick={() => setStatusFilter('all')}>All Statuses</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('true')}>True</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('false')}>False</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('partially_true')}>Partially True</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('misleading')}>Misleading</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('unverifiable')}>Unverifiable</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setStatusFilter('disputed')}>Disputed</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('all')}>{t('factCheck:statuses.all')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('true')}>{t('factCheck:status.true')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('false')}>{t('factCheck:status.false')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('partially_true')}>{t('factCheck:status.partially_true')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('misleading')}>{t('factCheck:status.misleading')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('unverifiable')}>{t('factCheck:status.unverifiable')}</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setStatusFilter('disputed')}>{t('factCheck:status.disputed')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -190,7 +202,7 @@ export function FactCheckHistoryList({
         {isLoading && sessions.length === 0 && claims.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <LoadingSpinner />
-            <span className="ml-2 text-muted-foreground">Loading history...</span>
+            <span className="ml-2 text-muted-foreground">{t('dashboard:history.loadingHistory')}</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -200,7 +212,7 @@ export function FactCheckHistoryList({
                 {viewMode === 'all' && filteredSessions.length > 0 && (
                   <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <Users className="w-4 h-4" />
-                    Sessions ({filteredSessions.length})
+{t('dashboard:history.views.sessions')} ({filteredSessions.length})
                   </div>
                 )}
                 <div className="grid gap-4">
@@ -221,7 +233,7 @@ export function FactCheckHistoryList({
                 {viewMode === 'all' && filteredClaims.length > 0 && (
                   <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <FileText className="w-4 h-4" />
-                    Individual Claims ({filteredClaims.length})
+{t('dashboard:history.views.claims')} ({filteredClaims.length})
                   </div>
                 )}
                 <div className="grid gap-3">
@@ -242,7 +254,7 @@ export function FactCheckHistoryList({
               (viewMode === 'all' && filteredSessions.length === 0 && filteredClaims.length === 0)) && (
               <div className="text-center py-8 text-gray-500">
                 <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p className="text-lg font-medium mb-2">No history found</p>
+                <p className="text-lg font-medium mb-2">{t('dashboard:history.noHistory')}</p>
                 <p className="text-sm">
                   {searchQuery || sourceFilter !== 'all' || statusFilter !== 'all'
                     ? 'Try adjusting your search or filters'

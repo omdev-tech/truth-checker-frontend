@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Zap, Shield, Microscope, ExternalLink } from 'lucide-react';
 import { HeroSectionProps } from '@/lib/types/landing';
-import { LANDING_PAGE_CONFIG } from '@/lib/config/landing';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Hero Section Component
@@ -12,7 +12,7 @@ import { LANDING_PAGE_CONFIG } from '@/lib/config/landing';
  * Follows conversion optimization best practices
  */
 export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
-  const { hero } = LANDING_PAGE_CONFIG;
+  const { t } = useTranslation(['common', 'dashboard']);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -35,9 +35,9 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
   };
 
   const trustIndicators = [
-    { icon: Zap, text: "Real-time processing" },
-    { icon: Shield, text: "Multi-format support" },
-    { icon: CheckCircle, text: "Source transparency" }
+    { icon: Zap, text: t('dashboard:features.textAnalysis.title') },
+    { icon: Shield, text: t('dashboard:features.mediaUpload.title') },
+    { icon: CheckCircle, text: t('common:general.confidence') }
   ];
 
   return (
@@ -59,7 +59,7 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
             className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight"
           >
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              {hero.title}
+              {t('dashboard:hero.title')}
             </span>
           </motion.h1>
 
@@ -68,7 +68,7 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
             variants={itemVariants}
             className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed"
           >
-            {hero.subtitle}
+            {t('dashboard:hero.subtitle')}
           </motion.p>
 
           {/* Description */}
@@ -76,7 +76,7 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
             variants={itemVariants}
             className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
           >
-            {hero.description}
+            {t('dashboard:hero.subtitle')}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -89,7 +89,7 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
               onClick={onTryDemo}
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
-              {hero.primaryCTA}
+              {t('common:actions.tryAgain')}
             </Button>
             
             <Button 
@@ -98,7 +98,7 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
               onClick={onSignUp}
               className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200"
             >
-              {hero.secondaryCTA}
+              {t('common:navigation.signup')}
             </Button>
           </motion.div>
 
@@ -198,8 +198,12 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2" />
+        <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full p-1">
+          <motion.div
+            className="w-1 h-3 bg-muted-foreground/50 rounded-full mx-auto"
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
         </div>
       </motion.div>
     </section>

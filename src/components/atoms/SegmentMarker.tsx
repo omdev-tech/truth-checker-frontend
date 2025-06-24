@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Loader2 } from 'lucide-react';
 import { SegmentData } from '@/lib/types';
+import { useTranslation } from 'react-i18next';
 
 interface SegmentMarkerProps {
   segment: SegmentData;
@@ -20,6 +21,8 @@ const SegmentMarker: React.FC<SegmentMarkerProps> = ({
   width,
   height = 60,
 }) => {
+  const { t } = useTranslation('common');
+
   const getStatusColor = (status: SegmentData['status'], factCheckResult?: SegmentData['factCheckResult']) => {
     if (status === 'processing') return 'bg-blue-500 animate-pulse';
     if (status === 'error') return 'bg-red-400';
@@ -47,34 +50,58 @@ const SegmentMarker: React.FC<SegmentMarkerProps> = ({
   };
 
   const getStatusText = (status: SegmentData['status'], factCheckResult?: SegmentData['factCheckResult']) => {
-    if (status === 'processing') return 'Processing...';
-    if (status === 'error') return 'Error';
-    if (status === 'pending') return 'Pending';
+    if (status === 'processing') return t('status.processing');
+    if (status === 'error') return t('status.error');
+    if (status === 'pending') return t('status.pending');
     
     if (status === 'completed' && factCheckResult) {
       // Check if there are any claims
       if (!factCheckResult.claims || factCheckResult.claims.length === 0) {
-        return 'No claims found';
+        return t('claims.noClaimsFound');
       }
       
       switch (factCheckResult.status) {
-        case 'true': return 'Accurate';
-        case 'false': return 'Inaccurate';
-        case 'uncertain': return 'Uncertain';
-        case 'not_checkable': return 'Not checkable';
-        case 'no_text': return 'No text';
-        case 'error': return 'Check failed';
-        default: return 'Unknown';
+        case 'true': return t('common:statuses.accurate');
+        case 'false': return t('common:statuses.inaccurate');
+        case 'uncertain': return t('common:statuses.uncertain');
+        case 'not_checkable': return t('common:statuses.notCheckable');
+        case 'no_text': return t('common:statuses.noText');
+        case 'error': return t('common:statuses.checkFailed');
+        default: return t('common:statuses.unknown');
       }
     }
     
-    return 'Not processed';
+    return t('common:statuses.notProcessed');
   };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getTooltipText = () => {
+    if (segment.status === 'completed' && segment.factCheckResult) {
+      // Check if there are any claims
+      if (!segment.factCheckResult.claims || segment.factCheckResult.claims.length === 0) {
+        return t('claims.noClaimsFound');
+      }
+      
+      const statusLabel = (() => {
+        switch (segment.factCheckResult.status) {
+          case 'true': return t('common:statuses.accurate');
+          case 'false': return t('common:statuses.inaccurate');
+          case 'partially_true': return t('common:statuses.partiallyTrue');
+          case 'uncertain': return t('common:statuses.uncertain');
+          case 'disputed': return t('common:statuses.disputed');
+          default: return t('common:statuses.unknown');
+        }
+      })();
+      
+      return `${statusLabel} (${segment.factCheckResult.claims.length} claims)`;
+    }
+    
+    return `${segment.startTime.toFixed(1)}s - ${segment.endTime.toFixed(1)}s`;
   };
 
   return (
@@ -93,7 +120,7 @@ const SegmentMarker: React.FC<SegmentMarkerProps> = ({
       `}
       style={{ width: `${width}px`, height: `${height}px` }}
       onClick={onClick}
-      title={getStatusText(segment.status, segment.factCheckResult)}
+      title={getTooltipText()}
     >
       {/* Thumbnail or placeholder */}
       <div className="w-full h-full rounded-md overflow-hidden relative">

@@ -1,0 +1,290 @@
+{
+  "title": "Vérification de faits",
+  "subtitle": "Vérifiez l'exactitude des affirmations dans le texte, les fichiers ou les flux en direct",
+  "tabs": {
+    "text": "Texte",
+    "file": "Fichier",
+    "stream": "Flux en direct",
+    "textInput": "Saisie de texte",
+    "fileUpload": "Téléversement de fichier",
+    "streamMode": "Mode streaming",
+    "audioMode": "Mode audio"
+  },
+  "upload": {
+    "title": "Télécharger du Contenu",
+    "subtitle": "Téléchargez des fichiers audio ou vidéo pour la vérification",
+    "selectFile": "Sélectionner un Fichier",
+    "dragAndDrop": "Glissez-déposez votre fichier ici, ou cliquez pour parcourir",
+    "supportedFormats": "Formats supportés",
+    "maxSize": "Taille max du fichier",
+    "processing": "Traitement du fichier...",
+    "analyzing": "Analyse du contenu...",
+    "uploadProgress": "Progression du Téléchargement",
+    "audioTitle": "Vérificateur Audio",
+    "videoTitle": "Vérificateur Vidéo"
+  },
+  "text": {
+    "title": "Vérification de texte",
+    "description": "Collez le contenu texte pour vérifier sa précision",
+    "placeholder": "Saisissez le texte que vous souhaitez vérifier...",
+    "submit": "Vérifier",
+    "processing": "Traitement en cours...",
+    "error": "Erreur lors de la vérification",
+    "analyze": "Analyser le texte",
+    "minLength": "Veuillez saisir au moins 10 caractères",
+    "maxLength": "Texte trop long (max {{max}} caractères)"
+  },
+  "file": {
+    "title": "Téléverser un fichier",
+    "description": "Téléversez un document pour extraire et vérifier le contenu textuel",
+    "supportedFormats": "Formats supportés : PDF, TXT, DOC, DOCX",
+    "clickToUpload": "Cliquez pour téléverser ou glissez-déposez",
+    "processing": "Traitement du fichier...",
+    "error": "Erreur lors du traitement du fichier"
+  },
+  "stream": {
+    "title": "Vérification en streaming",
+    "description": "Vérification en temps réel pour le contenu en streaming",
+    "statusReady": "Prêt",
+    "statusRecording": "Enregistrement...",
+    "statusProcessing": "Traitement...",
+    "statusError": "Erreur",
+    "startRecording": "Démarrer la vérification en direct",
+    "stopRecording": "Arrêter l'enregistrement",
+    "retryRecording": "Réessayer",
+    "noAudioDevice": "Pas d'accès au microphone",
+    "urlPlaceholder": "Entrez une URL de flux en direct pour commencer la vérification des faits en temps réel",
+    "startAnalysis": "Démarrer l'analyse en direct",
+    "stopAnalysis": "Arrêter l'analyse",
+    "forceLiveMode": "Forcer le mode flux en direct",
+    "status": {
+      "connecting": "Connexion au flux...",
+      "analyzing": "Analyse du contenu en direct...",
+      "paused": "Analyse en pause",
+      "error": "Erreur de flux"
+    },
+    "validation": "Validation du stream...",
+    "quality": "Qualité:",
+    "type": "Type:",
+    "selectQuality": "Sélectionner la Qualité",
+    "autoQuality": "Auto (Meilleure Disponible)",
+    "enterUrl": "Entrer l'URL du Stream",
+    "validateUrl": "Valider l'URL",
+    "liveOverrideHelp": "Utiliser quand l'URL ne montre pas d'indicateurs de direct",
+    "advancedOptions": "Options Avancées",
+    "startFactChecking": "Commencer la Vérification",
+    "validationSuccess": "Stream validé avec succès!",
+    "liveStream": "Stream en Direct"
+  },
+  "results": {
+    "title": "Résultats de vérification",
+    "verificationResults": "Résultats de vérification",
+    "status": "Statut",
+    "confidence": "Confiance",
+    "explanation": "Explication",
+    "sources": "Sources",
+    "claim": "Affirmation",
+    "verifiedAt": "Vérifié le {{timestamp}}",
+    "processingTime": "Temps de traitement : {{time}}",
+    "viewDetails": "Voir les détails",
+    "noResults": "Aucun résultat pour le moment",
+    "noResultsDescription": "Commencez la vérification pour voir les résultats ici",
+    "noClaimsFound": "Aucune affirmation vérifiable trouvée dans le texte fourni.",
+    "resultCount": "{{count}} résultat",
+    "resultCount_other": "{{count}} résultats",
+    "processingClaims": "Traitement des affirmations...",
+    "processingFailed": "Échec du traitement",
+    "sourcesWithCount": "Sources :",
+    "extracted": "Extrait",
+    "summary": "Résumé",
+    "claims": "Affirmations trouvées",
+    "claimsCount": "{{count}} affirmations analysées",
+    "overallAssessment": "Évaluation globale",
+    "accuracyRate": "Taux de précision",
+    "analysisFailed": "L'analyse a échoué. Veuillez réessayer."
+  },
+  "status": {
+    "true": "Vrai",
+    "false": "Faux",
+    "partiallyTrue": "Partiellement vrai",
+    "partially_true": "Partiellement vrai",
+    "misleading": "Trompeur",
+    "disputed": "Contesté",
+    "unverifiable": "Invérifiable"
+  },
+  "confidence": {
+    "high": "Confiance élevée",
+    "medium": "Confiance moyenne",
+    "low": "Confiance faible",
+    "insufficient": "Données insuffisantes"
+  },
+  "settings": {
+    "responseLanguage": "Langue de réponse",
+    "responseLanguageHelp": "Choisissez la langue pour les explications de vérification des faits",
+    "advanced": "Paramètres avancés",
+    "fastMode": "Mode rapide",
+    "fastModeHelp": "Traitement plus rapide avec une précision légèrement réduite"
+  },
+  "errors": {
+    "uploadFailed": "Échec du téléchargement du fichier",
+    "analysisFailed": "L'analyse a échoué",
+    "unsupportedFormat": "Format de fichier non supporté",
+    "fileTooLarge": "Fichier trop volumineux",
+    "networkError": "Erreur réseau - veuillez vérifier votre connexion",
+    "streamNotFound": "Flux introuvable ou inaccessible",
+    "invalidUrl": "URL de flux invalide"
+  },
+  "details": {
+    "verified": "Vérifié",
+    "processingTime": "Temps de traitement",
+    "sourceType": "Type de source",
+    "originalInput": "Saisie originale",
+    "explanation": "Explication de la vérification",
+    "sources": "Sources ({{count}})",
+    "additionalInfo": "Informations supplémentaires",
+    "metadata": "Métadonnées",
+    "lastUpdated": "Dernière mise à jour: {{time}}"
+  },
+  "sources": {
+    "text": "Prompt texte",
+    "media": "Fichier média",
+    "stream": "Flux en direct",
+    "recording": "Enregistrement en direct",
+    "all": "Toutes les sources",
+    "textPrompt": "Prompt texte",
+    "mediaFile": "Fichier média",
+    "liveStream": "Flux en direct",
+    "liveRecording": "Enregistrement en direct"
+  },
+  "statuses": {
+    "all": "Tous les statuts"
+  },
+  "media": {
+    "uploadTitle": "Télécharger des fichiers média",
+    "videoFiles": "Fichiers vidéo",
+    "audioFiles": "Fichiers audio",
+    "streamUrl": "URL du stream",
+    "twitch": "Streams Twitch",
+    "directUrls": "URLs de stream directes",
+    "qualityPreference": "Préférence de qualité",
+    "bufferDuration": "Durée du tampon",
+    "streamInfo": "Informations du stream"
+  },
+  "timeline": {
+    "next": "Suivant",
+    "liveStream": "Stream en direct",
+    "timeline": "Timeline",
+    "processingStatus": "Statut de traitement",
+    "audioAnalysis": "Analyse audio"
+  },
+  "mediaTypes": {
+    "video": "Vidéo",
+    "audio": "Audio",
+    "youtube": "YouTube Live et Vidéos",
+    "twitch": "Stream Twitch",
+    "direct": "Stream Direct"
+  },
+  "audio": {
+    "duration": "Durée:",
+    "language": "Langue:",
+    "confidence": "Confiance:",
+    "uploadTitle": "Téléverser un fichier audio",
+    "uploadDescription": "Formats supportés : MP3, WAV, M4A, OGG",
+    "recordTitle": "Enregistrer l'audio",
+    "recordDescription": "Cliquez pour commencer l'enregistrement de votre audio pour la vérification",
+    "clickToUpload": "Cliquez pour téléverser ou glissez-déposez",
+    "startRecording": "Démarrer l'enregistrement",
+    "stopRecording": "Arrêter l'enregistrement",
+    "processing": "Traitement de l'audio...",
+    "extractingText": "Extraction du texte de l'audio...",
+    "analyzing": "Analyse du contenu...",
+    "transcription": "Transcription",
+    "error": "Erreur lors du traitement de l'audio",
+    "supportedTypes": "Types de fichiers supportés",
+    "supportDescription": "Support pour vidéos, fichiers audio et plus de formats",
+    "resultCount_one": "{{count}} résultat",
+    "resultCount_other": "{{count}} résultats",
+    "noClaimsFound": "Aucune affirmation vérifiable trouvée dans l'audio transcrit."
+  },
+  "placeholders": {
+    "textInput": "Saisissez une déclaration, une info ou un fait à fact checker...",
+    "landingInput": "Saisissez une déclaration à fact checker... ex: 'La Terre est plate' ou 'Les vaccins provoquent l'autisme'",
+    "streamUrl": "https://youtube.com/watch?v=... ou https://twitch.tv/...",
+    "search": "Rechercher dans vos fact checks..."
+  },
+  "textFactChecker": {
+    "title": "Fact Checker Textuel",
+    "inputLabel": "Saisissez le texte à fact checker",
+    "characterCount": "{{current}}/{{max}} caractères",
+    "processing": "Analyse en cours...",
+    "checkFacts": "Fact Checker",
+    "remaining": "{{count}} restants"
+  },
+  "validation": {
+    "enterText": "Veuillez saisir un texte à fact checker",
+    "textTooLong": "Texte trop long (maximum {{maxLength}} caractères)"
+  },
+  "guest": {
+    "guestMode": "Mode Invité : {{count}} fact checks gratuits restants",
+    "noUsageRemaining": "Plus de fact checks gratuits. Inscrivez-vous pour un accès illimité !",
+    "usageLimitReached": "Limite atteinte. Veuillez vous inscrire pour un accès illimité.",
+    "lastFactCheck": "Fact check terminé ! C'était votre dernier essai gratuit. Inscrivez-vous pour un accès illimité.",
+    "remainingFactChecks": "Fact check terminé ! {{count}} essais gratuits restants.",
+    "creditRefunded": "Crédit remboursé suite à une erreur de traitement",
+    "signUpPrompt": "Inscrivez-vous pour un fact checking illimité !",
+    "signUpFree": "Inscription gratuite"
+  },
+  "processing": {
+    "title": "Fact checking IA en cours",
+    "subtitle": "Analyse avancée utilisant de multiples sources de données",
+    "tipMessage": "💡 Cette analyse approfondie prend généralement 10-15 secondes pour plus de fiabilité",
+    "tipMessageLanding": "💡 Cette analyse approfondie prend généralement 5-15 secondes pour plus de fiabilité",
+    "steps": {
+      "extracting": {
+        "title": "Extraction des déclarations",
+        "description": "Identification des énoncés fact checkables avec NLP"
+      },
+      "accessing": {
+        "title": "Accès aux sources de données",
+        "description": "Connexion à plus de 50 bases de données fiables"
+      },
+      "crossReferencing": {
+        "title": "Recoupement des preuves",
+        "description": "Analyse de crédibilité sur sources multiples"
+      },
+      "reasoning": {
+        "title": "Analyse de raisonnement IA",
+        "description": "Application de fact checking logique avancé"
+      },
+      "generating": {
+        "title": "Génération des résultats",
+        "description": "Compilation du rapport de fact checking complet"
+      }
+    }
+  },
+  "landing": {
+    "tryFree": "Test gratuit",
+    "title": "Service de fact checking IA",
+    "subtitle": "Obtenez un fact checking instantané avec notre analyse IA de pointe",
+    "checkClaim": "Fact checker cette déclaration",
+    "remainingChecks": "{{count}} fact checks gratuits restants",
+    "resultCount": "{{count}} résultats trouvés",
+    "noClaimsFound": "Aucune déclaration fact checkable trouvée dans le texte fourni",
+    "moreResultsAvailable": "+ {{count}} résultats supplémentaires disponibles dans l'app complète",
+    "powerfulResultsTitle": "🎉 Vous voyez la puissance du fact checking IA ?",
+    "powerfulResultsDescription": "Rejoignez des milliers d'utilisateurs qui luttent contre les fake news avec le fact checking illimité, l'analyse audio/vidéo et la vérification en temps réel.",
+    "getFullAccess": "Accès complet - Inscription gratuite",
+    "triedAllFree": "Vous avez épuisé vos fact checks gratuits !",
+    "readyToUnlock": "Prêt à débloquer le fact checking IA illimité ?",
+    "signUpUnlimited": "Inscription gratuite - Fact checking illimité",
+    "upgradePrompt": "🚀 Envie de fact checking illimité ?",
+    "upgradeDescription": "Rejoignez des milliers de personnes qui luttent contre la désinformation avec un accès illimité, l'analyse audio/vidéo et le support prioritaire.",
+    "upgradeButton": "Inscription gratuite - Fact checking illimité",
+    "noCardRequired": "Sans CB • Accès instantané • Résiliation libre"
+  },
+  "session": {
+    "claimsCount": "Affirmations ({{count}})",
+    "noClaimsTitle": "Aucune Affirmation Trouvée",
+    "noClaimsDescription": "Cette session n'a encore aucune affirmation."
+  }
+} 

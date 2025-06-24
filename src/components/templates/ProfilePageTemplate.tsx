@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -37,6 +38,7 @@ interface ProfilePageTemplateProps {
 export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
   className,
 }) => {
+  const { t } = useTranslation(['common', 'dashboard']);
   const router = useRouter();
   const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -55,7 +57,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
     const checkPaymentSuccess = () => {
       if (wasPaymentSuccessful()) {
         const sessionId = getCheckoutSessionFromUrl();
-        toast.success('🎉 Payment successful! Your plan has been upgraded. Refreshing your profile...', {
+        toast.success(t('dashboard:profile.paymentSuccess'), {
           duration: 5000,
         });
         
@@ -75,7 +77,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
     };
 
     checkPaymentSuccess();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
   const loadUserData = async () => {
     try {
@@ -91,7 +93,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
       setUserProfile(profile);
       setUsageStats(stats);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load user data');
+      setError(err instanceof Error ? err.message : t('common:errors.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -119,7 +121,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
         <Header />
         <main className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <p className="text-muted-foreground">Please log in to view your profile.</p>
+            <p className="text-muted-foreground">{t('dashboard:profile.loginRequired')}</p>
           </div>
         </main>
       </div>
@@ -133,7 +135,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
         <main className="flex items-center justify-center min-h-[400px]">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Loading profile...</span>
+            <span>{t('dashboard:profile.loading')}</span>
           </div>
         </main>
       </div>
@@ -148,14 +150,14 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
           <Alert variant="destructive" className="max-w-md">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {error || 'Failed to load profile'}
+              {error || t('dashboard:profile.loadError')}
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={loadUserData}
                 className="ml-2"
               >
-                Try Again
+                {t('common:actions.tryAgain')}
               </Button>
             </AlertDescription>
           </Alert>
@@ -171,7 +173,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
       <main className={cn('container mx-auto px-4 py-6 space-y-6', className)}>
         {/* Page Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Profile</h1>
+          <h1 className="text-3xl font-bold">{t('dashboard:profile.title')}</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -202,31 +204,31 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Member since {formatDate(authUser?.id || new Date().toISOString())}</span>
+                    <span>{t('dashboard:profile.memberSince', { date: formatDate(authUser?.id || new Date().toISOString()) })}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Activity className="h-4 w-4 text-muted-foreground" />
-                    <span>Current plan: {userProfile.plan}</span>
+                    <span>{t('dashboard:profile.currentPlan', { plan: userProfile.plan })}</span>
                   </div>
                 </div>
 
                 {/* Account Status */}
                 <div className="border-t pt-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Account Status</span>
+                    <span className="text-muted-foreground">{t('dashboard:profile.accountStatus')}</span>
                     <Badge variant="default">
-                      Active
+                      {t('dashboard:profile.statusActive')}
                     </Badge>
                   </div>
                 </div>
 
                 {/* Quick Actions */}
                 <div className="border-t pt-4 space-y-2">
-                  <h4 className="text-sm font-medium">Quick Actions</h4>
+                  <h4 className="text-sm font-medium">{t('dashboard:profile.quickActions')}</h4>
                   <div className="space-y-2">
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Download className="h-4 w-4 mr-2" />
-                      Export Data
+                      {t('dashboard:profile.exportData')}
                     </Button>
                     <UpgradeButton
                       onClick={handleUpgradePlan}
@@ -234,7 +236,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                       size="sm"
                       fullWidth
                     >
-                      Upgrade Plan
+                      {t('dashboard:profile.upgradePlan')}
                     </UpgradeButton>
                   </div>
                 </div>
@@ -247,7 +249,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Account Statistics
+                    {t('dashboard:profile.statistics.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -257,7 +259,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                         {usageStats.current_period.requests_used}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Requests This Month
+                        {t('dashboard:profile.statistics.requestsThisMonth')}
                       </div>
                     </div>
                     <div className="space-y-1">
@@ -265,7 +267,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                         {usageStats.current_period.hours_used}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Hours Processed
+                        {t('dashboard:profile.statistics.hoursProcessed')}
                       </div>
                     </div>
                   </div>
@@ -281,7 +283,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                 <CardContent className="flex items-center justify-center py-12">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>Loading usage statistics...</span>
+                    <span>{t('dashboard:profile.loadingUsage')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -298,7 +300,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                         onClick={loadUserData}
                         className="ml-2"
                       >
-                        Try Again
+                        {t('common:actions.tryAgain')}
                       </Button>
                     </AlertDescription>
                   </Alert>
@@ -314,31 +316,31 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
             {/* Billing Information */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Billing Information</CardTitle>
+                <CardTitle className="text-lg">{t('dashboard:profile.billing.title')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {usageStats && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">Current Plan</div>
+                        <div className="text-sm text-muted-foreground">{t('dashboard:profile.billing.currentPlan')}</div>
                         <div className="font-medium capitalize">{usageStats.plan_info.name}</div>
                       </div>
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">Billing Cycle</div>
+                        <div className="text-sm text-muted-foreground">{t('dashboard:profile.billing.billingCycle')}</div>
                         <div className="font-medium capitalize">{usageStats.plan_info.billing_cycle}</div>
                       </div>
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">Next Reset</div>
+                        <div className="text-sm text-muted-foreground">{t('dashboard:profile.billing.nextReset')}</div>
                         <div className="font-medium">
                           {usageStats.plan_info.next_reset 
                             ? formatDate(usageStats.plan_info.next_reset)
-                            : 'N/A'
+                            : t('common:notApplicable')
                           }
                         </div>
                       </div>
                       <div className="space-y-1">
-                        <div className="text-sm text-muted-foreground">Currency</div>
+                        <div className="text-sm text-muted-foreground">{t('dashboard:profile.billing.currency')}</div>
                         <div className="font-medium">{usageStats.plan_info.currency}</div>
                       </div>
                     </div>
@@ -346,7 +348,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                   
                   <div className="border-t pt-4">
                     <Button variant="outline" className="w-full sm:w-auto">
-                      View Billing History
+                      {t('dashboard:profile.billing.viewHistory')}
                     </Button>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +27,8 @@ export function ClaimDetailsModal({
   isOpen,
   onClose
 }: ClaimDetailsModalProps) {
+  const { t } = useTranslation(['factCheck', 'common']);
+
   if (!claim) return null;
 
   const formatDate = (dateString: string) => {
@@ -52,7 +55,7 @@ export function ClaimDetailsModal({
           color: 'text-green-600',
           bg: 'bg-green-50',
           border: 'border-green-200',
-          label: 'True'
+          label: t('factCheck:status.true')
         };
       case 'false':
         return {
@@ -60,7 +63,7 @@ export function ClaimDetailsModal({
           color: 'text-red-600',
           bg: 'bg-red-50',
           border: 'border-red-200',
-          label: 'False'
+          label: t('factCheck:status.false')
         };
       case 'partially_true':
         return {
@@ -68,7 +71,7 @@ export function ClaimDetailsModal({
           color: 'text-yellow-600',
           bg: 'bg-yellow-50',
           border: 'border-yellow-200',
-          label: 'Partially True'
+          label: t('factCheck:status.partiallyTrue')
         };
       case 'misleading':
         return {
@@ -76,7 +79,7 @@ export function ClaimDetailsModal({
           color: 'text-orange-600',
           bg: 'bg-orange-50',
           border: 'border-orange-200',
-          label: 'Misleading'
+          label: t('factCheck:status.misleading')
         };
       case 'disputed':
         return {
@@ -84,7 +87,7 @@ export function ClaimDetailsModal({
           color: 'text-purple-600',
           bg: 'bg-purple-50',
           border: 'border-purple-200',
-          label: 'Disputed'
+          label: t('factCheck:status.disputed')
         };
       default:
         return {
@@ -92,7 +95,7 @@ export function ClaimDetailsModal({
           color: 'text-gray-600',
           bg: 'bg-gray-50',
           border: 'border-gray-200',
-          label: 'Unverifiable'
+          label: t('factCheck:status.unverifiable')
         };
     }
   };
@@ -100,13 +103,13 @@ export function ClaimDetailsModal({
   const getConfidenceInfo = (level: string) => {
     switch (level.toLowerCase()) {
       case 'high':
-        return { label: 'High Confidence', color: 'text-green-600', bg: 'bg-green-100' };
+        return { label: t('factCheck:confidence.high'), color: 'text-green-600', bg: 'bg-green-100' };
       case 'medium':
-        return { label: 'Medium Confidence', color: 'text-yellow-600', bg: 'bg-yellow-100' };
+        return { label: t('factCheck:confidence.medium'), color: 'text-yellow-600', bg: 'bg-yellow-100' };
       case 'low':
-        return { label: 'Low Confidence', color: 'text-orange-600', bg: 'bg-orange-100' };
+        return { label: t('factCheck:confidence.low'), color: 'text-orange-600', bg: 'bg-orange-100' };
       default:
-        return { label: 'Insufficient Data', color: 'text-gray-600', bg: 'bg-gray-100' };
+        return { label: t('factCheck:confidence.insufficient'), color: 'text-gray-600', bg: 'bg-gray-100' };
     }
   };
 
@@ -144,7 +147,7 @@ export function ClaimDetailsModal({
             <div className="flex items-center gap-3">
               <Calendar className="w-4 h-4 text-muted-foreground" />
               <div>
-                <div className="font-medium text-foreground">Verified</div>
+                <div className="font-medium text-foreground">{t('factCheck:details.verified')}</div>
                 <div className="text-muted-foreground">
                   {formatDate(claim.verified_at)}
                 </div>
@@ -153,7 +156,7 @@ export function ClaimDetailsModal({
             <div className="flex items-center gap-3">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <div>
-                <div className="font-medium text-foreground">Processing Time</div>
+                <div className="font-medium text-foreground">{t('factCheck:details.processingTime')}</div>
                 <div className="text-muted-foreground">
                   {formatDuration(claim.processing_time_seconds)}
                 </div>
@@ -162,7 +165,7 @@ export function ClaimDetailsModal({
             <div className="flex items-center gap-3">
               <FileText className="w-4 h-4 text-muted-foreground" />
               <div>
-                <div className="font-medium text-foreground">Source Type</div>
+                <div className="font-medium text-foreground">{t('factCheck:details.sourceType')}</div>
                 <div className="text-muted-foreground capitalize">
                   {claim.source_type.replace('_', ' ')}
                 </div>
@@ -176,7 +179,7 @@ export function ClaimDetailsModal({
             {/* Original Input */}
             {claim.original_input && claim.original_input !== claim.claim_text && (
               <div>
-                <h3 className="text-lg font-semibold mb-3 text-foreground">Original Input</h3>
+                <h3 className="text-lg font-semibold mb-3 text-foreground">{t('factCheck:details.originalInput')}</h3>
                 <div className="bg-muted rounded-lg p-4 text-sm text-foreground">
                   {claim.original_input}
                 </div>
@@ -186,7 +189,7 @@ export function ClaimDetailsModal({
             {/* Explanation */}
             {claim.explanation && (
               <div>
-                <h3 className="text-lg font-semibold mb-3 text-foreground">Verification Explanation</h3>
+                <h3 className="text-lg font-semibold mb-3 text-foreground">{t('factCheck:details.explanation')}</h3>
                 <div className="prose prose-sm max-w-none">
                   <p className="text-foreground leading-relaxed">
                     {claim.explanation}
@@ -198,7 +201,7 @@ export function ClaimDetailsModal({
             {/* Sources */}
             {claim.sources_used && claim.sources_used.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-foreground">Sources ({claim.sources_used.length})</h3>
+                <h3 className="text-lg font-semibold mb-4 text-foreground">{t('factCheck:details.sources', { count: claim.sources_used.length })}</h3>
                 <div className="space-y-3">
                   {claim.sources_used.map((source, index) => (
                     <div key={index} className="flex items-start gap-3 p-4 bg-muted rounded-lg border border-border">
@@ -222,7 +225,7 @@ export function ClaimDetailsModal({
             {/* Metadata */}
             {claim.metadata && Object.keys(claim.metadata).length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold mb-4 text-foreground">Additional Information</h3>
+                <h3 className="text-lg font-semibold mb-4 text-foreground">{t('factCheck:details.additionalInfo')}</h3>
                 <div className="bg-muted rounded-lg p-4 border border-border">
                   <dl className="space-y-3 text-sm">
                     {Object.entries(claim.metadata).map(([key, value]) => (

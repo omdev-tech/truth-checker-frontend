@@ -17,6 +17,7 @@ import {
   HelpCircle,
   X
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SessionDetailsModalProps {
   session: FactCheckSession | null;
@@ -33,6 +34,7 @@ export function SessionDetailsModal({
   onClose,
   onClaimClick
 }: SessionDetailsModalProps) {
+  const { t } = useTranslation(['factCheck', 'common']);
   if (!session) return null;
 
   const formatDate = (dateString: string) => {
@@ -75,7 +77,7 @@ export function SessionDetailsModal({
               <div className="flex items-center gap-3 mt-3">
                 <SourceTypeBadge sourceType={session.source_type} />
                 <Badge variant={session.is_completed ? "secondary" : "outline"}>
-                  {session.is_completed ? "Complete" : "Processing"}
+                  {session.is_completed ? t('common:status.completed') : t('common:status.processing')}
                 </Badge>
                 {session.is_completed && (
                   <AccuracyScore percentage={session.accuracy_percentage} size="sm" />
@@ -91,7 +93,7 @@ export function SessionDetailsModal({
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-muted-foreground" />
               <span className="font-medium text-foreground">{session.total_claims}</span>
-              <span className="text-muted-foreground">Claims</span>
+              <span className="text-muted-foreground">{t('common:ui.claims')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
@@ -118,7 +120,7 @@ export function SessionDetailsModal({
           {/* Verification breakdown */}
           {session.is_completed && session.verified_claims > 0 && (
             <div className="mt-6 pt-4 border-t border-border">
-              <h4 className="text-sm font-medium text-foreground mb-3">Verification Results</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">{t('common:ui.verificationResults')}</h4>
               <div className="flex items-center gap-6 flex-wrap">
                 {getStatusIcon(session.true_claims, CheckCircle, "text-green-600")}
                 {getStatusIcon(session.false_claims, XCircle, "text-red-600")}
@@ -133,7 +135,7 @@ export function SessionDetailsModal({
           {/* File information */}
           {(session.original_file_name || session.original_file_size_mb) && (
             <div className="mt-6 pt-4 border-t border-border">
-              <h4 className="text-sm font-medium text-foreground mb-3">File Information</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">{t('common:ui.fileInformation')}</h4>
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 {session.original_file_name && (
                   <span className="truncate">{session.original_file_name}</span>
@@ -155,7 +157,7 @@ export function SessionDetailsModal({
         <div className="flex-1 min-h-0">
           <div className="p-6 pb-4">
             <h3 className="text-lg font-semibold mb-4 text-foreground">
-              Claims ({sessionClaims.length})
+              {t('factCheck:session.claimsCount', { count: sessionClaims.length })}
             </h3>
           </div>
           
@@ -174,9 +176,9 @@ export function SessionDetailsModal({
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-                <p className="text-lg font-medium mb-2 text-foreground">No claims found</p>
+                <p className="text-lg font-medium mb-2 text-foreground">{t('factCheck:session.noClaimsTitle')}</p>
                 <p className="text-sm">
-                  This session doesn't have any claims yet.
+                  {t('factCheck:session.noClaimsDescription')}
                 </p>
               </div>
             )}

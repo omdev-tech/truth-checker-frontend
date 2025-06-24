@@ -16,12 +16,15 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { getApiLanguage } from '@/lib/languageUtils';
 
 interface LiveRecordingProps {
   className?: string;
 }
 
 export function LiveRecording({ className = '' }: LiveRecordingProps) {
+  const { t } = useTranslation('common');
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -106,10 +109,10 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
         setRecordingTime(prev => prev + 1);
       }, 1000);
 
-      toast.success('Live recording started');
+      toast.success(t('recording.toasts.started'));
     } catch (error) {
       console.error('Recording error:', error);
-      toast.error('Failed to start recording. Please check microphone permissions.');
+      toast.error(t('recording.toasts.failed'));
     }
   };
 
@@ -118,11 +121,11 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
       if (isPaused) {
         mediaRecorderRef.current.resume();
         setIsPaused(false);
-        toast.success('Recording resumed');
+        toast.success(t('recording.toasts.resumed'));
       } else {
         mediaRecorderRef.current.pause();
         setIsPaused(true);
-        toast.success('Recording paused');
+        toast.success(t('recording.toasts.paused'));
       }
     }
   };
@@ -144,7 +147,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
       setIsPaused(false);
       setRecordingTime(0);
       setAudioLevel(0);
-      toast.success('Recording stopped');
+      toast.success(t('recording.toasts.stopped'));
     }
   };
 
@@ -166,7 +169,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
       // Use the combined transcribe and fact-check endpoint (following hexagonal architecture)
       const result = await truthCheckerApi.transcribeAndFactCheckChunk(file, {
         provider: 'elevenlabs',
-        language: 'en',
+        language: getApiLanguage(),
         fast_mode: true
       });
 
@@ -195,15 +198,15 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
         };
 
         setFactCheckResults(convertedResult);
-        toast.success('Live recording processed and fact-checked!');
+        toast.success(t('recording.toasts.processed'));
       } else {
         // Handle case where no claims were found
-        toast.info('Recording processed but no verifiable claims found');
+        toast.info(t('recording.toasts.noClaimsFound'));
       }
 
     } catch (error) {
       console.error('Live recording processing error:', error);
-      toast.error('Failed to process live recording');
+      toast.error(t('recording.toasts.processingError'));
     } finally {
       setIsProcessing(false);
     }
@@ -213,7 +216,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
     setCurrentTranscript('');
     setFactCheckResults(null);
     chunksRef.current = [];
-    toast.success('Session cleared');
+    toast.success(t('recording.toasts.cleared'));
   };
 
   return (
@@ -227,9 +230,9 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
                 <Mic className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Live Recording & Fact-Check</h3>
+                <h3 className="text-lg font-semibold">{t('recording.title')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Record audio in real-time with automatic transcription and fact-checking
+                  {t('recording.description')}
                 </p>
               </div>
             </div>
@@ -268,12 +271,12 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
                 {isRecording ? (
                   <>
                     <Square className="w-5 h-5" />
-                    Stop Recording
+                    {t('actions.stopRecording')}
                   </>
                 ) : (
                   <>
                     <Mic className="w-5 h-5" />
-                    Start Recording
+                    {t('actions.startRecording')}
                   </>
                 )}
               </Button>
@@ -288,12 +291,12 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
                   {isPaused ? (
                     <>
                       <Play className="w-5 h-5" />
-                      Resume
+                      {t('actions.resumeRecording')}
                     </>
                   ) : (
                     <>
                       <Pause className="w-5 h-5" />
-                      Pause
+                      {t('actions.pauseRecording')}
                     </>
                   )}
                 </Button>
@@ -306,7 +309,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
                   size="lg"
                   className="flex items-center gap-2 h-12"
                 >
-                  Clear Session
+                  {t('recording.clear')}
                 </Button>
               )}
             </div>
@@ -325,7 +328,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
                     {formatDuration(recordingTime)}
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    {isPaused ? 'PAUSED' : 'RECORDING'}
+                    {isPaused ? t('status.paused') : t('status.recording')}
                   </span>
                 </motion.div>
               )}
@@ -340,7 +343,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
               >
                 <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
                 <span className="font-medium text-blue-700 dark:text-blue-300">
-                  Processing recording...
+                  {t('recording.processingRecording')}
                 </span>
               </motion.div>
             )}
@@ -356,7 +359,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Live Transcription</CardTitle>
+              <CardTitle className="text-lg">{t('recording.transcriptionTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="p-4 bg-muted/50 rounded-lg">
@@ -378,7 +381,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
         >
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">
-              Live Fact-Check Results
+              {t('recording.resultsTitle')}
             </h2>
             <span className="text-sm text-muted-foreground">
               {factCheckResults.results.length} result{factCheckResults.results.length !== 1 ? 's' : ''}
@@ -388,7 +391,7 @@ export function LiveRecording({ className = '' }: LiveRecordingProps) {
           {factCheckResults.results.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground">
-                No verifiable claims found in the live recording.
+                {t('recording.noVerifiableClaims')}
               </p>
             </Card>
           ) : (

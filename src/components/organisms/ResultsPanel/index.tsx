@@ -3,6 +3,7 @@
 import React from 'react';
 import { EnhancedSegmentData } from '@/lib/types';
 import { X, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ResultsPanelProps {
   segment: EnhancedSegmentData;
@@ -11,6 +12,8 @@ interface ResultsPanelProps {
 }
 
 const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReprocess }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -38,45 +41,37 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
     }
   };
 
-  const getStatusLabel = (status?: string) => {
+  const getStatusLabel = (status: string, t: any) => {
     switch (status) {
       case 'true':
-        return 'True';
+        return t('common:statuses.true');
       case 'false':
-        return 'False';
+        return t('common:statuses.false');
       case 'partially_true':
-        return 'Partially True';
+        return t('common:statuses.partiallyTrue');
       case 'uncertain':
-        return 'Uncertain';
-      case 'misleading':
-        return 'Misleading';
-      case 'unverifiable':
-        return 'Unverifiable';
-      case 'disputed':
-        return 'Disputed';
+        return t('common:statuses.uncertain');
       case 'not_checkable':
-        return 'Not Checkable';
-      case 'no_text':
-        return 'No Text';
-      case 'error':
-        return 'Error';
+        return t('common:statuses.notCheckable');
+      case 'disputed':
+        return t('common:statuses.disputed');
       default:
-        return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown';
+        return t('common:statuses.unknown');
     }
   };
 
   const getConfidenceLabel = (confidence?: string) => {
     switch (confidence) {
       case 'high':
-        return 'High';
+        return t('common:confidence.high');
       case 'medium':
-        return 'Medium';
+        return t('common:confidence.medium');
       case 'low':
-        return 'Low';
+        return t('common:confidence.low');
       case 'insufficient':
-        return 'Insufficient';
+        return t('common:confidence.insufficient');
       default:
-        return confidence ? confidence.charAt(0).toUpperCase() + confidence.slice(1) : 'Unknown';
+        return confidence ? confidence.charAt(0).toUpperCase() + confidence.slice(1) : t('common:statuses.unknown');
     }
   };
 
@@ -112,7 +107,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
         {/* Transcription */}
         {segment.transcription && (
           <div>
-            <h4 className="text-white font-medium mb-2">Transcription</h4>
+            <h4 className="text-white font-medium mb-2">{t('dashboard:results.transcription')}</h4>
             <div className="bg-gray-700 rounded-lg p-3">
               <p className="text-gray-300 text-sm leading-relaxed">
                 {segment.transcription}
@@ -124,12 +119,12 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
         {/* Fact Check Results */}
         {segment.factCheckResult && (
           <div>
-            <h4 className="text-white font-medium mb-2">Fact Check Results</h4>
+            <h4 className="text-white font-medium mb-2">{t('dashboard:results.factCheckResults')}</h4>
             
             {/* Overall Status */}
             <div className={`rounded-lg p-3 mb-3 ${getStatusColor(segment.factCheckResult.status)}`}>
               <div className="flex items-center justify-between">
-                <span className="font-medium">{getStatusLabel(segment.factCheckResult.status)}</span>
+                <span className="font-medium">{getStatusLabel(segment.factCheckResult.status, t)}</span>
                 <span className="text-sm">
                   {Math.round(segment.factCheckResult.overall_confidence * 100)}% confidence
                 </span>
@@ -140,13 +135,13 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
             {segment.factCheckResult.claims && segment.factCheckResult.claims.length > 0 && (
               <div className="space-y-3">
                 <h5 className="text-sm text-gray-400 font-medium">
-                  Claims ({segment.factCheckResult.claims.length})
+                  {t('dashboard:results.claims')} ({segment.factCheckResult.claims.length})
                 </h5>
                 {segment.factCheckResult.claims.map((claim, index) => (
                   <div key={index} className="bg-gray-700 rounded-lg p-3">
                     <div className="flex items-start justify-between mb-2">
                       <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(claim.status)}`}>
-                        {getStatusLabel(claim.status)}
+                        {getStatusLabel(claim.status, t)}
                       </span>
                       <span className="text-xs text-gray-400">{getConfidenceLabel(claim.confidence)}</span>
                     </div>
@@ -162,7 +157,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
                     {/* Sources for individual claims */}
                     {claim.sources && claim.sources.length > 0 && (
                       <div className="text-xs text-gray-400 border-t border-gray-600 pt-2 mt-2">
-                        <div className="font-medium text-gray-300 mb-1">Sources:</div>
+                        <div className="font-medium text-gray-300 mb-1">{t('dashboard:results.sources')}:</div>
                         <div className="space-y-1">
                           {claim.sources.map((source, sourceIndex) => (
                             <a
@@ -192,7 +187,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
             {segment.factCheckResult.sources && segment.factCheckResult.sources.length > 0 && (
               <div className="mt-4 pt-3 border-t border-gray-600">
                 <h5 className="text-sm text-gray-400 font-medium mb-2">
-                  All Sources ({segment.factCheckResult.sources.length})
+                  {t('dashboard:results.allSources')} ({segment.factCheckResult.sources.length})
                 </h5>
                 <div className="space-y-2">
                   {segment.factCheckResult.sources.map((source, index) => (
@@ -226,7 +221,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
              !segment.factCheckResult.claims.some(claim => claim.sources && claim.sources.length > 0) && (
               <div className="mt-4 pt-3 border-t border-gray-600">
                 <div className="text-xs text-gray-500 italic text-center py-2">
-                  No sources available for this segment
+                  {t('dashboard:results.noSourcesAvailable')}
                 </div>
               </div>
             )}
@@ -238,7 +233,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
           <div className="flex items-center justify-center p-8">
             <div className="text-center">
               <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-gray-400 text-sm">Processing claims...</p>
+                              <p className="text-gray-400 text-sm">{t('claims.processingClaims')}</p>
             </div>
           </div>
         )}
@@ -259,10 +254,10 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ segment, onClose, onReproce
         {/* Metadata */}
         {segment.processingTime && (
           <div className="border-t border-gray-700 pt-4">
-            <h5 className="text-sm text-gray-400 font-medium mb-2">Metadata</h5>
+            <h5 className="text-sm text-gray-400 font-medium mb-2">{t('dashboard:results.metadata')}</h5>
             <div className="text-xs text-gray-500 space-y-1">
-              <div>Processing time: {segment.processingTime.toFixed(2)}s</div>
-              <div>Last updated: {segment.lastUpdated.toLocaleTimeString()}</div>
+              <div>{t('dashboard:results.processingTime')}: {segment.processingTime.toFixed(2)}s</div>
+              <div>{t('dashboard:results.lastUpdated')}: {segment.lastUpdated.toLocaleTimeString()}</div>
             </div>
           </div>
         )}

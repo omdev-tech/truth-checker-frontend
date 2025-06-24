@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export function FactCheckHistoryDashboard() {
+  const { t } = useTranslation(['dashboard', 'factCheck', 'common']);
   const router = useRouter();
   const {
     sessions,
@@ -30,6 +32,7 @@ export function FactCheckHistoryDashboard() {
     isLoading,
     error,
     hasMore,
+    isInitialized,
     loadMore,
     refreshHistory,
     setFilters,
@@ -92,11 +95,11 @@ export function FactCheckHistoryDashboard() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back
+            {t('common:actions.back')}
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Fact-Check History</h1>
-            <p className="text-muted-foreground">Review your past fact-checking sessions and results</p>
+            <h1 className="text-3xl font-bold text-foreground">{t('dashboard:history.title')}</h1>
+            <p className="text-muted-foreground">{t('dashboard:history.subtitle')}</p>
           </div>
         </div>
         <Button
@@ -106,7 +109,7 @@ export function FactCheckHistoryDashboard() {
           className="flex items-center gap-2"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
+          {t('common:actions.refresh')}
         </Button>
       </div>
 
@@ -118,25 +121,25 @@ export function FactCheckHistoryDashboard() {
         </Alert>
       )}
 
-      {/* Statistics Overview */}
+      {/* Statistics Overview - only show if we have statistics */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard:history.stats.totalSessions')}</CardTitle>
               <FileText className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">{statistics.total_sessions}</div>
               <p className="text-xs text-muted-foreground">
-                {statistics.total_claims} claims processed
+                {t('dashboard:history.stats.claimsProcessed', { count: statistics.total_claims })}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Processing Time</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard:history.stats.processingTime')}</CardTitle>
               <Clock className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -144,14 +147,14 @@ export function FactCheckHistoryDashboard() {
                 {formatDuration(statistics.total_processing_time_seconds)}
               </div>
               <p className="text-xs text-muted-foreground">
-                Avg: {formatDuration(statistics.average_processing_time_per_claim)} per claim
+                {t('dashboard:history.stats.averagePerClaim', { avg: formatDuration(statistics.average_processing_time_per_claim) })}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Accuracy Trends</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard:history.stats.accuracyTrends')}</CardTitle>
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -160,7 +163,7 @@ export function FactCheckHistoryDashboard() {
                   <div key={status} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(status, "w-3 h-3")}
-                      <span className="capitalize text-foreground">{status.replace('_', ' ')}</span>
+                      <span className="capitalize text-foreground">{t(`factCheck:status.${status}`)}</span>
                     </div>
                     <span className="font-medium text-foreground">{String(count)}</span>
                   </div>
@@ -171,7 +174,7 @@ export function FactCheckHistoryDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Source Types</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard:history.stats.sourceTypes')}</CardTitle>
               <BarChart3 className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -189,15 +192,15 @@ export function FactCheckHistoryDashboard() {
       )}
 
       {/* Loading state for initial load */}
-      {isLoading && sessions.length === 0 && claims.length === 0 && (
+      {(isLoading && !isInitialized) && (
         <div className="flex items-center justify-center py-12">
           <LoadingSpinner />
-          <span className="ml-2 text-muted-foreground">Loading your history...</span>
+          <span className="ml-2 text-muted-foreground">{t('dashboard:history.loading')}</span>
         </div>
       )}
 
-      {/* History List */}
-      {(sessions.length > 0 || claims.length > 0 || (!isLoading && !error)) && (
+      {/* History List - only render when initialized and there's data */}
+      {isInitialized && (sessions.length > 0 || claims.length > 0) && (
         <FactCheckHistoryList
           sessions={sessions}
           claims={claims}
@@ -210,18 +213,18 @@ export function FactCheckHistoryDashboard() {
         />
       )}
 
-      {/* Empty state when no data and not loading */}
-      {!isLoading && !error && sessions.length === 0 && claims.length === 0 && statistics && (
+      {/* Empty state - only show when initialized and no data */}
+      {isInitialized && !isLoading && !error && sessions.length === 0 && claims.length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h3 className="text-lg font-semibold mb-2 text-foreground">No History Yet</h3>
+            <h3 className="text-lg font-semibold mb-2 text-foreground">{t('dashboard:history.empty.title')}</h3>
             <p className="text-muted-foreground mb-4">
-              Start fact-checking to build your history and track your accuracy over time.
+              {t('dashboard:history.empty.description')}
             </p>
             <Button onClick={() => router.push('/')} className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
-              Start Fact-Checking
+              {t('dashboard:history.empty.startButton')}
             </Button>
           </CardContent>
         </Card>

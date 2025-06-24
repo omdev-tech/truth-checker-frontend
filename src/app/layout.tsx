@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers/Providers";
+import { headers } from 'next/headers';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -45,17 +46,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get the detected language from middleware headers
+  const headersList = await headers();
+  const detectedLanguage = headersList.get('x-detected-language') || 'en';
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={detectedLanguage} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
+        <Providers detectedLanguage={detectedLanguage}>
           {children}
         </Providers>
       </body>

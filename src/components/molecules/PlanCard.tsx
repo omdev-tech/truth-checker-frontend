@@ -7,6 +7,7 @@ import { UpgradeButton } from '@/components/atoms/UpgradeButton';
 import { Check, Star, Zap } from 'lucide-react';
 import { PlanConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface PlanCardProps {
   plan: PlanConfig;
@@ -29,6 +30,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   className,
   earlyDevelopmentDiscount = 0,
 }) => {
+  const { t } = useTranslation();
   const originalPrice = billingCycle === 'monthly' ? plan.pricing.monthly : plan.pricing.annual;
   const discountedPrice = earlyDevelopmentDiscount > 0 && originalPrice > 0 
     ? originalPrice * (1 - earlyDevelopmentDiscount / 100) 
@@ -38,13 +40,13 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   const originalMonthlyPrice = billingCycle === 'annual' ? originalPrice / 12 : originalPrice;
 
   const formatPrice = (amount: number) => {
-    if (amount === 0) return 'Free';
+    if (amount === 0) return t('dashboard:plans.pricing.free');
     return `${plan.pricing.currency === 'EUR' ? '€' : '$'}${amount.toFixed(2)}`;
   };
 
   const formatMonthlyPrice = (amount: number) => {
-    if (amount === 0) return 'Free';
-    return `${plan.pricing.currency === 'EUR' ? '€' : '$'}${amount.toFixed(2)}/month`;
+    if (amount === 0) return t('dashboard:plans.pricing.free');
+    return `${plan.pricing.currency === 'EUR' ? '€' : '$'}${amount.toFixed(2)}/${t('dashboard:plans.pricing.perMonth')}`;
   };
 
   const hasDiscount = earlyDevelopmentDiscount > 0 && originalPrice > 0;
@@ -52,7 +54,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   return (
     <Card 
       className={cn(
-        'relative w-full transition-all duration-200 hover:shadow-lg',
+        'relative w-full transition-all duration-200 hover:shadow-lg flex flex-col h-full',
         isPopular && 'border-primary shadow-md',
         isCurrentPlan && 'ring-2 ring-primary ring-offset-2',
         hasDiscount && 'border-orange-300 shadow-orange-100 dark:border-orange-700 dark:shadow-orange-950',
@@ -64,7 +66,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
         <div className="absolute -top-3 left-4">
           <Badge className="bg-orange-500 text-white px-3 py-1 shadow-lg">
             <Zap className="h-3 w-3 mr-1" />
-            {earlyDevelopmentDiscount}% OFF
+            {t('dashboard:plans.badges.discount', { percent: earlyDevelopmentDiscount })}
           </Badge>
         </div>
       )}
@@ -77,7 +79,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
         )}>
           <Badge className="bg-primary text-primary-foreground px-3 py-1">
             <Star className="h-3 w-3 mr-1" />
-            Most Popular
+            {t('dashboard:plans.badges.mostPopular')}
           </Badge>
         </div>
       )}
@@ -85,7 +87,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
       {/* Current Plan Badge */}
       {isCurrentPlan && (
         <div className="absolute top-4 right-4">
-          <Badge variant="secondary">Current Plan</Badge>
+          <Badge variant="secondary">{t('dashboard:plans.badges.currentPlan')}</Badge>
         </div>
       )}
 
@@ -107,7 +109,10 @@ export const PlanCard: React.FC<PlanCardProps> = ({
                 {formatPrice(price)}
               </div>
               <div className="text-xs text-orange-600 font-medium">
-                Save {formatPrice(originalPrice - price)} ({earlyDevelopmentDiscount}% off)
+                {t('dashboard:plans.pricing.save', { 
+                  amount: formatPrice(originalPrice - price), 
+                  percent: earlyDevelopmentDiscount 
+                })}
               </div>
             </div>
           ) : (
@@ -122,93 +127,96 @@ export const PlanCard: React.FC<PlanCardProps> = ({
               {hasDiscount ? (
                 <div className="space-y-1">
                   <div className="line-through text-xs">
-                    {formatMonthlyPrice(originalMonthlyPrice)} billed annually
+                    {formatMonthlyPrice(originalMonthlyPrice)} {t('dashboard:plans.pricing.billedAnnually')}
                   </div>
                   <div className="text-orange-600 font-medium">
-                    {formatMonthlyPrice(monthlyPrice)} billed annually
+                    {formatMonthlyPrice(monthlyPrice)} {t('dashboard:plans.pricing.billedAnnually')}
                   </div>
                 </div>
               ) : (
-                <div>{formatMonthlyPrice(monthlyPrice)} billed annually</div>
+                <div>{formatMonthlyPrice(monthlyPrice)} {t('dashboard:plans.pricing.billedAnnually')}</div>
               )}
             </div>
           )}
           
           {billingCycle === 'monthly' && price > 0 && !hasDiscount && (
-            <div className="text-sm text-muted-foreground">per month</div>
+            <div className="text-sm text-muted-foreground">{t('dashboard:plans.pricing.perMonth')}</div>
           )}
           
           {billingCycle === 'annual' && plan.pricing.annual_discount > 0 && !hasDiscount && (
             <div className="text-sm text-green-600 font-medium">
-              Save {plan.pricing.annual_discount}% annually
+              {t('dashboard:plans.pricing.saveAnnually', { percent: plan.pricing.annual_discount })}
             </div>
           )}
           
           {hasDiscount && (
             <div className="text-sm text-orange-600 font-medium bg-orange-50 dark:bg-orange-950/30 px-2 py-1 rounded-md">
-              🚀 Early Adopter Price
+              {t('dashboard:plans.pricing.earlyAdopterPrice')}
             </div>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Limits */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium">What's included:</div>
-          <div className="space-y-1 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Check className="h-4 w-4 text-green-600" />
-              <span>{plan.limits.requests_per_month.toLocaleString()} requests/month</span>
-            </div>
-            {plan.limits.hours_per_month > 0 && (
+      <CardContent className="space-y-6 flex-1 flex flex-col">
+        {/* Content Section - takes up available space */}
+        <div className="flex-1 space-y-6">
+          {/* Limits */}
+          <div className="space-y-2">
+            <div className="text-sm font-medium">{t('dashboard:plans.features.whatsIncluded')}</div>
+            <div className="space-y-1 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-600" />
-                <span>{plan.limits.hours_per_month.toLocaleString()} hours processing</span>
+                <span>{t('dashboard:plans.features.requestsPerMonth', { count: plan.limits.requests_per_month })}</span>
               </div>
-            )}
+              {plan.limits.hours_per_month > 0 && (
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span>{t('dashboard:plans.features.hoursProcessing', { count: plan.limits.hours_per_month })}</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Features */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium">Features:</div>
-          <ul className="space-y-1">
-            {plan.features.map((feature, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                <span>{feature}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Early Development Bonus Features */}
-        {hasDiscount && (
-          <div className="space-y-2 border-t pt-4">
-            <div className="text-sm font-medium text-orange-600">🎁 Early Adopter Bonus:</div>
+          {/* Features */}
+          <div className="space-y-2">
+            <div className="text-sm font-medium">{t('dashboard:plans.features.features')}</div>
             <ul className="space-y-1">
-              <li className="flex items-start gap-2 text-sm text-orange-600">
-                <Check className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                <span>Price locked for life</span>
-              </li>
-              <li className="flex items-start gap-2 text-sm text-orange-600">
-                <Check className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                <span>Priority support</span>
-              </li>
-              <li className="flex items-start gap-2 text-sm text-orange-600">
-                <Check className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                <span>Exclusive beta features</span>
-              </li>
+              {plan.features.map((feature, index) => (
+                <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>{feature}</span>
+                </li>
+              ))}
             </ul>
           </div>
-        )}
 
-        {/* Action Button */}
-        <div className="pt-4">
+          {/* Early Development Bonus Features */}
+          {hasDiscount && (
+            <div className="space-y-2 border-t pt-4">
+              <div className="text-sm font-medium text-orange-600">{t('dashboard:plans.features.earlyAdopterBonus')}</div>
+              <ul className="space-y-1">
+                <li className="flex items-start gap-2 text-sm text-orange-600">
+                  <Check className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <span>{t('dashboard:plans.features.priceLockedForLife')}</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-orange-600">
+                  <Check className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <span>{t('dashboard:plans.features.prioritySupport')}</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-orange-600">
+                  <Check className="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                  <span>{t('dashboard:plans.features.exclusiveBetaFeatures')}</span>
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Action Button - always at bottom */}
+        <div className="pt-4 mt-auto">
           {isCurrentPlan ? (
             <div className="text-center py-2 text-sm text-muted-foreground">
-              Your current plan
+              {t('dashboard:plans.actions.yourCurrentPlan')}
             </div>
           ) : (
             <UpgradeButton
@@ -218,7 +226,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
               fullWidth
               disabled={!onUpgrade}
             >
-              {plan.pricing.monthly === 0 ? 'Get Started' : hasDiscount ? `Get ${earlyDevelopmentDiscount}% Off` : 'Upgrade Now'}
+              {plan.pricing.monthly === 0 ? t('dashboard:plans.actions.getStarted') : hasDiscount ? t('dashboard:plans.actions.getDiscount', { percent: earlyDevelopmentDiscount }) : t('dashboard:plans.actions.upgradeNow')}
             </UpgradeButton>
           )}
         </div>

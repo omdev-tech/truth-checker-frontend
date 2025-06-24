@@ -11,12 +11,15 @@ import { formatDuration } from '@/lib/format';
 import { Upload, Video, FileAudio } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { getApiLanguage } from '@/lib/languageUtils';
 
 interface AudioFactCheckerProps {
   onFileUpload?: (file: File) => void;
 }
 
 export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
+  const { t } = useTranslation(['factCheck', 'common']);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [transcriptionResult, setTranscriptionResult] = useState<TranscriptionResult | null>(null);
   const [factCheckResults, setFactCheckResults] = useState<FactCheckResponse | null>(null);
@@ -64,7 +67,7 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
       // Transcribe the file
       const transcription = await truthCheckerApi.transcribeFile(file, {
         provider: 'elevenlabs',
-        language: 'en'
+        language: getApiLanguage()
       });
 
       setTranscriptionResult(transcription);
@@ -74,7 +77,7 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
       if (transcription.text) {
         factCheck = await truthCheckerApi.checkText({
           text: transcription.text,
-          language: 'en'
+          language: getApiLanguage()
         });
 
         setFactCheckResults(factCheck);
@@ -152,9 +155,9 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
                 <Upload className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold">Upload Media Files</h3>
+                <h3 className="text-lg font-semibold">{t('factCheck:audio.uploadTitle')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Support for videos, audio files, and more formats
+                  {t('factCheck:audio.supportDescription')}
                 </p>
             </div>
           </div>
@@ -170,11 +173,11 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Video className="w-4 h-4" />
-                <span>Video Files</span>
+                <span>{t('factCheck:media.videoFiles')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <FileAudio className="w-4 h-4" />
-                <span>Audio Files</span>
+                <span>{t('factCheck:media.audioFiles')}</span>
               </div>
             </div>
           </div>
@@ -189,21 +192,21 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
         >
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Transcription</CardTitle>
+              <CardTitle className="text-lg">{t('factCheck:audio.transcriptionTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Duration:</span>
+                    <span className="text-muted-foreground">{t('factCheck:audio.duration')}</span>
                     <p className="font-medium">{formatDuration(transcriptionResult.end_time - transcriptionResult.start_time)}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Language:</span>
+                    <span className="text-muted-foreground">{t('factCheck:audio.language')}</span>
                     <p className="font-medium uppercase">{transcriptionResult.language}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Confidence:</span>
+                    <span className="text-muted-foreground">{t('factCheck:audio.confidence')}</span>
                     <p className="font-medium">{Math.round(transcriptionResult.confidence * 100)}%</p>
                   </div>
                 </div>
@@ -228,17 +231,17 @@ export function AudioFactChecker({ onFileUpload }: AudioFactCheckerProps) {
         >
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">
-              Verification Results
+              {t('factCheck:results.title')}
             </h2>
             <span className="text-sm text-muted-foreground">
-              {factCheckResults.results.length} result{factCheckResults.results.length !== 1 ? 's' : ''}
+              {t('factCheck:audio.resultCount', { count: factCheckResults.results.length })}
             </span>
           </div>
 
           {factCheckResults.results.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground">
-                No verifiable claims found in the transcribed audio.
+                {t('factCheck:audio.noClaimsFound')}
               </p>
             </Card>
           ) : (

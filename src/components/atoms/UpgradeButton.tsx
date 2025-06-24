@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, Crown, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,8 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
   children,
   className,
 }) => {
+  const { t } = useTranslation(['common']);
+
   const getIcon = () => {
     switch (variant) {
       case 'premium':
@@ -75,7 +78,7 @@ export const UpgradeButton: React.FC<UpgradeButtonProps> = ({
       ) : (
         getIcon()
       )}
-      {children || (loading ? 'Processing...' : 'Upgrade Plan')}
+      {children || (loading ? t('common:actions.processing') : t('common:plans.upgradePlan'))}
     </Button>
   );
 }; 

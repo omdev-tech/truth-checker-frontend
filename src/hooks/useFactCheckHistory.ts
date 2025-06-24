@@ -12,6 +12,7 @@ interface UseFactCheckHistoryReturn {
   isLoading: boolean;
   error: string | null;
   hasMore: boolean;
+  isInitialized: boolean;
   
   // Actions
   loadHistory: (filters?: HistoryFilters) => Promise<void>;
@@ -32,6 +33,7 @@ export function useFactCheckHistory(): UseFactCheckHistoryReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Use ref to store current filters to avoid dependency cycles
   const currentFiltersRef = useRef<HistoryFilters>({
@@ -63,20 +65,34 @@ export function useFactCheckHistory(): UseFactCheckHistoryReturn {
       }
       
       setStatistics(response.statistics);
-      setHasMore(
+      
+      // Properly determine if there's more data
+      // If we got less than the limit, there's no more data
+      const hasMoreData = (
         response.sessions.length === (mergedFilters.limit || DEFAULT_LIMIT) ||
         response.claims.length === (mergedFilters.limit || DEFAULT_LIMIT)
       );
+      setHasMore(hasMoreData);
       
       // Update filters ref
       currentFiltersRef.current = mergedFilters;
+      
+      // Mark as initialized after first successful load
+      if (!isInitialized) {
+        setIsInitialized(true);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load history');
       console.error('Error loading history:', err);
+      
+      // Mark as initialized even on error to prevent infinite retries
+      if (!isInitialized) {
+        setIsInitialized(true);
+      }
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isInitialized]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || isLoading) return;
@@ -92,6 +108,8 @@ export function useFactCheckHistory(): UseFactCheckHistoryReturn {
   }, [loadHistory]);
 
   const setFilters = useCallback((filters: HistoryFilters) => {
+    // Reset hasMore when changing filters to allow new searches
+    setHasMore(true);
     loadHistory({ ...filters, offset: 0 });
   }, [loadHistory]);
 
@@ -100,7 +118,7 @@ export function useFactCheckHistory(): UseFactCheckHistoryReturn {
     let isMounted = true;
     
     const loadInitialData = async () => {
-      if (isMounted) {
+      if (isMounted && !isInitialized) {
         await loadHistory();
       }
     };
@@ -110,7 +128,7 @@ export function useFactCheckHistory(): UseFactCheckHistoryReturn {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array
+  }, [loadHistory, isInitialized]);
 
   return {
     // Data
@@ -122,6 +140,7 @@ export function useFactCheckHistory(): UseFactCheckHistoryReturn {
     isLoading,
     error,
     hasMore,
+    isInitialized,
     
     // Actions
     loadHistory,

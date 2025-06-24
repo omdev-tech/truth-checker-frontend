@@ -5,6 +5,7 @@ import { SequencerState, SegmentData, ChunkProcessingResponse } from '@/lib/type
 import { truthCheckerApi } from '@/lib/api';
 import { CONFIG } from '@/lib/config';
 import ColorLegend from '../../molecules/ColorLegend';
+import { useTranslation } from 'react-i18next';
 
 // Temporary simple implementations - will be replaced with full components
 interface VideoPlayerProps {
@@ -74,6 +75,8 @@ interface FactCheckModalProps {
 }
 
 const FactCheckModal: React.FC<FactCheckModalProps> = ({ segment, isOpen, onClose }) => {
+  const { t } = useTranslation('common');
+  
   if (!isOpen) return null;
   
   return (
@@ -107,27 +110,20 @@ const FactCheckModal: React.FC<FactCheckModalProps> = ({ segment, isOpen, onClos
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">Status:</span>
-                  <span className={`
-                    px-2 py-1 rounded text-sm
-                    ${segment.factCheckResult.status === 'true' ? 'bg-green-100 text-green-800' : ''}
-                    ${segment.factCheckResult.status === 'false' ? 'bg-red-100 text-red-800' : ''}
-                    ${segment.factCheckResult.status === 'partially_true' ? 'bg-yellow-100 text-yellow-800' : ''}
-                    ${segment.factCheckResult.status === 'uncertain' ? 'bg-orange-100 text-orange-800' : ''}
-                    ${segment.factCheckResult.status === 'misleading' ? 'bg-orange-100 text-orange-800' : ''}
-                    ${segment.factCheckResult.status === 'unverifiable' ? 'bg-gray-100 text-gray-800' : ''}
-                    ${segment.factCheckResult.status === 'disputed' ? 'bg-purple-100 text-purple-800' : ''}
-                    ${segment.factCheckResult.status === 'not_checkable' || segment.factCheckResult.status === 'no_text' ? 'bg-gray-100 text-gray-800' : ''}
-                  `}>
-                    {segment.factCheckResult.status === 'true' ? 'True' :
-                     segment.factCheckResult.status === 'false' ? 'False' :
-                     segment.factCheckResult.status === 'partially_true' ? 'Partially True' :
-                     segment.factCheckResult.status === 'uncertain' ? 'Uncertain' :
-                     segment.factCheckResult.status === 'misleading' ? 'Misleading' :
-                     segment.factCheckResult.status === 'unverifiable' ? 'Unverifiable' :
-                     segment.factCheckResult.status === 'disputed' ? 'Disputed' :
-                     segment.factCheckResult.status === 'not_checkable' ? 'Not Checkable' :
-                     segment.factCheckResult.status === 'no_text' ? 'No Text' :
-                     segment.factCheckResult.status}
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    segment.factCheckResult.status === 'true' ? 'bg-green-100 text-green-800' :
+                    segment.factCheckResult.status === 'false' ? 'bg-red-100 text-red-800' :
+                    segment.factCheckResult.status === 'partially_true' ? 'bg-yellow-100 text-yellow-800' :
+                    segment.factCheckResult.status === 'uncertain' ? 'bg-orange-100 text-orange-800' :
+                    segment.factCheckResult.status === 'disputed' ? 'bg-purple-100 text-purple-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                                        {segment.factCheckResult.status === 'true' ? t('statuses.true') :
+                    segment.factCheckResult.status === 'false' ? t('statuses.false') :
+                    segment.factCheckResult.status === 'partially_true' ? t('statuses.partiallyTrue') :
+                    segment.factCheckResult.status === 'uncertain' ? t('statuses.uncertain') :
+                    segment.factCheckResult.status === 'disputed' ? t('statuses.disputed') :
+                    t('statuses.unknown')}
                   </span>
                 </div>
                 
@@ -139,17 +135,15 @@ const FactCheckModal: React.FC<FactCheckModalProps> = ({ segment, isOpen, onClos
                         <li key={index} className="bg-gray-50 p-3 rounded">
                           <div className="font-medium">{claim.text}</div>
                           <div className="text-sm text-gray-600 mt-1">
-                            Status: {claim.status === 'true' ? 'True' :
-                                   claim.status === 'false' ? 'False' :
-                                   claim.status === 'partially_true' ? 'Partially True' :
-                                   claim.status === 'uncertain' ? 'Uncertain' :
-                                   claim.status === 'misleading' ? 'Misleading' :
-                                   claim.status === 'unverifiable' ? 'Unverifiable' :
-                                   claim.status === 'disputed' ? 'Disputed' :
-                                   claim.status} | Confidence: {claim.confidence === 'high' ? 'High' :
-                                                               claim.confidence === 'medium' ? 'Medium' :
-                                                               claim.confidence === 'low' ? 'Low' :
-                                                               claim.confidence === 'insufficient' ? 'Insufficient' :
+                            Status: {claim.status === 'true' ? t('statuses.true') :
+                                   claim.status === 'false' ? t('statuses.false') :
+                                   claim.status === 'partially_true' ? t('statuses.partiallyTrue') :
+                                   claim.status === 'uncertain' ? t('statuses.uncertain') :
+                            claim.status === 'disputed' ? t('statuses.disputed') :
+                            t('statuses.unknown')} | Confidence: {claim.confidence === 'high' ? t('confidence.high') :
+                                                       claim.confidence === 'medium' ? t('confidence.medium') :
+                                                       claim.confidence === 'low' ? t('confidence.low') :
+                                                               claim.confidence === 'insufficient' ? t('confidence.insufficient') :
                                                                claim.confidence}
                           </div>
                           {claim.explanation && (
@@ -182,6 +176,8 @@ const VideoSequencer: React.FC<VideoSequencerProps> = ({
   chunkDuration = CONFIG.MEDIA.CHUNK_DURATION,
   maxParallelProcessing = CONFIG.MEDIA.MAX_PARALLEL_PROCESSING,
 }) => {
+  const { t } = useTranslation('common');
+  
   const [state, setState] = useState<SequencerState>({
     file: null,
     duration: 0,

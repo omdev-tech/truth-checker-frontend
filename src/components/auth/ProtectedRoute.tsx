@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+// import { useEffect } from 'react'; // Unused import
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { motion } from 'framer-motion';
 import { Shield, AlertTriangle } from 'lucide-react';
@@ -23,6 +24,7 @@ export function ProtectedRoute({
   fallback,
   requireAuth = true 
 }: ProtectedRouteProps) {
+  const { t } = useTranslation(['auth', 'common']);
   const { isAuthenticated, isLoading, signIn } = useAuth();
 
   // Show loading state while checking authentication
@@ -35,7 +37,7 @@ export function ProtectedRoute({
           className="text-center space-y-4"
         >
           <LoadingSpinner size="lg" />
-          <p className="text-muted-foreground">Checking authentication...</p>
+          <p className="text-muted-foreground">{t('auth:checking')}</p>
         </motion.div>
       </div>
     );
@@ -62,10 +64,10 @@ export function ProtectedRoute({
           
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-foreground">
-              Authentication Required
+              {t('auth:required.title')}
             </h2>
             <p className="text-muted-foreground">
-              Please sign in to access this page. We'll redirect you back here after authentication.
+              {t('auth:required.description')}
             </p>
           </div>
 
@@ -74,7 +76,7 @@ export function ProtectedRoute({
               onClick={signIn}
               className="w-full bg-primary hover:bg-primary/90"
             >
-              Sign In with Google
+              {t('auth:signInGoogle')}
             </Button>
             
             <Button 
@@ -82,14 +84,14 @@ export function ProtectedRoute({
               onClick={() => window.location.href = '/'}
               className="w-full"
             >
-              Back to Home
+              {t('common:actions.backToHome')}
             </Button>
           </div>
 
           <div className="text-xs text-muted-foreground">
             <div className="flex items-center justify-center space-x-2">
               <AlertTriangle className="h-3 w-3" />
-              <span>Secure authentication powered by Google</span>
+              <span>{t('auth:secureAuth')}</span>
             </div>
           </div>
         </motion.div>

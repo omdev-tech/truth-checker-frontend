@@ -10,6 +10,7 @@ import { PlanConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useTranslation } from 'react-i18next';
 
 interface PlanSelectorProps {
   currentPlan?: string;
@@ -24,6 +25,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
   className,
   earlyDevelopmentDiscount = 0,
 }) => {
+  const { t } = useTranslation();
   const [plans, setPlans] = useState<PlanConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
         <CardContent className="flex items-center justify-center py-12">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <span>Loading plans...</span>
+            <span>{t('dashboard:plans.loadingPlans')}</span>
           </div>
         </CardContent>
       </Card>
@@ -91,7 +93,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
                 onClick={loadPlans}
                 className="ml-2"
               >
-                Try Again
+                {t('dashboard:plans.tryAgain')}
               </Button>
             </AlertDescription>
           </Alert>
@@ -106,11 +108,11 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <CardTitle className="text-2xl font-bold">Choose Your Plan</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t('dashboard:plans.title')}</CardTitle>
             <div className="flex items-center gap-4">
               {/* Currency Toggle */}
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Currency:</span>
+                <span className="text-sm text-muted-foreground">{t('dashboard:plans.currency')}:</span>
                 <CurrencyToggle
                   currency={currency}
                   onCurrencyChange={setCurrency}
@@ -131,7 +133,7 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
                 onClick={() => setBillingCycle('monthly')}
                 className="px-4"
               >
-                Monthly
+                {t('dashboard:plans.billingCycle.monthly')}
               </Button>
               <Button
                 variant={billingCycle === 'annual' ? 'default' : 'ghost'}
@@ -139,9 +141,9 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
                 onClick={() => setBillingCycle('annual')}
                 className="px-4"
               >
-                Annual
+                {t('dashboard:plans.billingCycle.annual')}
                 <span className="ml-1 text-xs bg-green-100 text-green-700 px-1 rounded">
-                  20% OFF
+                  {t('dashboard:plans.billingCycle.annualDiscount')}
                 </span>
               </Button>
             </div>
@@ -166,14 +168,14 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
           {/* Additional Info */}
           <div className="mt-8 text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              All plans include our core fact-checking features and API access.
+              {t('dashboard:plans.info.allPlansInclude')}
             </p>
             <p className="text-sm text-muted-foreground">
-              Upgrade or downgrade at any time. Unused credits don't expire.
+              {t('dashboard:plans.info.flexibleBilling')}
             </p>
             {earlyDevelopmentDiscount > 0 && (
               <p className="text-sm text-orange-600 font-medium">
-                🎉 Early adopter pricing - Save {earlyDevelopmentDiscount}% on all plans!
+                {t('dashboard:plans.info.earlyAdopterPricing', { percent: earlyDevelopmentDiscount })}
               </p>
             )}
           </div>

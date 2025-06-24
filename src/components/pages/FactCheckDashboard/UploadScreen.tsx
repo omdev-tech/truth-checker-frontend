@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileVideo, FileAudio, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ColorLegend from '../../molecules/ColorLegend';
@@ -10,6 +11,7 @@ interface UploadScreenProps {
 }
 
 const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -34,9 +36,9 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
       setIsUploading(true);
       onFileUpload(file);
     } else {
-      alert('Please upload a video or audio file');
+      alert(t('dashboard:upload.invalidFileType'));
     }
-  }, [onFileUpload]);
+  }, [onFileUpload, t]);
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,14 +59,13 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
         >
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-blue-100 rounded-full text-sm text-blue-700 font-medium">
             <Sparkles className="w-4 h-4" />
-            AI-Powered Fact Checking
+            {t('dashboard:upload.aiPowered')}
           </div>
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
-            Video Fact-Check Studio
+            {t('dashboard:upload.title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Upload your video or audio content and get real-time fact-checking analysis 
-            with professional timeline controls and detailed claim verification.
+            {t('dashboard:upload.subtitle')}
           </p>
         </motion.div>
 
@@ -104,8 +105,8 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
                   className="flex flex-col items-center"
                 >
                   <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                  <p className="text-lg font-medium text-gray-700">Processing your file...</p>
-                  <p className="text-sm text-gray-500">Creating segments and preparing for analysis</p>
+                  <p className="text-lg font-medium text-gray-700">{t('dashboard:upload.processing')}</p>
+                  <p className="text-sm text-gray-500">{t('dashboard:upload.preparingAnalysis')}</p>
                 </motion.div>
               ) : (
                 <>
@@ -120,10 +121,10 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
                   
                   <div className="space-y-2">
                     <h3 className="text-2xl font-semibold text-gray-800">
-                      Drop your media file here
+                      {t('dashboard:upload.dropZoneTitle')}
                     </h3>
                     <p className="text-gray-600">
-                      or click to browse and select a video or audio file
+                      {t('dashboard:upload.dropZoneSubtitle')}
                     </p>
                   </div>
                   
@@ -134,13 +135,13 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
                       className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
                     >
                       <Upload className="w-5 h-5" />
-                      Choose File
+                      {t('dashboard:upload.chooseFile')}
                     </motion.button>
                   </div>
                   
                   <div className="mt-6 text-sm text-gray-500">
-                    <p>Supported formats: MP4, AVI, MOV, WebM, MP3, WAV, M4A</p>
-                    <p>Maximum file size: 500MB</p>
+                    <p>{t('dashboard:upload.supportedFormats')}</p>
+                    <p>{t('dashboard:upload.maxFileSize')}</p>
                   </div>
                 </>
               )}
@@ -169,9 +170,9 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <FileVideo className="w-6 h-6 text-green-600" />
             </div>
-            <h3 className="font-semibold mb-2">Professional Timeline</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:upload.features.timeline.title')}</h3>
             <p className="text-sm text-gray-600">
-              Video editor-style timeline with segment thumbnails and real-time status updates
+              {t('dashboard:upload.features.timeline.description')}
             </p>
           </div>
 
@@ -179,9 +180,9 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-6 h-6 text-blue-600" />
             </div>
-            <h3 className="font-semibold mb-2">AI-Powered Analysis</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:upload.features.analysis.title')}</h3>
             <p className="text-sm text-gray-600">
-              Advanced fact-checking with confidence scores and detailed explanations
+              {t('dashboard:upload.features.analysis.description')}
             </p>
           </div>
 
@@ -189,9 +190,9 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ onFileUpload }) => {
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <FileAudio className="w-6 h-6 text-purple-600" />
             </div>
-            <h3 className="font-semibold mb-2">Multi-Format Support</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:upload.features.formats.title')}</h3>
             <p className="text-sm text-gray-600">
-              Works with all popular video and audio formats with automatic transcription
+              {t('dashboard:upload.features.formats.description')}
             </p>
           </div>
         </motion.div>

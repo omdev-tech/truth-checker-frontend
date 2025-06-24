@@ -12,8 +12,10 @@ import { Header } from '@/components/layout/Header';
 import { TabType, StreamData, StreamMetadata } from '@/lib/types';
 import { MessageSquare, Play, Mic, Radio, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export function MainPageTemplate() {
+  const { t } = useTranslation(['dashboard', 'common']);
   const [activeTab, setActiveTab] = useState<TabType>('text');
   const [showDashboard, setShowDashboard] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -59,14 +61,13 @@ export function MainPageTemplate() {
         >
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 rounded-full text-sm text-primary font-medium">
             <Sparkles className="w-4 h-4" />
-            Powered by Advanced AI
+            {t('dashboard:hero.poweredBy')}
           </div>
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-4">
-            Verify Facts in Real-Time
+            {t('dashboard:hero.title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Our AI-powered fact-checking system analyzes text, documents, audio, and live streams to help you 
-            verify information instantly with authoritative sources.
+            {t('dashboard:hero.subtitle')}
           </p>
         </motion.div>
 
@@ -97,7 +98,7 @@ export function MainPageTemplate() {
                         className="flex items-center gap-2"
                       >
                         <MessageSquare className="w-4 h-4" />
-                        <span className="hidden sm:inline">Text</span>
+                        <span className="hidden sm:inline">{t('dashboard:tabs.text')}</span>
                       </motion.div>
                     </TabsTrigger>
                     <TabsTrigger 
@@ -110,7 +111,7 @@ export function MainPageTemplate() {
                         className="flex items-center gap-2"
                       >
                         <Play className="w-4 h-4" />
-                        <span className="hidden sm:inline">Media</span>
+                        <span className="hidden sm:inline">{t('dashboard:tabs.media')}</span>
                       </motion.div>
                     </TabsTrigger>
                     <TabsTrigger 
@@ -123,7 +124,7 @@ export function MainPageTemplate() {
                         className="flex items-center gap-2"
                       >
                         <Radio className="w-4 h-4" />
-                        <span className="hidden sm:inline">Stream</span>
+                        <span className="hidden sm:inline">{t('dashboard:tabs.stream')}</span>
                       </motion.div>
                     </TabsTrigger>
                     <TabsTrigger 
@@ -136,7 +137,7 @@ export function MainPageTemplate() {
                         className="flex items-center gap-2"
                       >
                         <Mic className="w-4 h-4" />
-                        <span className="hidden sm:inline">Live</span>
+                        <span className="hidden sm:inline">{t('dashboard:tabs.live')}</span>
                       </motion.div>
                     </TabsTrigger>
                   </TabsList>
@@ -207,9 +208,9 @@ export function MainPageTemplate() {
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
               <MessageSquare className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="font-semibold mb-2">Text Analysis</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:features.textAnalysis.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Instantly verify claims in any text input with AI-powered analysis
+              {t('dashboard:features.textAnalysis.description')}
             </p>
           </Card>
 
@@ -217,9 +218,9 @@ export function MainPageTemplate() {
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Play className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
-            <h3 className="font-semibold mb-2">Media Upload</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:features.mediaUpload.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Upload audio and video files for comprehensive fact-checking analysis
+              {t('dashboard:features.mediaUpload.description')}
             </p>
           </Card>
 
@@ -227,9 +228,9 @@ export function MainPageTemplate() {
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Radio className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
-            <h3 className="font-semibold mb-2">Live Streams</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:features.liveStreams.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Real-time fact-checking of YouTube, Twitch, and other live streams
+              {t('dashboard:features.liveStreams.description')}
             </p>
           </Card>
 
@@ -237,9 +238,9 @@ export function MainPageTemplate() {
             <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Mic className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
-            <h3 className="font-semibold mb-2">Live Recording</h3>
+            <h3 className="font-semibold mb-2">{t('dashboard:features.liveRecording.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Record audio in real-time with instant transcription and fact-checking
+              {t('dashboard:features.liveRecording.description')}
             </p>
           </Card>
         </motion.div>

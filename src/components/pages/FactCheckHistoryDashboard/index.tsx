@@ -1,0 +1,1 @@
+export { FactCheckHistoryDashboard } from '../FactCheckHistoryDashboard'; 

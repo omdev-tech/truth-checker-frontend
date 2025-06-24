@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DashboardState, EnhancedSegmentData } from '@/lib/types';
 import PlayerControls from './PlayerControls';
 import PlayerOverlay from './PlayerOverlay';
@@ -26,6 +27,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onPlaybackChange,
   isStream = false,
 }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showControls, setShowControls] = useState(true);
@@ -217,10 +219,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
 
           {/* Stream Info Overlay */}
-          <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 text-white">
-            <div className="text-sm font-medium">Live Fact-Checking Active</div>
-            <div className="text-xs text-gray-300">Processing audio in real-time</div>
-          </div>
+                        <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 text-white">
+                <div className="text-sm font-medium">{t('dashboard:player.liveFactCheckingActive')}</div>
+                <div className="text-xs text-gray-300">{t('dashboard:player.processingAudioRealTime')}</div>
+              </div>
         </div>
       ) : mediaType === 'video' ? (
         <video
@@ -252,7 +254,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Audio Analysis</h3>
+                              <h3 className="text-xl font-semibold text-white mb-2">{t('dashboard:player.audioAnalysis')}</h3>
               <p className="text-gray-400 text-sm">
                 {formatTime(playback.currentTime)} / {formatTime(mediaRef.current?.duration || 0)}
               </p>

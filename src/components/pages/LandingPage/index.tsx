@@ -14,6 +14,7 @@ import { LANDING_PAGE_CONFIG } from '@/lib/config/landing';
 import { LandingPageProps } from '@/lib/types/landing';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Main Landing Page Component
@@ -21,6 +22,7 @@ import { toast } from 'sonner';
  * Implements conversion flow with guest access and authentication
  */
 export function LandingPage({ className }: LandingPageProps) {
+  const { t } = useTranslation(['common', 'dashboard']);
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -47,19 +49,19 @@ export function LandingPage({ className }: LandingPageProps) {
       });
 
       if (result?.error) {
-        toast.error('Authentication failed. Please try again.');
+        toast.error(t('auth:error.signInFailed'));
         console.error('Sign up error:', result.error);
       } else if (result?.url) {
-        toast.success('Welcome! Redirecting to your dashboard...');
+        toast.success(t('auth:success.signedIn'));
         window.location.href = result.url;
       }
     } catch (error) {
       console.error('Sign-up error:', error);
-      toast.error('Authentication error. Please try again.');
+      toast.error(t('auth:error.signInFailed'));
     } finally {
       setIsAuthenticating(false);
     }
-  }, []);
+  }, [t]);
 
   const handleGetStarted = useCallback(() => {
     handleSignUp();
@@ -76,19 +78,19 @@ export function LandingPage({ className }: LandingPageProps) {
       });
 
       if (result?.error) {
-        toast.error('Authentication failed. Please try again.');
+        toast.error(t('auth:error.signInFailed'));
         console.error('Sign in error:', result.error);
       } else if (result?.url) {
-        toast.success('Welcome back! Redirecting to your dashboard...');
+        toast.success(t('auth:welcome'));
         window.location.href = result.url;
       }
     } catch (error) {
       console.error('Sign-in error:', error);
-      toast.error('Authentication error. Please try again.');
+      toast.error(t('auth:error.signInFailed'));
     } finally {
       setIsAuthenticating(false);
     }
-  }, []);
+  }, [t]);
 
   const closeGuestModal = useCallback(() => {
     setShowGuestModal(false);
@@ -159,7 +161,7 @@ export function LandingPage({ className }: LandingPageProps) {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2 text-muted-foreground">
-              <span>&copy; 2024 Truth Checker. All rights reserved.</span>
+              <span>{t('common:general.copyright')}</span>
             </div>
             
             <div className="flex items-center space-x-6 text-sm text-muted-foreground">
@@ -167,19 +169,19 @@ export function LandingPage({ className }: LandingPageProps) {
                 onClick={() => handleSmoothScroll('features')}
                 className="hover:text-foreground transition-colors"
               >
-                Features
+                {t('dashboard:features.textAnalysis.title')}
               </button>
               <button 
                 onClick={() => handleSmoothScroll('how-it-works')}
                 className="hover:text-foreground transition-colors"
               >
-                How It Works
+                {t('common:general.help')}
               </button>
               <button 
                 onClick={() => handleSmoothScroll('trust')}
                 className="hover:text-foreground transition-colors"
               >
-                Trust & Safety
+                {t('common:general.privacy')}
               </button>
             </div>
           </div>
@@ -187,8 +189,7 @@ export function LandingPage({ className }: LandingPageProps) {
           {/* Additional footer content */}
           <div className="mt-8 pt-8 border-t border-border/50 text-center">
             <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              Truth Checker is committed to fighting misinformation through AI-powered fact-checking. 
-              Our mission is to make accurate information accessible to everyone, everywhere.
+              {t('dashboard:hero.subtitle')}
             </p>
           </div>
         </div>

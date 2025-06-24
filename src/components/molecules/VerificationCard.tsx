@@ -5,6 +5,7 @@ import { VerificationResult } from '@/lib/types';
 import { formatTimestamp } from '@/lib/format';
 import { ExternalLink, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface VerificationCardProps {
   result: VerificationResult;
@@ -12,6 +13,8 @@ interface VerificationCardProps {
 }
 
 export function VerificationCard({ result, index = 0 }: VerificationCardProps) {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -23,7 +26,7 @@ export function VerificationCard({ result, index = 0 }: VerificationCardProps) {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-sm text-muted-foreground mb-2">
-                Claim
+                {t('factCheck:results.claim')}
               </h3>
               <p className="text-foreground font-medium leading-relaxed">
                 {result.claim_text}
@@ -38,7 +41,7 @@ export function VerificationCard({ result, index = 0 }: VerificationCardProps) {
           
           <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-2">
-              Explanation
+              {t('factCheck:results.explanation')}
             </h4>
             <p className="text-sm text-foreground leading-relaxed">
               {result.explanation}
@@ -48,7 +51,7 @@ export function VerificationCard({ result, index = 0 }: VerificationCardProps) {
           {result.sources.length > 0 && (
             <div>
               <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                Sources
+                {t('factCheck:results.sources')}
               </h4>
               <div className="space-y-1">
                 {result.sources.map((source, i) => (
@@ -71,7 +74,7 @@ export function VerificationCard({ result, index = 0 }: VerificationCardProps) {
 
           <div className="flex items-center gap-1 text-xs text-muted-foreground pt-2 border-t">
             <Clock className="w-3 h-3" />
-            <span>Verified at {formatTimestamp(result.timestamp)}</span>
+            <span>{t('factCheck:results.verifiedAt', { timestamp: formatTimestamp(result.timestamp) })}</span>
           </div>
         </CardContent>
       </Card>

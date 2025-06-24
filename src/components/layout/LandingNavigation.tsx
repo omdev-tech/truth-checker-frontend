@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { NAVIGATION_CONFIG } from '@/lib/config/landing';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/atoms/Logo';
+import { LanguageSelector } from '@/components/atoms/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 interface LandingNavigationProps {
   onSignIn: () => void;
@@ -23,6 +25,7 @@ export function LandingNavigation({
   onGetStarted, 
   className 
 }: LandingNavigationProps) {
+  const { t } = useTranslation(['common']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLinkClick = (href: string) => {
@@ -48,8 +51,8 @@ export function LandingNavigation({
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <Logo width={32} height={32} priority className="w-full h-full" />
+            <div className="w-12 h-12 rounded-lg overflow-hidden">
+              <Logo width={56} height={56} priority className="w-full h-full" />
             </div>
             <span className="text-xl font-bold text-foreground">
               {NAVIGATION_CONFIG.logo.text}
@@ -71,18 +74,19 @@ export function LandingNavigation({
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
+            <LanguageSelector variant="ghost" size="sm" />
             <Button 
               variant="ghost" 
               onClick={onSignIn}
               className="font-medium"
             >
-              {NAVIGATION_CONFIG.actions.signIn}
+              {t('common:navigation.login')}
             </Button>
             <Button 
               onClick={onGetStarted}
               className="bg-primary hover:bg-primary/90 font-medium"
             >
-              {NAVIGATION_CONFIG.actions.getStarted}
+              {t('common:navigation.signup')}
             </Button>
           </div>
 
@@ -90,7 +94,7 @@ export function LandingNavigation({
           <button
             className="md:hidden p-2 rounded-md hover:bg-accent transition-colors"
             onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
+            aria-label={t('common:navigation.toggleMenu')}
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
@@ -115,6 +119,14 @@ export function LandingNavigation({
                 </button>
               ))}
               
+              {/* Mobile Language Selector */}
+              <div className="px-3 py-2">
+                <div className="text-sm font-medium text-muted-foreground mb-2">
+                  {t('common:language.label')}
+                </div>
+                <LanguageSelector variant="outline" size="sm" className="w-full justify-start" />
+              </div>
+              
               {/* Mobile Actions */}
               <div className="pt-4 pb-2 space-y-2">
                 <Button 
@@ -125,7 +137,7 @@ export function LandingNavigation({
                   }}
                   className="w-full justify-start font-medium"
                 >
-                  {NAVIGATION_CONFIG.actions.signIn}
+                  {t('common:navigation.login')}
                 </Button>
                 <Button 
                   onClick={() => {
@@ -134,7 +146,7 @@ export function LandingNavigation({
                   }}
                   className="w-full bg-primary hover:bg-primary/90 font-medium"
                 >
-                  {NAVIGATION_CONFIG.actions.getStarted}
+                  {t('common:navigation.signup')}
                 </Button>
               </div>
             </div>

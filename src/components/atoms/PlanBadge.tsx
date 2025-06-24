@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 import { Crown, Zap, Star, Building, Rocket, Users } from 'lucide-react';
 
 interface PlanBadgeProps {
@@ -32,8 +33,10 @@ export const PlanBadge: React.FC<PlanBadgeProps> = ({
   size = 'md', 
   variant = 'default' 
 }) => {
-  const Icon = planIcons[plan.toLowerCase()] || Star;
-  const colorClass = planColors[plan.toLowerCase()] || planColors.free;
+  const { t } = useTranslation(['common']);
+  const planKey = plan.toLowerCase();
+  const Icon = planIcons[planKey] || Star;
+  const colorClass = planColors[planKey] || planColors.free;
   
   const sizeClasses = {
     sm: 'text-xs px-2 py-1',
@@ -47,9 +50,12 @@ export const PlanBadge: React.FC<PlanBadgeProps> = ({
     lg: 'h-5 w-5',
   };
 
+  // Get translated plan name, fallback to original plan name if translation doesn't exist
+  const planName = t(`common:plans.${planKey}`, { defaultValue: plan });
+
   return (
     <Badge 
-      variant={variant as any}
+      variant={variant}
       className={`
         ${sizeClasses[size]} 
         ${variant === 'default' ? colorClass : ''} 
@@ -57,7 +63,7 @@ export const PlanBadge: React.FC<PlanBadgeProps> = ({
       `}
     >
       <Icon className={iconSizes[size]} />
-      {plan}
+      {planName}
     </Badge>
   );
 }; 

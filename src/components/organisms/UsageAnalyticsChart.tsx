@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { truthCheckerApi } from '@/lib/api';
+import { useTranslation } from 'react-i18next';
 import { 
   LineChart, 
   Line, 
@@ -30,6 +31,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UsageHistoryData {
   period: {
@@ -65,6 +67,7 @@ interface UsageAnalyticsChartProps {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
+  const { t } = useTranslation(['dashboard', 'common']);
   const [data, setData] = useState<UsageHistoryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -81,8 +84,8 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
       const historyData = await truthCheckerApi.getUserUsageHistory(selectedPeriod);
       setData(historyData);
     } catch (err) {
-      setError('Failed to load usage history');
-      toast.error('Failed to load usage analytics');
+      setError(t('dashboard:analytics.loadError'));
+      toast.error(t('dashboard:analytics.loadError'));
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +112,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
         <CardContent className="flex items-center justify-center h-64">
           <div className="flex items-center gap-2 text-muted-foreground">
             <LoadingSpinner size="sm" />
-            <span>Loading analytics...</span>
+            <span>{t('dashboard:analytics.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -122,9 +125,9 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
         <CardContent className="py-6">
           <div className="flex flex-col items-center justify-center h-64 space-y-4">
             <AlertCircle className="w-12 h-12 text-destructive" />
-            <p className="text-muted-foreground">{error || 'No data available'}</p>
+            <p className="text-muted-foreground">{error || t('dashboard:analytics.noData')}</p>
             <Button onClick={loadUsageHistory} variant="outline">
-              Try Again
+              {t('common:actions.tryAgain')}
             </Button>
           </div>
         </CardContent>
@@ -144,7 +147,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Usage Analytics
+              {t('dashboard:analytics.title')}
             </CardTitle>
             <div className="flex items-center gap-2">
               <Button
@@ -152,21 +155,21 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                 size="sm"
                 onClick={() => setSelectedPeriod(7)}
               >
-                7 Days
+                {t('dashboard:analytics.period.sevenDays')}
               </Button>
               <Button
                 variant={selectedPeriod === 30 ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedPeriod(30)}
               >
-                30 Days
+                {t('dashboard:analytics.period.thirtyDays')}
               </Button>
               <Button
                 variant={selectedPeriod === 90 ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedPeriod(90)}
               >
-                90 Days
+                {t('dashboard:analytics.period.ninetyDays')}
               </Button>
             </div>
           </div>
@@ -175,9 +178,9 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
         <CardContent>
           <Tabs defaultValue="timeline" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="timeline">Usage Timeline</TabsTrigger>
-              <TabsTrigger value="breakdown">Action Breakdown</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
+              <TabsTrigger value="timeline">{t('dashboard:analytics.tabs.timeline')}</TabsTrigger>
+              <TabsTrigger value="breakdown">{t('dashboard:analytics.tabs.breakdown')}</TabsTrigger>
+              <TabsTrigger value="performance">{t('dashboard:analytics.tabs.performance')}</TabsTrigger>
             </TabsList>
 
             {/* Timeline Chart */}
@@ -194,7 +197,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                     <YAxis tick={{ fontSize: 12 }} />
                     <Tooltip 
                       labelFormatter={(value) => formatDate(value as string)}
-                      formatter={(value, name) => [value, name === 'requests' ? 'Requests' : 'Credits']}
+                      formatter={(value, name) => [value, name === 'requests' ? t('dashboard:analytics.chart.requests') : t('dashboard:analytics.chart.credits')]}
                     />
                     <Legend />
                     <Line 
@@ -202,14 +205,14 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                       dataKey="requests" 
                       stroke="#0088FE" 
                       strokeWidth={2}
-                      name="Daily Requests"
+                      name={t('dashboard:analytics.chart.dailyRequests')}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="credits_consumed" 
                       stroke="#00C49F" 
                       strokeWidth={2}
-                      name="Credits Used"
+                      name={t('dashboard:analytics.chart.creditsUsed')}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -221,7 +224,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Pie Chart */}
                 <div className="h-64">
-                  <h4 className="text-sm font-medium mb-2">Actions by Count</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('dashboard:analytics.charts.actionsByCount')}</h4>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -239,14 +242,14 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value, name) => [value, 'Count']} />
+                      <Tooltip formatter={(value, name) => [value, t('dashboard:analytics.chart.count')]} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
 
                 {/* Bar Chart */}
                 <div className="h-64">
-                  <h4 className="text-sm font-medium mb-2">Credits by Action Type</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('dashboard:analytics.charts.creditsByAction')}</h4>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data.action_breakdown}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -260,7 +263,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                       />
                       <YAxis tick={{ fontSize: 12 }} />
                       <Tooltip 
-                        formatter={(value, name) => [value, 'Credits']}
+                        formatter={(value, name) => [value, t('dashboard:analytics.chart.credits')]}
                         labelFormatter={formatActionType}
                       />
                       <Bar dataKey="credits_consumed" fill="#FFBB28" />
@@ -286,7 +289,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                       labelFormatter={(value) => formatDate(value as string)}
                       formatter={(value, name) => [
                         `${parseFloat(value as string).toFixed(2)}${name === 'processing_time' ? 's' : 'h'}`, 
-                        name === 'processing_time' ? 'Avg Processing Time' : 'Hours Used'
+                        name === 'processing_time' ? t('dashboard:analytics.chart.avgProcessingTime') : t('dashboard:analytics.chart.hoursUsed')
                       ]}
                     />
                     <Legend />
@@ -295,14 +298,14 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                       dataKey="hours_consumed" 
                       stroke="#FF8042" 
                       strokeWidth={2}
-                      name="Hours Used"
+                      name={t('dashboard:analytics.chart.hoursUsed')}
                     />
                     <Line 
                       type="monotone" 
                       dataKey="processing_time" 
                       stroke="#8884D8" 
                       strokeWidth={2}
-                      name="Processing Time (s)"
+                      name={t('dashboard:analytics.chart.processingTimeSeconds')}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -317,19 +320,19 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                 <div className="text-2xl font-bold text-primary">
                   {data.summary.total_requests}
                 </div>
-                <div className="text-xs text-muted-foreground">Total Requests</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard:analytics.summary.totalRequests')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {data.summary.total_hours.toFixed(1)}h
                 </div>
-                <div className="text-xs text-muted-foreground">Hours Consumed</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard:analytics.summary.hoursConsumed')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-orange-600">
                   {data.summary.avg_processing_time.toFixed(1)}s
                 </div>
-                <div className="text-xs text-muted-foreground">Avg Processing</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard:analytics.summary.avgProcessing')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
@@ -338,7 +341,7 @@ export function UsageAnalyticsChart({ className }: UsageAnalyticsChartProps) {
                     'N/A'
                   }
                 </div>
-                <div className="text-xs text-muted-foreground">Top Action</div>
+                <div className="text-xs text-muted-foreground">{t('dashboard:analytics.summary.topAction')}</div>
               </div>
             </div>
           )}

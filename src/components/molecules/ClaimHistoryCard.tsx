@@ -6,6 +6,7 @@ import { ConfidenceIndicator } from '@/components/atoms/ConfidenceIndicator';
 import { FactCheckClaim } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Clock, HardDrive, Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ClaimHistoryCardProps {
   claim: FactCheckClaim;
@@ -14,6 +15,8 @@ interface ClaimHistoryCardProps {
 }
 
 export function ClaimHistoryCard({ claim, onClick, className }: ClaimHistoryCardProps) {
+  const { t } = useTranslation();
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -80,9 +83,9 @@ export function ClaimHistoryCard({ claim, onClick, className }: ClaimHistoryCard
           {/* Sources */}
           {claim.sources_used.length > 0 && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Sources:</span>
+              <span className="text-xs text-muted-foreground">{t('factCheck:results.sourcesWithCount')}</span>
               <Badge variant="secondary" className="text-xs">
-                {claim.sources_used.length} source{claim.sources_used.length !== 1 ? 's' : ''}
+                {t('factCheck:results.resultCount', { count: claim.sources_used.length })}
               </Badge>
             </div>
           )}
@@ -105,7 +108,7 @@ export function ClaimHistoryCard({ claim, onClick, className }: ClaimHistoryCard
             </div>
             {claim.original_input !== claim.claim_text && (
               <Badge variant="outline" className="text-xs">
-                Extracted
+                {t('factCheck:results.extracted')}
               </Badge>
             )}
           </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DashboardState } from '@/lib/types';
 import VideoPlayer from '../../organisms/VideoPlayer';
 import SequencerTimeline from '../../organisms/SequencerTimeline';
@@ -25,6 +26,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({
   onReset,
   isModal = false,
 }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   // Handle window resize for responsive design
@@ -66,7 +68,7 @@ const AnalysisScreen: React.FC<AnalysisScreenProps> = ({
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">
-                {isModal ? 'Close Dashboard' : 'Back to Upload'}
+                {isModal ? t('dashboard:analysis.closeDashboard') : t('dashboard:analysis.backToUpload')}
               </span>
             </button>
             

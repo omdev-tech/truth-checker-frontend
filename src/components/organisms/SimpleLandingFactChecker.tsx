@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
@@ -10,51 +10,52 @@ import { useGuestSession } from '@/hooks/useGuestSession';
 import { truthCheckerApi } from '@/lib/api';
 import { FactCheckResponse } from '@/lib/types';
 import { MAX_TEXT_LENGTH } from '@/lib/constants';
-import { Search, Sparkles, ArrowRight, CheckCircle, Clock, Database, Brain, Shield, Zap } from 'lucide-react';
+import { Search, Sparkles, ArrowRight, CheckCircle, Clock, Database, Brain, Shield, Zap, FileText, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { getApiLanguage } from '@/lib/languageUtils';
 
 interface SimpleLandingFactCheckerProps {
   onSignUpClick: () => void;
   className?: string;
 }
 
-// Processing steps for engaging loading experience
-const PROCESSING_STEPS = [
+const getProcessingSteps = (t: any) => [
   {
-    id: 1,
-    title: "Extracting Claims",
-    description: "Identifying verifiable statements using NLP",
-    icon: Brain,
-    duration: 2500
+    id: 'extract',
+    title: t('factCheck:processing.steps.extracting.title'),
+    description: t('factCheck:processing.steps.extracting.description'),
+    icon: FileText,
+    duration: 2000
   },
   {
-    id: 2,
-    title: "Accessing Data Sources",
-    description: "Connecting to 50+ trusted databases",
-    icon: Database,
+    id: 'sources',
+    title: t('factCheck:processing.steps.accessing.title'),
+    description: t('factCheck:processing.steps.accessing.description'),
+    icon: Globe,
     duration: 3000
   },
   {
-    id: 3,
-    title: "Cross-Referencing Evidence",
-    description: "Analyzing credibility across multiple sources",
-    icon: Shield,
-    duration: 3000
-  },
-  {
-    id: 4,
-    title: "AI Reasoning Analysis",
-    description: "Applying advanced logic verification",
+    id: 'crossref',
+    title: t('factCheck:processing.steps.crossReferencing.title'),
+    description: t('factCheck:processing.steps.crossReferencing.description'),
     icon: Zap,
     duration: 2500
   },
   {
-    id: 5,
-    title: "Generating Results",
-    description: "Compiling comprehensive fact-check report",
+    id: 'reasoning',
+    title: t('factCheck:processing.steps.reasoning.title'),
+    description: t('factCheck:processing.steps.reasoning.description'),
+    icon: Brain,
+    duration: 3000
+  },
+  {
+    id: 'generate',
+    title: t('factCheck:processing.steps.generating.title'),
+    description: t('factCheck:processing.steps.generating.description'),
     icon: CheckCircle,
-    duration: 1500
+    duration: 2000
   }
 ];
 
@@ -64,8 +65,11 @@ interface ProcessingStepDisplayProps {
 }
 
 function ProcessingStepDisplay({ isVisible, onComplete }: ProcessingStepDisplayProps) {
+  const { t } = useTranslation(['factCheck', 'common']);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  
+  const PROCESSING_STEPS = useMemo(() => getProcessingSteps(t), [t]);
 
   useEffect(() => {
     if (!isVisible) {
@@ -99,7 +103,7 @@ function ProcessingStepDisplay({ isVisible, onComplete }: ProcessingStepDisplayP
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isVisible, onComplete]);
+  }, [isVisible, onComplete, PROCESSING_STEPS]);
 
   if (!isVisible) return null;
 
@@ -116,9 +120,9 @@ function ProcessingStepDisplay({ isVisible, onComplete }: ProcessingStepDisplayP
             <LoadingSpinner size="sm" className="text-primary" />
           </div>
           <div>
-            <h4 className="font-semibold text-lg">AI Fact-Checking in Progress</h4>
+            <h4 className="font-semibold text-lg">{t('factCheck:processing.title')}</h4>
             <p className="text-sm text-muted-foreground">
-              Advanced verification using multiple data sources
+              {t('factCheck:processing.subtitle')}
             </p>
           </div>
         </div>
@@ -224,22 +228,24 @@ export function SimpleLandingFactChecker({
     usageStats
   } = useGuestSession();
 
+  const { t } = useTranslation(['factCheck', 'common']);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!text.trim()) {
-      toast.error('Please enter some text to fact-check');
+      toast.error(t('factCheck:validation.enterText'));
       return;
     }
 
     if (text.length > MAX_TEXT_LENGTH) {
-      toast.error(`Text is too long. Maximum ${MAX_TEXT_LENGTH} characters allowed.`);
+      toast.error(t('factCheck:validation.textTooLong', { maxLength: MAX_TEXT_LENGTH }));
       return;
     }
 
     // Check guest usage limits
     if (!hasUsageRemaining) {
-      toast.error('No free fact-checks remaining. Please sign up to continue.');
+      toast.error(t('factCheck:guest.noUsageRemaining'));
       onSignUpClick();
       return;
     }
@@ -247,7 +253,7 @@ export function SimpleLandingFactChecker({
     // Consume guest credit before making API call
     const usageResult = consumeUsage();
     if (!usageResult.success) {
-      toast.error(usageResult.message || 'Usage limit reached. Please sign up to continue.');
+      toast.error(usageResult.message || t('factCheck:guest.usageLimitReached'));
       onSignUpClick();
       return;
     }
@@ -260,7 +266,7 @@ export function SimpleLandingFactChecker({
     try {
       const response = await truthCheckerApi.checkText({
         text: text.trim(),
-        language: 'en',
+        language: getApiLanguage(),
       });
       
       // Wait for processing animation to complete before showing results
@@ -270,20 +276,20 @@ export function SimpleLandingFactChecker({
         
         // Show appropriate success message
         if (usageResult.remainingUsage === 0) {
-          toast.success('Fact-check completed! This was your last free fact-check.');
+          toast.success(t('factCheck:guest.lastFactCheck'));
         } else {
-          toast.success(`Fact-check completed! ${usageResult.remainingUsage} free fact-checks remaining.`);
+          toast.success(t('factCheck:guest.remainingFactChecks', { count: usageResult.remainingUsage }));
         }
       }, 500);
     } catch (error) {
       console.error('Fact-check error:', error);
-      toast.error('Failed to fact-check text. Please try again.');
+      toast.error(t('factCheck:errors.failed'));
       setShowProcessing(false);
       
       // Refund credit on failure
       const refundResult = refundUsage();
       if (refundResult.success) {
-        toast.info('Credit refunded due to failed request.');
+        toast.info(t('factCheck:guest.creditRefunded'));
       }
     } finally {
       setIsLoading(false);
@@ -312,13 +318,13 @@ export function SimpleLandingFactChecker({
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-primary/10 rounded-full text-sm text-primary font-medium">
               <Sparkles className="w-4 h-4" />
-              Try AI Fact-Checking Free
+              {t('factCheck:landing.tryFree')}
             </div>
             <h3 className="text-xl font-bold mb-2">
-              Verify Any Claim Instantly
+              {t('factCheck:landing.title')}
             </h3>
             <p className="text-muted-foreground text-sm">
-              Enter any statement or claim below and see our AI fact-checker in action
+              {t('factCheck:landing.subtitle')}
             </p>
           </div>
 
@@ -328,7 +334,7 @@ export function SimpleLandingFactChecker({
               <Textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Enter a claim to fact-check... e.g., 'The Earth is flat' or 'Vaccines cause autism'"
+                placeholder={t('factCheck:placeholders.landingInput')}
                 className="min-h-[100px] resize-none text-base"
                 maxLength={MAX_TEXT_LENGTH}
                 disabled={!hasUsageRemaining || isLoading}
@@ -336,10 +342,10 @@ export function SimpleLandingFactChecker({
               
               <div className="flex justify-between items-center text-xs">
                 <span className="text-muted-foreground">
-                  {text.length} / {MAX_TEXT_LENGTH} characters
+                  {t('factCheck:textFactChecker.characterCount', { current: text.length, max: MAX_TEXT_LENGTH })}
                 </span>
                 <span className="text-primary font-medium">
-                  {usageStats?.remaining || 0} free fact-checks remaining
+                  {t('factCheck:landing.remainingChecks', { count: usageStats?.remaining || 0 })}
                 </span>
               </div>
             </div>
@@ -353,16 +359,16 @@ export function SimpleLandingFactChecker({
               {isLoading ? (
                 <>
                   <LoadingSpinner size="sm" className="mr-2" />
-                  Processing with AI...
+                  {t('factCheck:textFactChecker.processing')}
                 </>
               ) : hasUsageRemaining ? (
                 <>
                   <Search className="w-5 h-5 mr-2" />
-                  Fact-Check This Claim
+                  {t('factCheck:landing.checkClaim')}
                 </>
               ) : (
                 <>
-                  Sign Up for Free Access
+                  {t('factCheck:guest.signUpFree')}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </>
               )}
@@ -388,16 +394,16 @@ export function SimpleLandingFactChecker({
               >
                 <div className="border-t pt-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-lg">Verification Results</h4>
+                    <h4 className="font-semibold text-lg">{t('factCheck:results.title')}</h4>
                     <span className="text-sm text-muted-foreground">
-                      {results.results.length} result{results.results.length !== 1 ? 's' : ''}
+                      {t('factCheck:landing.resultCount', { count: results.results.length })}
                     </span>
                   </div>
 
                   {results.results.length === 0 ? (
                     <div className="p-6 text-center bg-muted/30 rounded-lg">
                       <p className="text-muted-foreground">
-                        No verifiable claims found in the provided text.
+                        {t('factCheck:landing.noClaimsFound')}
                       </p>
                     </div>
                   ) : (
@@ -413,7 +419,7 @@ export function SimpleLandingFactChecker({
                       {results.results.length > 2 && (
                         <div className="text-center p-3 bg-muted/20 rounded-lg">
                           <p className="text-sm text-muted-foreground">
-                            + {results.results.length - 2} more results available in full app
+                            {t('factCheck:landing.moreResultsAvailable', { count: results.results.length - 2 })}
                           </p>
                         </div>
                       )}
@@ -429,22 +435,21 @@ export function SimpleLandingFactChecker({
                   className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-lg p-6 text-center"
                 >
                   <h4 className="font-bold text-lg mb-2">
-                    🎉 See how powerful AI fact-checking can be?
+                    {t('factCheck:landing.powerfulResultsTitle')}
                   </h4>
                   <p className="text-muted-foreground mb-4 text-sm">
-                    Join thousands of users fighting misinformation with unlimited fact-checking, 
-                    audio/video analysis, and real-time verification.
+                    {t('factCheck:landing.powerfulResultsDescription')}
                   </p>
                   <Button 
                     onClick={handleSignUpAfterTrial}
                     size="lg"
                     className="bg-primary hover:bg-primary/90 font-semibold"
                   >
-                    Get Full Access - Sign Up Free
+                    {t('factCheck:landing.getFullAccess')}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                   <p className="text-xs text-muted-foreground mt-2">
-                    No credit card required • Instant access • Cancel anytime
+                    {t('factCheck:landing.noCardRequired')}
                   </p>
                 </motion.div>
               </motion.div>
@@ -459,17 +464,17 @@ export function SimpleLandingFactChecker({
               className="mt-6 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6 text-center"
             >
               <h4 className="font-semibold text-lg mb-2">
-                You've tried all your free fact-checks!
+                {t('factCheck:landing.triedAllFree')}
               </h4>
               <p className="text-muted-foreground mb-4 text-sm">
-                Ready to unlock unlimited AI-powered fact-checking?
+                {t('factCheck:landing.readyToUnlock')}
               </p>
               <Button 
                 onClick={handleSignUpAfterTrial}
                 size="lg"
                 className="bg-primary hover:bg-primary/90"
               >
-                Sign Up Free - Unlimited Access
+                {t('factCheck:landing.signUpUnlimited')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </motion.div>

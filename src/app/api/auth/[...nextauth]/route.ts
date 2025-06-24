@@ -2,6 +2,8 @@ import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { JWT } from 'next-auth/jwt';
 import { Session } from 'next-auth';
+import { User } from 'next-auth';
+import { Account } from 'next-auth';
 
 /**
  * NextAuth.js Configuration
@@ -20,13 +22,13 @@ const handler = NextAuth({
     /**
      * JWT Callback - Runs whenever a JWT is created, updated, or accessed
      */
-    async jwt({ token, user, account }: { token: JWT; user?: any; account?: any }) {
+    async jwt({ token, user, account }: { token: JWT; user?: User; account?: Account | null }) {
       // Initial sign in
       if (account && user) {
-        token.accessToken = account.access_token;
+        token.accessToken = account.access_token || '';
         token.userId = user.id;
-        token.email = user.email;
-        token.name = user.name;
+        token.email = user.email || '';
+        token.name = user.name || '';
         token.picture = user.image;
         token.provider = account.provider;
         token.providerAccountId = account.providerAccountId;
@@ -74,11 +76,20 @@ const handler = NextAuth({
      * Redirect Callback - Controls where users are redirected after authentication
      */
     async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
+      // Preserve language preference in URL parameters during redirect
+      const redirectUrl = (() => {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
+        if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
+      })();
+      
+      // Add language preservation flag for post-auth language restoration
+      const urlObj = new URL(redirectUrl);
+      if (!urlObj.searchParams.has('preserveLang')) {
+        urlObj.searchParams.set('preserveLang', 'true');
+      }
+      
+      return urlObj.toString();
     }
   },
 
@@ -97,10 +108,10 @@ const handler = NextAuth({
   },
 
   events: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       console.log('User signed in:', { user: user.email, provider: account?.provider });
     },
-    async signOut({ session, token }) {
+    async signOut({ token }) {
       console.log('User signed out:', { user: token?.email });
     },
   },

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Star, Users, Zap } from 'lucide-react';
 import { CTASectionProps } from '@/lib/types/landing';
-import { LANDING_PAGE_CONFIG } from '@/lib/config/landing';
+import { useTranslation } from 'react-i18next';
 
 /**
  * CTA Section Component
@@ -12,7 +12,7 @@ import { LANDING_PAGE_CONFIG } from '@/lib/config/landing';
  * Follows conversion optimization best practices
  */
 export function CTASection({ onGetStarted, onTryDemo }: CTASectionProps) {
-  const { cta } = LANDING_PAGE_CONFIG;
+  const { t } = useTranslation(['common', 'dashboard']);
 
   const socialProofItems = [
     { icon: Users, text: "10,000+ active users" },
@@ -63,11 +63,11 @@ export function CTASection({ onGetStarted, onTryDemo }: CTASectionProps) {
         >
           {/* Main CTA */}
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight">
-            {cta.title}
+            {t('dashboard:hero.title')}
           </h2>
           
           <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-            {cta.description}
+            {t('dashboard:hero.subtitle')}
           </p>
 
           {/* Action Buttons */}
@@ -83,7 +83,7 @@ export function CTASection({ onGetStarted, onTryDemo }: CTASectionProps) {
               onClick={onGetStarted}
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 group"
             >
-              {cta.primaryButton}
+              {t('common:ui.getStarted')}
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
             </Button>
             
@@ -93,7 +93,7 @@ export function CTASection({ onGetStarted, onTryDemo }: CTASectionProps) {
               onClick={onTryDemo}
               className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200"
             >
-              {cta.secondaryButton}
+              {t('common:actions.tryAgain')}
             </Button>
           </motion.div>
 
@@ -128,21 +128,21 @@ export function CTASection({ onGetStarted, onTryDemo }: CTASectionProps) {
           >
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>No credit card required</span>
+              <span>{t('common:plans.free')}</span>
             </div>
             
             <div className="hidden sm:block w-1 h-1 bg-muted-foreground/30 rounded-full"></div>
             
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>3 free fact-checks included</span>
+              <span>{t('dashboard:quickActions.newFactCheck')}</span>
             </div>
             
             <div className="hidden sm:block w-1 h-1 bg-muted-foreground/30 rounded-full"></div>
             
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Upgrade anytime</span>
+              <span>{t('common:plans.upgradePlan')}</span>
             </div>
           </motion.div>
         </motion.div>

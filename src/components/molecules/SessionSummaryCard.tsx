@@ -5,6 +5,7 @@ import { AccuracyScore } from '@/components/atoms/AccuracyScore';
 import { FactCheckSession } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { Calendar, Clock, FileText, CheckCircle, XCircle, AlertTriangle, HelpCircle, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SessionSummaryCardProps {
   session: FactCheckSession;
@@ -13,6 +14,8 @@ interface SessionSummaryCardProps {
 }
 
 export function SessionSummaryCard({ session, onClick, className }: SessionSummaryCardProps) {
+  const { t } = useTranslation('common');
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -34,10 +37,10 @@ export function SessionSummaryCard({ session, onClick, className }: SessionSumma
     if (total === 0) return null;
     
     return [
-      { label: 'True', count: session.true_claims, color: 'text-green-600', icon: CheckCircle },
-      { label: 'False', count: session.false_claims, color: 'text-red-600', icon: XCircle },
-      { label: 'Partial', count: session.partially_true_claims, color: 'text-yellow-600', icon: AlertTriangle },
-      { label: 'Disputed', count: session.disputed_claims, color: 'text-purple-600', icon: HelpCircle },
+      { label: t('common:statuses.true'), count: session.true_claims, color: 'text-green-600', icon: CheckCircle },
+      { label: t('common:statuses.false'), count: session.false_claims, color: 'text-red-600', icon: XCircle },
+      { label: t('common:statuses.partial'), count: session.partially_true_claims, color: 'text-yellow-600', icon: AlertTriangle },
+      { label: t('common:statuses.disputed'), count: session.disputed_claims, color: 'text-purple-600', icon: HelpCircle },
     ].filter(item => item.count > 0);
   };
 
@@ -63,11 +66,11 @@ export function SessionSummaryCard({ session, onClick, className }: SessionSumma
             <SourceTypeBadge sourceType={session.source_type} />
             {session.is_completed ? (
               <Badge variant="secondary" className="text-xs">
-                Complete
+                {t('status.complete')}
               </Badge>
             ) : (
               <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-400/50 bg-yellow-50/20 dark:bg-yellow-950/20">
-                Processing
+                {t('status.processing')}
               </Badge>
             )}
             {onClick && (
@@ -83,13 +86,13 @@ export function SessionSummaryCard({ session, onClick, className }: SessionSumma
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">{session.total_claims} Claims</span>
+              <span className="text-sm font-medium text-foreground">{session.total_claims} {t('session.claims')}</span>
             </div>
             {session.is_completed && session.verified_claims > 0 && (
               <div className="flex items-center gap-2">
                 <AccuracyScore percentage={session.accuracy_percentage} size="sm" />
                 <span className="text-xs text-muted-foreground">
-                  {session.accuracy_percentage.toFixed(1)}% accurate
+                  {session.accuracy_percentage.toFixed(1)}% {t('session.accurate')}
                 </span>
               </div>
             )}
@@ -113,7 +116,7 @@ export function SessionSummaryCard({ session, onClick, className }: SessionSumma
         {/* Claims breakdown */}
         {claimsBreakdown && claimsBreakdown.length > 0 && (
           <div className="space-y-3">
-            <span className="text-sm font-medium text-foreground">Verification Results</span>
+            <span className="text-sm font-medium text-foreground">{t('session.verificationResults')}</span>
             <div className="flex items-center gap-4 flex-wrap">
               {claimsBreakdown.map((item) => {
                 const Icon = item.icon;

@@ -16,6 +16,7 @@ import {
   ArrowRight,
   Sparkles
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface GuestAccessModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export function GuestAccessModal({
   onClose, 
   onSignUp 
 }: GuestAccessModalProps) {
+  const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSignUp = async () => {
@@ -62,7 +64,7 @@ export function GuestAccessModal({
               </motion.div>
 
               <DialogTitle className="text-xl font-semibold">
-                Ready to get to know the truth?
+                {t('common:guestAccess.title')}
               </DialogTitle>
             </DialogHeader>
 
@@ -75,31 +77,31 @@ export function GuestAccessModal({
                 className="text-center space-y-4"
               >
                 <p className="text-muted-foreground">
-                  Join thousands of users fighting misinformation with unlimited AI-powered fact-checking.
+                  {t('common:guestAccess.description')}
                 </p>
 
                 <div className="bg-primary/5 rounded-lg p-4 space-y-3">
-                  <h4 className="font-semibold text-foreground">Get Full Access</h4>
+                  <h4 className="font-semibold text-foreground">{t('common:guestAccess.getFullAccess')}</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Unlimited fact-checking</span>
+                      <span>{t('common:guestAccess.features.unlimitedFactChecking')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>All media formats (text, audio, video)</span>
+                      <span>{t('common:guestAccess.features.allMediaFormats')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Save your fact-check history</span>
+                      <span>{t('common:guestAccess.features.saveHistory')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Real-time stream processing</span>
+                      <span>{t('common:guestAccess.features.realTimeStreaming')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span>Priority processing</span>
+                      <span>{t('common:guestAccess.features.priorityProcessing')}</span>
                     </div>
                   </div>
                 </div>
@@ -121,12 +123,12 @@ export function GuestAccessModal({
                   {isProcessing ? (
                     <div className="flex items-center space-x-2">
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      <span>Connecting...</span>
+                      <span>{t('common:guestAccess.actions.connecting')}</span>
                     </div>
                   ) : (
                     <>
                       <CreditCard className="h-5 w-5 mr-2" />
-                      Sign Up with Google - Free
+                      {t('common:guestAccess.actions.signUpWithGoogle')}
                       <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
@@ -139,7 +141,7 @@ export function GuestAccessModal({
                   className="w-full text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4 mr-2" />
-                  Maybe Later
+                  {t('common:guestAccess.actions.maybeLater')}
                 </Button>
               </motion.div>
 
@@ -151,13 +153,13 @@ export function GuestAccessModal({
                 className="text-center space-y-2"
               >
                 <div className="flex justify-center items-center space-x-4 text-xs text-muted-foreground">
-                  <span>✓ No credit card required</span>
-                  <span>✓ Instant access</span>
-                  <span>✓ Cancel anytime</span>
+                  <span>{t('common:guestAccess.trustIndicators.noCardRequired')}</span>
+                  <span>{t('common:guestAccess.trustIndicators.instantAccess')}</span>
+                  <span>{t('common:guestAccess.trustIndicators.cancelAnytime')}</span>
                 </div>
                 
                 <p className="text-xs text-muted-foreground">
-                  Already tried our fact-checker? Time to unlock the full power!
+                  {t('common:guestAccess.trustIndicators.alreadyTried')}
                 </p>
               </motion.div>
             </div>

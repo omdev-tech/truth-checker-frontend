@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { EnhancedSegmentData } from '@/lib/types';
+import { Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PlayerOverlayProps {
   segment: EnhancedSegmentData;
@@ -9,6 +11,8 @@ interface PlayerOverlayProps {
 }
 
 const PlayerOverlay: React.FC<PlayerOverlayProps> = ({ segment, isVisible }) => {
+  const { t } = useTranslation('common');
+
   if (!isVisible) return null;
 
   const getStatusColor = (status: string) => {
@@ -41,11 +45,13 @@ const PlayerOverlay: React.FC<PlayerOverlayProps> = ({ segment, isVisible }) => 
       )}
       
       {segment.status === 'processing' && (
-        <div className="text-xs text-blue-400">Processing claims...</div>
+        <div className="absolute top-1 right-1 bg-blue-600 bg-opacity-90 rounded-md px-2 py-1">
+          <div className="text-xs text-blue-400">{t('claims.processingClaims')}</div>
+        </div>
       )}
       
       {segment.status === 'error' && (
-        <div className="text-xs text-red-400">Processing failed</div>
+                  <div className="text-xs text-red-400">{t('dashboard:player.processingFailed')}</div>
       )}
     </div>
   );

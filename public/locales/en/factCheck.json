@@ -1,0 +1,286 @@
+{
+  "title": "Fact Check",
+  "subtitle": "Verify the accuracy of claims in text, files, or live streams",
+  "tabs": {
+    "text": "Text",
+    "file": "File",
+    "stream": "Live Stream",
+    "textInput": "Text Input",
+    "fileUpload": "File Upload",
+    "streamMode": "Stream Mode",
+    "audioMode": "Audio Mode"
+  },
+  "upload": {
+    "title": "Upload Media",
+    "subtitle": "Upload audio or video files for fact-checking",
+    "selectFile": "Select File",
+    "dragAndDrop": "Drag and drop your file here, or click to browse",
+    "supportedFormats": "Supported formats",
+    "maxSize": "Max file size",
+    "processing": "Processing file...",
+    "analyzing": "Analyzing content...",
+    "uploadProgress": "Upload Progress",
+    "audioTitle": "Audio Fact Checker",
+    "videoTitle": "Video Fact Checker"
+  },
+  "text": {
+    "title": "Fact Check Text",
+    "description": "Paste text content to verify its accuracy",
+    "placeholder": "Enter the text you want to fact-check...",
+    "submit": "Fact Check",
+    "processing": "Processing...",
+    "error": "Error occurred during fact-checking",
+    "analyze": "Analyze Text",
+    "minLength": "Please enter at least 10 characters",
+    "maxLength": "Text too long (max {{max}} characters)"
+  },
+  "file": {
+    "title": "Upload File",
+    "description": "Upload a document to extract and verify text content",
+    "supportedFormats": "Supported formats: PDF, TXT, DOC, DOCX",
+    "clickToUpload": "Click to upload or drag and drop",
+    "processing": "Processing file...",
+    "error": "Error processing file"
+  },
+  "stream": {
+    "title": "Fact Check Stream",
+    "description": "Live fact-checking for streaming content",
+    "statusReady": "Ready",
+    "statusRecording": "Recording...",
+    "statusProcessing": "Processing...",
+    "statusError": "Error",
+    "startRecording": "Start Live Fact Check",
+    "stopRecording": "Stop Recording",
+    "retryRecording": "Retry",
+    "noAudioDevice": "No microphone access",
+    "urlPlaceholder": "Enter a live stream URL to start real-time fact-checking",
+    "startAnalysis": "Start Live Analysis",
+    "stopAnalysis": "Stop Analysis",
+    "forceLiveMode": "Force Live Stream Mode",
+    "status": {
+      "connecting": "Connecting to stream...",
+      "analyzing": "Analyzing live content...",
+      "paused": "Analysis paused",
+      "error": "Stream error"
+    },
+    "validation": "Validating stream...",
+    "quality": "Quality:",
+    "type": "Type:",
+    "selectQuality": "Select Quality",
+    "autoQuality": "Auto (Best Available)",
+    "enterUrl": "Enter Stream URL",
+    "validateUrl": "Validate URL",
+    "liveOverrideHelp": "Use when URL doesn't show live indicators",
+    "advancedOptions": "Advanced Options",
+    "startFactChecking": "Start Fact-Checking",
+    "validationSuccess": "Stream validated successfully!",
+    "liveStream": "Live Stream"
+  },
+  "results": {
+    "title": "Fact Check Results",
+    "verificationResults": "Verification Results",
+    "status": "Status",
+    "confidence": "Confidence",
+    "explanation": "Explanation",
+    "sources": "Sources",
+    "claim": "Claim",
+    "verifiedAt": "Verified at {{timestamp}}",
+    "processingTime": "Processing time: {{time}}",
+    "viewDetails": "View Details",
+    "noResults": "No results yet",
+    "noResultsDescription": "Start fact-checking to see results here",
+    "noClaimsFound": "No verifiable claims found in the provided text.",
+    "resultCount": "{{count}} result",
+    "resultCount_other": "{{count}} results",
+    "processingClaims": "Processing claims...",
+    "processingFailed": "Processing failed",
+    "sourcesWithCount": "Sources:",
+    "extracted": "Extracted"
+  },
+  "status": {
+    "true": "True",
+    "false": "False",
+    "partiallyTrue": "Partially True",
+    "partially_true": "Partially True",
+    "misleading": "Misleading",
+    "disputed": "Disputed",
+    "unverifiable": "Unverifiable"
+  },
+  "confidence": {
+    "high": "High Confidence",
+    "medium": "Medium Confidence",
+    "low": "Low Confidence",
+    "insufficient": "Insufficient Data"
+  },
+  "settings": {
+    "responseLanguage": "Response Language",
+    "responseLanguageHelp": "Choose the language for fact-check explanations",
+    "advanced": "Advanced Settings",
+    "fastMode": "Fast Mode",
+    "fastModeHelp": "Faster processing with slightly reduced accuracy"
+  },
+  "errors": {
+    "uploadFailed": "File upload failed",
+    "analysisFailed": "Analysis failed",
+    "unsupportedFormat": "Unsupported file format",
+    "fileTooLarge": "File too large",
+    "networkError": "Network error - please check your connection",
+    "streamNotFound": "Stream not found or inaccessible",
+    "invalidUrl": "Invalid stream URL"
+  },
+  "details": {
+    "verified": "Verified",
+    "processingTime": "Processing Time",
+    "sourceType": "Source Type",
+    "originalInput": "Original Input",
+    "explanation": "Verification Explanation",
+    "sources": "Sources ({{count}})",
+    "additionalInfo": "Additional Information",
+    "metadata": "Metadata",
+    "lastUpdated": "Last updated: {{time}}"
+  },
+  "sources": {
+    "text": "Text Prompt",
+    "media": "Media File",
+    "stream": "Live Stream",
+    "recording": "Live Recording",
+    "all": "All Sources",
+    "textPrompt": "Text Prompt",
+    "mediaFile": "Media File",
+    "liveStream": "Live Stream",
+    "liveRecording": "Live Recording"
+  },
+  "statuses": {
+    "all": "All Statuses"
+  },
+  "media": {
+    "uploadTitle": "Upload Media Files",
+    "videoFiles": "Video Files",
+    "audioFiles": "Audio Files",
+    "streamUrl": "Stream URL",
+    "twitch": "Twitch Streams",
+    "directUrls": "Direct Stream URLs",
+    "qualityPreference": "Quality Preference",
+    "bufferDuration": "Buffer Duration",
+    "streamInfo": "Stream Information"
+  },
+  "timeline": {
+    "next": "Next",
+    "liveStream": "Live Stream",
+    "timeline": "Timeline",
+    "processingStatus": "Processing Status",
+    "audioAnalysis": "Audio Analysis"
+  },
+  "processing": {
+    "title": "AI Fact-Checking in Progress",
+    "subtitle": "Advanced verification using multiple data sources",
+    "tipMessage": "💡 This comprehensive analysis typically takes 10-15 seconds for accuracy",
+    "tipMessageLanding": "💡 This comprehensive analysis typically takes 5-15 seconds for accuracy",
+    "steps": {
+      "extracting": {
+        "title": "Extracting Claims",
+        "description": "Identifying verifiable statements using NLP"
+      },
+      "accessing": {
+        "title": "Accessing Data Sources", 
+        "description": "Connecting to 50+ trusted databases"
+      },
+      "crossReferencing": {
+        "title": "Cross-Referencing Evidence",
+        "description": "Analyzing credibility across multiple sources"
+      },
+      "reasoning": {
+        "title": "AI Reasoning Analysis",
+        "description": "Applying advanced logic verification"
+      },
+      "generating": {
+        "title": "Generating Results",
+        "description": "Compiling comprehensive fact-check report"
+      }
+    }
+  },
+  "placeholders": {
+    "textInput": "Enter any statement, claim, or information you'd like to verify...",
+    "landingInput": "Enter a claim to fact-check... e.g., 'The Earth is flat' or 'Vaccines cause autism'",
+    "streamUrl": "https://youtube.com/watch?v=... or https://twitch.tv/...",
+    "search": "Search fact-checks..."
+  },
+  "mediaTypes": {
+    "video": "Video",
+    "audio": "Audio",
+    "youtube": "YouTube Live & Videos",
+    "twitch": "Twitch Stream",
+    "direct": "Direct Stream"
+  },
+  "audio": {
+    "title": "Audio Fact Check",
+    "description": "Upload audio files or record live audio for fact-checking",
+    "uploadTitle": "Upload Audio File",
+    "uploadDescription": "Supported formats: MP3, WAV, M4A, OGG",
+    "recordTitle": "Record Audio",
+    "recordDescription": "Click to start recording your audio for fact-checking",
+    "clickToUpload": "Click to upload or drag and drop",
+    "startRecording": "Start Recording",
+    "stopRecording": "Stop Recording",
+    "processing": "Processing audio...",
+    "extractingText": "Extracting text from audio...",
+    "analyzing": "Analyzing content...",
+    "transcription": "Transcription",
+    "error": "Error processing audio",
+    "duration": "Duration:",
+    "language": "Language:", 
+    "confidence": "Confidence:",
+    "supportedTypes": "Supported file types",
+    "supportDescription": "Support for videos, audio files, and more formats",
+    "resultCount_one": "{{count}} result",
+    "resultCount_other": "{{count}} results",
+    "noClaimsFound": "No verifiable claims found in the transcribed audio."
+  },
+  "textFactChecker": {
+    "title": "Text Fact Checker",
+    "inputLabel": "Enter text to fact-check",
+    "characterCount": "{{current}} / {{max}} characters",
+    "processing": "Processing with AI...",
+    "checkFacts": "Check Facts",
+    "remaining": "{{count}} remaining"
+  },
+  "validation": {
+    "enterText": "Please enter some text to fact-check",
+    "textTooLong": "Text is too long (maximum {{maxLength}} characters)"
+  },
+  "guest": {
+    "guestMode": "Guest Mode: {{count}} free fact-checks remaining",
+    "noUsageRemaining": "No free checks remaining. Sign up for unlimited access!",
+    "usageLimitReached": "Usage limit reached. Please sign up for unlimited access.",
+    "lastFactCheck": "Fact-check completed! This was your last free fact-check. Sign up for unlimited access.",
+    "remainingFactChecks": "Fact-check completed! {{count}} free fact-checks remaining.",
+    "creditRefunded": "Credit refunded due to processing error",
+    "signUpPrompt": "Sign up for unlimited fact-checking access!",
+    "signUpFree": "Sign Up Free"
+  },
+  "landing": {
+    "tryFree": "Try Free",
+    "title": "AI-Powered Fact Checker",
+    "subtitle": "Get instant verification of claims with AI analysis",
+    "checkClaim": "Check This Claim",
+    "remainingChecks": "{{count}} free checks remaining",
+    "resultCount": "{{count}} results found",
+    "noClaimsFound": "No verifiable claims found in the provided text",
+    "moreResultsAvailable": "+ {{count}} more results available in full app",
+    "powerfulResultsTitle": "🎉 See how powerful AI fact-checking can be?",
+    "powerfulResultsDescription": "Join thousands of users fighting misinformation with unlimited fact-checking, audio/video analysis, and real-time verification.",
+    "getFullAccess": "Get Full Access - Sign Up Free",
+    "triedAllFree": "You've tried all your free fact-checks!",
+    "readyToUnlock": "Ready to unlock unlimited AI-powered fact-checking?",
+    "signUpUnlimited": "Sign Up Free - Unlimited Access",
+    "upgradePrompt": "🚀 Want unlimited fact-checking?",
+    "upgradeDescription": "Join thousands fighting misinformation with unlimited access, audio/video analysis, and priority support.",
+    "upgradeButton": "Sign Up Free - Unlimited Access",
+    "noCardRequired": "No credit card required • Instant access • Cancel anytime"
+  },
+  "session": {
+    "claimsCount": "Claims ({{count}})",
+    "noClaimsTitle": "No Claims Found",
+    "noClaimsDescription": "This session doesn't have any claims yet."
+  }
+} 

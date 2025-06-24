@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Upload, Brain, CheckCircle, ArrowRight } from 'lucide-react';
 import { HowItWorksSectionProps } from '@/lib/types/landing';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Icon mapping for process steps
@@ -19,6 +20,7 @@ const iconMap = {
  * Emphasizes simplicity and speed
  */
 export function HowItWorksSection({ steps }: HowItWorksSectionProps) {
+  const { t } = useTranslation(['dashboard']);
   const getIcon = (iconName: string) => {
     const IconComponent = iconMap[iconName as keyof typeof iconMap];
     return IconComponent || Upload;
@@ -44,6 +46,31 @@ export function HowItWorksSection({ steps }: HowItWorksSectionProps) {
     }
   };
 
+  // Define static steps with translation keys
+  const translatedSteps = [
+    {
+      id: 'upload',
+      step: 1,
+      title: t('dashboard:howItWorks.steps.upload.title'),
+      description: t('dashboard:howItWorks.steps.upload.description'),
+      icon: 'Upload'
+    },
+    {
+      id: 'analyze',
+      step: 2,
+      title: t('dashboard:howItWorks.steps.analyze.title'),
+      description: t('dashboard:howItWorks.steps.analyze.description'),
+      icon: 'Brain'
+    },
+    {
+      id: 'results',
+      step: 3,
+      title: t('dashboard:howItWorks.steps.results.title'),
+      description: t('dashboard:howItWorks.steps.results.description'),
+      icon: 'CheckCircle'
+    }
+  ];
+
   return (
     <section id="how-it-works" className="py-24 bg-background">
       <div className="container mx-auto px-4">
@@ -56,14 +83,12 @@ export function HowItWorksSection({ steps }: HowItWorksSectionProps) {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            How It 
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              {" "}Works
+              {t('dashboard:howItWorks.title')}
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Get fact-checked results in three simple steps. Our AI handles the complexity 
-            while you focus on what matters - the truth.
+            {t('dashboard:howItWorks.subtitle')}
           </p>
         </motion.div>
 
@@ -76,9 +101,9 @@ export function HowItWorksSection({ steps }: HowItWorksSectionProps) {
           className="max-w-6xl mx-auto"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-            {steps.map((step, index) => {
+            {translatedSteps.map((step, index) => {
               const IconComponent = getIcon(step.icon);
-              const isLastStep = index === steps.length - 1;
+              const isLastStep = index === translatedSteps.length - 1;
               
               return (
                 <motion.div
@@ -154,18 +179,18 @@ export function HowItWorksSection({ steps }: HowItWorksSectionProps) {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-primary">&lt; 10s</div>
-              <div className="text-sm text-muted-foreground">Average processing time</div>
+              <div className="text-2xl font-bold text-primary">{t('dashboard:howItWorks.metrics.processingTime')}</div>
+              <div className="text-sm text-muted-foreground">{t('dashboard:howItWorks.metrics.processingTimeLabel')}</div>
             </div>
             
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-primary">94%</div>
-              <div className="text-sm text-muted-foreground">Accuracy rate</div>
+              <div className="text-2xl font-bold text-primary">{t('dashboard:howItWorks.metrics.accuracyRate')}</div>
+              <div className="text-sm text-muted-foreground">{t('dashboard:howItWorks.metrics.accuracyLabel')}</div>
             </div>
             
             <div className="space-y-2">
-              <div className="text-2xl font-bold text-primary">24/7</div>
-              <div className="text-sm text-muted-foreground">Always available</div>
+              <div className="text-2xl font-bold text-primary">{t('dashboard:howItWorks.metrics.availability')}</div>
+              <div className="text-sm text-muted-foreground">{t('dashboard:howItWorks.metrics.availabilityLabel')}</div>
             </div>
           </div>
         </motion.div>

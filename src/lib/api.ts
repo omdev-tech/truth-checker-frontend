@@ -129,9 +129,14 @@ export const truthCheckerApi = {
 
   // Text fact checking (with optional authentication)
   async checkText(request: FactCheckRequest): Promise<FactCheckResponse> {
+    // If no language specified in request, default to 'en'
+    const requestWithLanguage = { 
+      language: 'en', 
+      ...request 
+    };
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/fact-check/text`, {
       method: 'POST',
-      body: JSON.stringify(request),
+      body: JSON.stringify(requestWithLanguage),
     });
     return handleResponse<FactCheckResponse>(response);
   },

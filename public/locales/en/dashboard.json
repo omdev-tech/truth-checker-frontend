@@ -1,0 +1,440 @@
+{
+  "title": "Dashboard",
+  "subtitle": "Overview of your fact-checking activity and insights",
+  "overview": {
+    "title": "Overview",
+    "thisMonth": "This Month",
+    "allTime": "All Time",
+    "lastUpdated": "Last updated: {{time}}"
+  },
+  "stats": {
+    "factsChecked": "Facts Checked",
+    "accuracy": "Accuracy Rate", 
+    "timesSaved": "Time Saved",
+    "sourcesUsed": "Sources Used",
+    "requestsUsed": "Requests Used",
+    "hoursProcessed": "Hours Processed",
+    "remainingRequests": "Remaining Requests",
+    "remainingHours": "Remaining Hours",
+    "unlimited": "Unlimited"
+  },
+  "recentActivity": {
+    "title": "Recent Activity",
+    "noActivity": "No recent activity",
+    "viewAll": "View All History"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "newFactCheck": "New Fact Check",
+    "uploadFile": "Upload File",
+    "viewHistory": "View History",
+    "managePlans": "Manage Plans"
+  },
+  "profile": {
+    "title": "Profile",
+    "loading": "Loading profile...",
+    "loadingUsage": "Loading usage statistics...",
+    "loginRequired": "Please log in to view your profile.",
+    "loadError": "Failed to load profile",
+    "paymentSuccess": "🎉 Payment successful! Your plan has been upgraded. Refreshing your profile...",
+    "memberSince": "Member since {{date}}",
+    "currentPlan": "Current plan: {{plan}}",
+    "accountStatus": "Account Status",
+    "statusActive": "Active",
+    "quickActions": "Quick Actions",
+    "exportData": "Export Data",
+    "upgradePlan": "Upgrade Plan",
+    "statistics": {
+      "title": "Account Statistics",
+      "requestsThisMonth": "Requests This Month",
+      "hoursProcessed": "Hours Processed"
+    },
+    "billing": {
+      "title": "Billing Information",
+      "currentPlan": "Current Plan",
+      "billingCycle": "Billing Cycle",
+      "nextReset": "Next Reset",
+      "currency": "Currency",
+      "viewHistory": "View Billing History"
+    }
+  },
+  "history": {
+    "title": "Fact-Check History",
+    "subtitle": "Review your past fact-checking sessions and results",
+    "loading": "Loading your history...",
+    "search": "Search fact-checks...",
+    "filter": "Filter",
+    "views": {
+      "title": "View",
+      "sessions": "Sessions",
+      "claims": "Claims"
+    },
+    "filters": {
+      "sourceType": "Source Type", 
+      "verificationStatus": "Verification Status"
+    },
+    "empty": {
+      "title": "No History Yet",
+      "description": "Start fact-checking to build your history and track your accuracy over time.",
+      "startButton": "Start Fact-Checking"
+    },
+    "stats": {
+      "totalSessions": "Total Sessions",
+      "claimsProcessed": "{{count}} claims processed",
+      "processingTime": "Processing Time",
+      "averagePerClaim": "Avg: {{avg}} per claim",
+      "accuracyTrends": "Accuracy Trends",
+      "sourceTypes": "Source Types"
+    }
+  },
+  "usage": {
+    "title": "Usage Overview",
+    "period": {
+      "week": "Week",
+      "month": "Month", 
+      "year": "Year"
+    },
+    "metrics": {
+      "requests": "Requests",
+      "hours": "Hours",
+      "accuracy": "Accuracy"
+    },
+    "creditsRemaining": "Credits Remaining",
+    "ofTotal": "of {{total}}",
+    "recommendations": "Recommendations",
+    "recommendationMessages": {
+      "upgradeHighUsage": "Consider upgrading your plan - you're using over 80% of your monthly requests",
+      "upgradeToPaid": "Upgrade to a paid plan for unlimited fact-checking capabilities"
+    }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "totalChecks": "Total Checks",
+    "accuracyAverage": "Average Accuracy",
+    "processingTimeAverage": "Avg. Processing Time",
+    "claimsVerified": "Claims Verified",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "improvement": "{{percent}}% improvement"
+  },
+  "currentPlan": {
+    "title": "Current Plan",
+    "usage": "Usage",
+    "requestsUsed": "{{used}}/{{limit}} requests",
+    "hoursUsed": "{{used}}/{{limit}} hours",
+    "upgrade": "Upgrade Plan",
+    "managePlan": "Manage Plan"
+  },
+  "processing": {
+    "title": "Processing Queue", 
+    "noProcessing": "No items processing",
+    "item": "{{filename}} - {{status}}",
+    "eta": "ETA: {{time}}",
+    "startLiveStream": "Starting live stream fact-checking...",
+    "startAnalysis": "Starting fact-check analysis...",
+    "segmentCreationFailed": "Failed to create segments",
+    "failed": "Failed to process {{time}}"
+  },
+  "tabs": {
+    "text": "Text",
+    "media": "Media",
+    "stream": "Stream",
+    "live": "Live"
+  },
+  "textAnalysis": "Text Analysis",
+  "mediaUpload": "Media Upload",
+  "liveStreams": "Live Streams",
+  "liveRecording": "Live Recording",
+  "analytics": {
+    "title": "Usage Analytics",
+    "loading": "Loading analytics...",
+    "loadError": "Failed to load analytics data",
+    "noData": "No data available",
+    "period": {
+      "sevenDays": "7 Days",
+      "thirtyDays": "30 Days",
+      "ninetyDays": "90 Days"
+    },
+    "tabs": {
+      "timeline": "Usage Timeline",
+      "breakdown": "Action Breakdown",
+      "performance": "Performance"
+    },
+    "chart": {
+      "requests": "Requests",
+      "credits": "Credits",
+      "dailyRequests": "Daily Requests",
+      "creditsUsed": "Credits Used",
+      "count": "Count",
+      "avgProcessingTime": "Avg Processing Time",
+      "hoursUsed": "Hours Used",
+      "processingTimeSeconds": "Processing Time (s)"
+    },
+    "charts": {
+      "actionsByCount": "Actions by Count",
+      "creditsByAction": "Credits by Action Type"
+    },
+    "summary": {
+      "totalRequests": "Total Requests",
+      "hoursConsumed": "Hours Consumed",
+      "avgProcessing": "Avg Processing",
+      "topAction": "Top Action"
+    }
+  },
+  "upload": {
+    "success": "{{mediaType}} uploaded successfully!",
+    "failed": "Failed to process uploaded file",
+    "invalidFileType": "Please upload a video or audio file",
+    "title": "Video Fact-Check Studio",
+    "subtitle": "Upload your video or audio content and get real-time fact-checking analysis with professional timeline controls and detailed claim verification.",
+    "aiPowered": "AI-Powered Fact Checking",
+    "processing": "Processing your file...",
+    "preparingAnalysis": "Creating segments and preparing for analysis",
+    "dropZoneTitle": "Drop your media file here",
+    "dropZoneSubtitle": "or click to browse and select a video or audio file",
+    "chooseFile": "Choose File",
+    "supportedFormats": "Supported formats: MP4, AVI, MOV, WebM, MP3, WAV, M4A",
+    "maxFileSize": "Maximum file size: 500MB",
+    "features": {
+      "timeline": {
+        "title": "Professional Timeline",
+        "description": "Video editor-style timeline with segment thumbnails and real-time status updates"
+      },
+      "analysis": {
+        "title": "AI-Powered Analysis",
+        "description": "Advanced fact-checking with confidence scores and detailed explanations"
+      },
+      "formats": {
+        "title": "Multi-Format Support",
+        "description": "Works with all popular video and audio formats with automatic transcription"
+      }
+    }
+  },
+  "stream": {
+    "connected": "Connected to {{type}} stream!",
+    "connectionFailed": "Failed to connect to stream"
+  },
+  "mediaTypes": {
+    "video": "Video",
+    "audio": "Audio"
+  },
+  "hero": {
+    "poweredBy": "Powered by Advanced AI",
+    "title": "Verify Facts in Real-Time",
+    "subtitle": "Our AI-powered fact-checking system analyzes text, documents, audio, and live streams to help you verify information instantly with authoritative sources."
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "newFactCheck": "New Fact Check",
+    "uploadFile": "Upload File",
+    "viewHistory": "View History",
+    "managePlans": "Manage Plans"
+  },
+  "features": {
+    "title": "Powerful Features for Truth Verification",
+    "subtitle": "Advanced AI technology meets scientific methodology to deliver comprehensive fact-checking across all media formats.",
+    "cta": "Ready to experience the power of AI-driven fact-checking?",
+    "tryNow": "Try it now for free",
+    "learnMore": "Learn more",
+    "textAnalysis": {
+      "title": "Text Analysis", 
+      "description": "Instantly verify claims in any text input with AI-powered analysis",
+      "benefits": [
+        "Text document analysis",
+        "Audio transcription & verification", 
+        "Video content fact-checking",
+        "Real-time stream monitoring"
+      ]
+    },
+    "mediaUpload": {
+      "title": "Media Upload",
+      "description": "Upload audio and video files for comprehensive fact-checking analysis",
+      "benefits": [
+        "Sub-second response times",
+        "Live stream monitoring",
+        "Batch processing support", 
+        "Real-time notifications"
+      ]
+    },
+    "liveStreams": {
+      "title": "Live Streams",
+      "description": "Real-time fact-checking of YouTube, Twitch, and other live streams",
+      "benefits": [
+        "Credible source citations",
+        "Methodology transparency",
+        "Confidence scoring",
+        "Audit trail tracking"
+      ]
+    },
+    "liveRecording": {
+      "title": "Live Recording", 
+      "description": "Record audio in real-time with instant transcription and fact-checking",
+      "benefits": [
+        "Evidence-based verification",
+        "Peer-reviewed methods", 
+        "Bias detection algorithms",
+        "Continuous model improvement"
+      ]
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Get your fact-checking results in three ultra-simple steps. Our AI takes care of everything while you focus on what matters: the truth.",
+    "steps": {
+      "upload": {
+        "title": "Submit Your Content",
+        "description": "Enter your text, upload your files, or paste the URL of your streams and videos."
+      },
+      "analyze": {
+        "title": "AI Analysis", 
+        "description": "Our AI extracts key claims and cross-references them with our verified sources."
+      },
+      "results": {
+        "title": "Get Your Results",
+        "description": "Receive a detailed fact-checking report with sources and reliability indicators."
+      }
+    },
+    "metrics": {
+      "processingTime": "< 10s",
+      "processingTimeLabel": "Average processing time",
+      "accuracyRate": "94%",
+      "accuracyLabel": "Reliability rate",
+      "availability": "24/7",
+      "availabilityLabel": "Service available continuously"
+    }
+  },
+  "trust": {
+    "title": "Trust & Transparency",
+    "subtitle": "Our commitment to scientific accuracy and transparency in AI-powered fact-checking. Every result is backed by verifiable sources and rigorous methodology.",
+    "cta": {
+      "title": "Ready to verify with confidence?",
+      "subtitle": "Join thousands of users who trust our AI-powered fact-checking to separate truth from misinformation.",
+      "benefits": {
+        "noCard": "No credit card required",
+        "freeTrial": "Free trial included", 
+        "cancelAnytime": "Cancel anytime"
+      }
+    },
+    "pillars": {
+      "scientific": {
+        "title": "Scientific Method",
+        "description": "Built on peer-reviewed research and established fact-checking methodologies used by professional journalists and researchers."
+      },
+      "transparency": {
+        "title": "Source Transparency",
+        "description": "Every fact-check includes detailed source citations and confidence scores. Our methodology is transparent and continuously audited."
+      },
+      "community": {
+        "title": "Community Driven", 
+        "description": "Our models are continuously improved through expert feedback and community contributions from fact-checkers worldwide."
+      }
+    },
+    "metrics": {
+      "accuracy": {
+        "value": "94%",
+        "label": "Accuracy Rate",
+        "description": "Verified against human fact-checkers"
+      },
+      "sources": {
+        "value": "10,000+",
+        "label": "Verified Sources", 
+        "description": "Credible databases and publications"
+      },
+      "claims": {
+        "value": "1M+",
+        "label": "Claims Processed",
+        "description": "Fact-checks completed successfully"
+      },
+      "responseTime": {
+        "value": "< 10s",
+        "label": "Average Response",
+        "description": "Lightning-fast fact verification"
+      }
+    }
+  },
+  "analysis": {
+    "closeDashboard": "Close Dashboard",
+    "backToUpload": "Back to Upload",
+    "analysisActive": "Analysis Active"
+  },
+  "player": {
+    "liveFactCheckingActive": "Live Fact-Checking Active",
+    "processingAudioRealTime": "Processing audio in real-time",
+    "audioAnalysis": "Audio Analysis",
+    "processingFailed": "Processing failed"
+  },
+  "results": {
+    "transcription": "Transcription",
+    "factCheckResults": "Fact Check Results",
+    "claims": "Claims",
+    "sources": "Sources",
+    "allSources": "All Sources",
+    "noSourcesAvailable": "No sources available for this segment",
+    "metadata": "Metadata",
+    "processingTime": "Processing time",
+    "lastUpdated": "Last updated"
+  },
+  "plans": {
+    "title": "Choose Your Plan",
+    "loadingPlans": "Loading plans...",
+    "tryAgain": "Try Again",
+    "currency": "Currency",
+    "billingCycle": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualDiscount": "20% OFF"
+    },
+    "pricing": {
+      "free": "Free",
+      "perMonth": "per month",
+      "billedAnnually": "billed annually",
+      "billedMonthly": "billed monthly",
+      "save": "Save {{amount}} ({{percent}}% off)",
+      "saveAnnually": "Save {{percent}}% annually",
+      "earlyAdopterPrice": "🚀 Early Adopter Price"
+    },
+    "badges": {
+      "mostPopular": "Most Popular",
+      "currentPlan": "Current Plan",
+      "discount": "{{percent}}% OFF"
+    },
+    "features": {
+      "whatsIncluded": "What's included:",
+      "requestsPerMonth": "{{count}} requests/month",
+      "hoursProcessing": "{{count}} hours processing",
+      "features": "Features:",
+      "earlyAdopterBonus": "🎁 Early Adopter Bonus:",
+      "priceLockedForLife": "Price locked for life",
+      "prioritySupport": "Priority support",
+      "exclusiveBetaFeatures": "Exclusive beta features",
+      "planFeatures": {
+        "tenKRequests": "10K requests per month",
+        "fiveHourProcessing": "5h processing time",
+        "commercialLicense": "Commercial license",
+        "emailSupport": "Email support",
+        "unlimitedRequests": "Unlimited requests",
+        "priorityProcessing": "Priority processing",
+        "dedicatedSupport": "Dedicated support",
+        "apiAccess": "API access",
+        "advancedAnalytics": "Advanced analytics",
+        "customIntegrations": "Custom integrations",
+        "fiveHundredKRequests": "500K requests per month",
+        "twoFiftyHourProcessing": "250h processing time",
+        "instantCallSupport": "Instant call center support",
+        "fasterProcessing": "Faster processing",
+        "earlyAccessFeatures": "Early access to new features"
+      }
+    },
+    "actions": {
+      "yourCurrentPlan": "Your current plan",
+      "getStarted": "Get Started",
+      "upgradeNow": "Upgrade Now",
+      "getDiscount": "Get {{percent}}% Off"
+    },
+    "info": {
+      "allPlansInclude": "All plans include our core fact-checking features and API access.",
+      "flexibleBilling": "Upgrade or downgrade at any time. Unused credits don't expire.",
+      "earlyAdopterPricing": "🎉 Early adopter pricing - Save {{percent}}% on all plans!"
+    }
+  }
+} 

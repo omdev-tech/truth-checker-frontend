@@ -17,10 +17,12 @@ import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { useAuth } from '@/hooks/useAuth';
 import { truthCheckerApi } from '@/lib/api';
 import { HealthStatus } from '@/lib/types';
-import { Shield, Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft, FileText } from 'lucide-react';
+import { Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft, FileText } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { Logo } from '@/components/atoms/Logo';
+import { LanguageSelector } from '@/components/atoms/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 export function Header() {
   const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
@@ -28,6 +30,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation('common');
   const { 
     isAuthenticated, 
     user, 
@@ -61,7 +64,7 @@ export function Header() {
       return (
         <Badge variant="outline" className="gap-1">
           <LoadingSpinner size="sm" />
-          Checking...
+          {t('status.loading')}
         </Badge>
       );
     }
@@ -70,7 +73,7 @@ export function Header() {
       return (
         <Badge variant="destructive" className="gap-1">
           <Activity className="w-3 h-3" />
-          Offline
+          {t('status.offline', 'Offline')}
         </Badge>
       );
     }
@@ -91,7 +94,7 @@ export function Header() {
     // Show "Partial" only if server is responding but some providers are initialized and others aren't
     // This provides more meaningful status information
     const statusVariant = allProvidersHealthy ? "default" : "secondary";
-    const statusText = hasAnyProviders && !allProvidersHealthy ? "Partial" : "Online";
+    const statusText = hasAnyProviders && !allProvidersHealthy ? t('status.partial', 'Partial') : t('status.online', 'Online');
     const statusClass = allProvidersHealthy 
       ? 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
       : hasAnyProviders 
@@ -152,13 +155,13 @@ export function Header() {
           className={`flex items-center gap-3 ${isOnSecondaryPage ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
           onClick={isOnSecondaryPage ? handleBackToApp : undefined}
         >
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden">
-            <Logo width={40} height={40} priority className="w-full h-full" />
+          <div className="flex items-center justify-center w-12 h-12 rounded-xl overflow-hidden">
+            <Logo width={56} height={56} priority className="w-full h-full" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">TruthChecker</h1>
             <p className="text-xs text-muted-foreground hidden sm:block">
-              AI-Powered Fact Verification
+              {t('app.tagline')}
             </p>
           </div>
         </motion.div>
@@ -180,7 +183,7 @@ export function Header() {
                 className="hidden sm:flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to App
+                {t('actions.back')}
               </Button>
               {/* Mobile version */}
               <Button
@@ -196,9 +199,12 @@ export function Header() {
 
           {/* Health Status */}
           <div className="hidden sm:flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Status:</span>
+            <span className="text-sm text-muted-foreground">{t('status.label', 'Status')}:</span>
             {getHealthBadge()}
           </div>
+
+          {/* Language Selector */}
+          <LanguageSelector variant="ghost" size="sm" />
 
           {/* Theme Toggle */}
           <Button
@@ -241,15 +247,15 @@ export function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{t('navigation.profile')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer" onClick={handleHistoryClick}>
                       <FileText className="mr-2 h-4 w-4" />
-                      <span>History</span>
+                      <span>{t('navigation.history')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer" onClick={handlePlansClick}>
                       <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Plans</span>
+                      <span>{t('navigation.plans')}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -257,7 +263,7 @@ export function Header() {
                       onClick={handleSignOut}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sign out</span>
+                      <span>{t('navigation.logout')}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -269,7 +275,7 @@ export function Header() {
                   className="text-sm"
                 >
                   <User className="mr-2 h-4 w-4" />
-                  Sign In
+                  {t('navigation.login')}
                 </Button>
               )}
             </>

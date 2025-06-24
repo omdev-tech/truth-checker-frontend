@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DashboardState, EnhancedSegmentData, ChunkProcessingResponse, StreamData } from '@/lib/types';
 import { truthCheckerApi, getVideoInfo, VideoInfo } from '@/lib/api';
 import { CONFIG } from '@/lib/config';
+import { getApiLanguage } from '@/lib/languageUtils';
 import UploadScreen from './UploadScreen';
 import AnalysisScreen from './AnalysisScreen';
 import { toast } from 'sonner';
@@ -21,6 +23,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   initialStream = null,
   onClose,
 }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const [state, setState] = useState<DashboardState>({
     mode: initialFile ? 'analysis' : initialStream ? 'stream' : 'upload',
     file: initialFile,
@@ -83,15 +86,15 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
 
       // Start processing segments
       if (state.processing.isLiveStream) {
-        toast.info('Starting live stream fact-checking...');
+        toast.info(t('dashboard:processing.startLiveStream'));
       } else {
-        toast.info('Starting fact-check analysis...');
+        toast.info(t('dashboard:processing.startAnalysis'));
       }
     } catch (error) {
       console.error('Error creating segments:', error);
-      toast.error('Failed to create segments');
+      toast.error(t('dashboard:processing.segmentCreationFailed'));
     }
-  }, [state.file, state.streamData, state.processing.isLiveStream]);
+  }, [state.file, state.streamData, state.processing.isLiveStream, t]);
 
   // Generate video thumbnail
   const generateThumbnail = useCallback(async (videoFile: File, timeInSeconds: number): Promise<string> => {
@@ -159,56 +162,6 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       return 'direct-url';
     }
   };
-
-  // Add helper function to detect if a stream is live using backend API
-  // const isLiveStream = useCallback(async (streamData: StreamData | null): Promise<boolean> => {
-  //   if (!streamData) return false;
-    
-  //   // For streams, always check with backend API for authoritative live status
-  //   if (streamData.url) {
-  //     try {
-  //       console.log('🔍 Checking live status via backend API:', streamData.url.substring(0, 50) + '...');
-        
-  //       const streamType = getStreamType(streamData.url);
-  //       const videoInfo: VideoInfo = await getVideoInfo({
-  //         url: streamData.url,
-  //         stream_type: streamType,
-  //         start_time: 0,
-  //         duration: CONFIG.MEDIA.CHUNK_DURATION,
-  //         provider: 'elevenlabs',
-  //         fast_mode: true
-  //       });
-        
-  //       console.log('📡 Backend video-info response:', {
-  //         is_live: videoInfo.is_live,
-  //         processing_mode: videoInfo.processing_mode,
-  //         method: videoInfo.live_status.method,
-  //         broadcast_content: videoInfo.live_status.live_broadcast_content,
-  //         source: 'Backend API (authoritative)'
-  //       });
-        
-  //       return videoInfo.is_live;
-        
-  //     } catch (error) {
-  //       console.warn('⚠️ Backend live status check failed, using frontend fallback:', error);
-        
-  //       // Fallback to frontend metadata if backend is unavailable
-  //       if (streamData.metadata?.isLive !== undefined) {
-  //         console.log('🔄 Using frontend metadata as fallback:', {
-  //           isLive: streamData.metadata.isLive,
-  //           source: 'StreamFactChecker metadata (fallback)',
-  //           reliable: false
-  //         });
-  //         return streamData.metadata.isLive;
-  //       }
-  //     }
-  //   }
-    
-  //   // Last resort: URL-based detection
-  //   console.log('⚠️ Using URL-based live detection (last resort)');
-  //   const url = streamData.url.toLowerCase();
-  //   return url.includes('live=1') || url.includes('live=true') || url.includes('/live/');
-  // }, []);
 
   // Synchronous version for immediate checks (uses cached result)
   const isLiveStreamSync = (streamData: StreamData | null): boolean => {
@@ -450,17 +403,13 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   // Handle file upload
   const handleFileUpload = useCallback(async (file: File) => {
     try {
-      // Create media URL for playback
-      const mediaUrl = URL.createObjectURL(file);
       const mediaType = file.type.startsWith('video/') ? 'video' : 'audio';
       
-      // Update state to analysis mode
       setState(prev => ({
         ...prev,
         mode: 'analysis',
         file,
-        streamData: null, // Clear stream data when uploading file
-        mediaUrl,
+        mediaUrl: URL.createObjectURL(file),
         mediaType,
         processing: {
           ...prev.processing,
@@ -469,12 +418,12 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         },
       }));
 
-      toast.success(`${mediaType === 'video' ? 'Video' : 'Audio'} uploaded successfully!`);
+      toast.success(t('dashboard:upload.success', { mediaType: t(`dashboard:mediaTypes.${mediaType}`) }));
     } catch (error) {
-      console.error('Error handling file upload:', error);
-      toast.error('Failed to process uploaded file');
+      console.error('Error uploading file:', error);
+      toast.error(t('dashboard:upload.failed'));
     }
-  }, []);
+  }, [t]);
 
   // Extract actual audio/video chunk from media file using Web Audio API
   const extractAudioChunk = useCallback(async (
@@ -691,7 +640,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   useEffect(() => {
     if (initialStream && state.mode === 'stream') {
       console.log('🎥 Starting stream analysis:', initialStream);
-      toast.success(`Connected to ${initialStream.type} stream!`);
+      toast.success(t('dashboard:stream.connected', { type: initialStream.type }));
       
       // For streams, we need to manually trigger segment creation since there's no media element duration event
       // Use a default duration for live streams (will be adjusted in createSegments based on live status)
@@ -700,7 +649,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       console.log('🔧 Triggering handleMediaLoaded for stream with duration:', defaultStreamDuration + 's');
       handleMediaLoaded(defaultStreamDuration);
     }
-  }, [initialStream, state.mode, handleMediaLoaded]);
+  }, [initialStream, state.mode, handleMediaLoaded, t]);
 
   // Process a single segment
   const processSegment = useCallback(async (segment: EnhancedSegmentData) => {
@@ -804,7 +753,8 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
           start_time: processStartTime, // 0 for live, actual time for regular videos
           duration: processDuration,
           provider: 'elevenlabs',
-          fast_mode: true
+          fast_mode: true,
+          language: getApiLanguage()
         });
         const apiCallDuration = Date.now() - apiCallStart;
         
@@ -914,7 +864,8 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
           fast_mode: true,
           start_time: segment.startTime,
           end_time: segment.endTime,
-          provider: 'elevenlabs'
+          provider: 'elevenlabs',
+          language: getApiLanguage()
         });
         const apiCallDuration = Date.now() - apiCallStart;
 
@@ -969,7 +920,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
       }));
 
       const timeDisplay = isLive ? `chunk #${segment.id + 1}` : `${segment.startTime}-${segment.endTime}s`;
-      toast.error(`Failed to process ${timeDisplay}`);
+      toast.error(t('dashboard:processing.failed', { time: timeDisplay }));
     } finally {
       // Always remove the segment from processing set when done
       processingSegmentsRef.current.delete(segment.id);
@@ -977,7 +928,7 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     }
     
     console.log('🏁 PROCESSING SEGMENT END\n');
-  }, [state.file, state.streamData, extractAudioChunk, createFileWithTimeParams, createNextLiveSegment]);
+  }, [state.file, state.streamData, extractAudioChunk, createFileWithTimeParams, createNextLiveSegment, t]);
 
   // Auto-start processing when segments are created
   useEffect(() => {

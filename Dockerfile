@@ -14,7 +14,12 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+
+# Copy application files
 COPY . .
+
+# Use production environment for build
+RUN cp .env.prod .env.local
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry

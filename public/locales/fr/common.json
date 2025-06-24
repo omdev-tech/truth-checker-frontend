@@ -1,0 +1,349 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "dashboard": "Tableau de Bord",
+    "history": "Historique",
+    "plans": "Abonnements",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "toggleMenu": "Basculer le menu"
+  },
+  "actions": {
+    "factCheck": "vérification des faits",
+    "transcription": "transcription",
+    "liveStream": "streaming en direct",
+    "action": "action",
+    "upload": "Téléverser",
+    "analyze": "Analyser",
+    "download": "Télécharger",
+    "share": "Partager",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "close": "Fermer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "reset": "Réinitialiser",
+    "clear": "Effacer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "export": "Exporter",
+    "import": "Importer",
+    "cancel": "Annuler",
+    "retry": "Réessayer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "continue": "Continuer",
+    "validate": "Valider",
+    "play": "Lecture",
+    "pause": "Pause",
+    "loading": "Chargement...",
+    "refresh": "Actualiser",
+    "tryAgain": "Essayer Truth Checker",
+    "viewMore": "Voir plus",
+    "showLess": "Voir moins",
+    "copy": "Copier",
+    "processing": "Traitement...",
+    "startRecording": "Démarrer l'enregistrement",
+    "pauseRecording": "Mettre en pause l'enregistrement",
+    "stopRecording": "Arrêter l'enregistrement",
+    "resumeRecording": "Reprendre"
+  },
+  "status": {
+    "loading": "Chargement...",
+    "processing": "Traitement...",
+    "completed": "Terminé",
+    "error": "Erreur",
+    "success": "Succès",
+    "failed": "Échoué",
+    "pending": "En attente",
+    "uploading": "Téléchargement...",
+    "analyzing": "Analyse...",
+    "ready": "Prêt",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "partial": "Partiel",
+    "label": "Statut",
+    "warning": "Avertissement",
+    "info": "Info",
+    "connecting": "Connexion...",
+    "checkingAuth": "Vérification de l'authentification...",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "cancelled": "Annulé",
+    "complete": "Terminé",
+    "paused": "EN PAUSE",
+    "recording": "ENREGISTREMENT"
+  },
+  "language": {
+    "label": "Langue",
+    "english": "English",
+    "french": "Français",
+    "select": "Sélectionner la langue",
+    "current": "Langue actuelle",
+    "selector": "Langue",
+    "current": "Langue actuelle: {{language}}"
+  },
+  "general": {
+    "help": "Aide",
+    "about": "À propos",
+    "contact": "Contact",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "version": "Version",
+    "copyright": "© 2024 Truth Checker. Tous droits réservés.",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "unknown": "Inconnu",
+    "none": "Aucun",
+    "all": "Tout",
+    "or": "ou",
+    "and": "et",
+    "confidence": "Confiance",
+    "accuracy": "Précision",
+    "timestamp": "Horodatage",
+    "duration": "Durée",
+    "fileSize": "Taille du fichier",
+    "fileType": "Type de fichier",
+    "originalInput": "Entrée originale",
+    "additionalInformation": "Informations supplémentaires",
+    "professionalTimeline": "Chronologie professionnelle",
+    "showMore": "Afficher Plus",
+    "showLess": "Afficher Moins",
+    "viewAll": "Voir Tout",
+    "noResults": "Aucun Résultat",
+    "tryAgain": "Réessayer",
+    "goBack": "Retour",
+    "getStarted": "Commencer",
+    "learnMore": "En Savoir Plus"
+  },
+  "creditExhausted": {
+    "title": "Crédits Nécessaires",
+    "description": "Vous avez besoin de {{creditsNeeded}} crédit(s) pour {{action}}, mais il vous reste {{creditsRemaining}}.",
+    "badges": {
+      "upgradeNeeded": "Mise à Niveau Requise"
+    },
+    "usage": {
+      "current": "Utilisation Actuelle",
+      "creditsRemaining": "crédits restants",
+      "nextAction": "{{action}} suivante nécessite {{credits}} crédit(s)"
+    },
+    "upgradeWillUnlock": "La mise à niveau débloquera :",
+    "benefits": {
+      "unlimitedChecks": "Quota de crédits plus élevé pour plus de vérifications",
+      "fasterProcessing": "Heures d'utilisation mensuelles étendues",
+      "advancedFeatures": "Accès complet à toutes les fonctionnalités actuelles"
+    },
+    "pricingHint": "Plans flexibles conçus pour tous les besoins",
+    "startingFrom": "À partir de seulement 5€/mois",
+    "actions": {
+      "upgradeNow": "Mettre à Niveau",
+      "viewPlans": "Voir les Plans",
+      "maybeLater": "Plus Tard"
+    }
+  },
+  "ui": {
+    "close": "Fermer",
+    "poweredBy": "Propulsé par l'IA nouvelle génération",
+    "verifyFacts": "Débusquez les fake news en temps réel",
+    "aiDescription": "Notre service de fact checking IA analyse en temps réel le texte, les documents, l'audio et les flux live pour vous aider à démêler le vrai du faux avec des sources de référence.",
+    "getFullAccess": "Accès complet",
+    "currentPlan": "Abonnement actuel",
+    "perMonth": "par mois"
+  },
+  "accessibility": {
+    "playPause": "{{action}} le média",
+    "toggleMenu": "Basculer le menu",
+    "loading": "Chargement du contenu",
+    "error": "Une erreur s'est produite",
+    "success": "Opération réussie"
+  },
+  "time": {
+    "seconds": "secondes",
+    "minutes": "minutes",
+    "hours": "heures",
+    "days": "jours",
+    "ago": "il y a",
+    "now": "maintenant"
+  },
+  "errors": {
+    "generic": "Quelque chose s'est mal passé. Veuillez réessayer.",
+    "network": "Erreur réseau. Veuillez vérifier votre connexion.",
+    "notFound": "La ressource demandée n'a pas été trouvée.",
+    "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action.",
+    "validation": "Veuillez vérifier votre saisie et réessayer.",
+    "loadFailed": "Échec du chargement des données"
+  },
+  "success": {
+    "saved": "Enregistré avec succès",
+    "deleted": "Supprimé avec succès",
+    "updated": "Mis à jour avec succès",
+    "created": "Créé avec succès"
+  },
+  "notApplicable": "S/O",
+  "plans": {
+    "free": "Gratuit",
+    "starter": "Débutant", 
+    "casual": "Occasionnel",
+    "independent": "Indépendant",
+    "professional": "Professionnel",
+    "business": "Entreprise",
+    "upgradePlan": "Mettre à niveau le plan",
+    "title": "Choisissez votre plan",
+    "subtitle": "Libérez tout le potentiel de la vérification des faits alimentée par l'IA avec des plans flexibles conçus pour tous, des utilisateurs occasionnels aux grandes organisations.",
+    "earlyAdopterDiscount": "💥 Offre limitée : Économisez {{percent}}% en tant qu'adopteur précoce !",
+    "benefits": {
+      "title": "Ce que vous obtenez avec chaque plan",
+      "advancedAI": "Vérification IA avancée des faits",
+      "multipleSourceVerification": "Vérification de sources multiples",
+      "detailedReports": "Rapports de précision détaillés",
+      "apiAccess": "Accès API inclus",
+      "realTimeProcessing": "Traitement en temps réel",
+      "multiLanguage": "Support multi-langues",
+      "usageAnalytics": "Analyses d'utilisation",
+      "cancelAnytime": "Annulation à tout moment"
+    },
+    "earlyAdopter": {
+      "title": "🚀 Offre spéciale adopteur précoce - {{percent}}% DE RÉDUCTION !",
+      "description": "Comme nous sommes encore en développement, nous offrons à nos premiers supporteurs une réduction exclusive de {{percent}}% sur tous les plans. Aidez-nous à façonner l'avenir de la vérification des faits alimentée par l'IA et profitez des fonctionnalités premium à des prix d'adopteur précoce !",
+      "perks": "⚡ Toutes les fonctionnalités incluses • 🔒 Prix bloqué à vie • 🎯 Support prioritaire",
+      "faq": {
+        "title": "🎯 Pourquoi la réduction adopteur précoce ?",
+        "description": "Nous affinons encore notre plateforme et voulons récompenser les premiers supporteurs qui nous aident à améliorer. Vos commentaires sont inestimables, et cette réduction est notre façon de dire merci ! Une fois que vous vous abonnez au tarif réduit, votre prix est bloqué à vie."
+      }
+    },
+    "faq": {
+      "title": "Questions fréquemment posées",
+      "changePlans": {
+        "question": "Puis-je changer de plan à tout moment ?",
+        "answer": "Oui, vous pouvez passer à un plan supérieur ou inférieur à tout moment. Les changements prennent effet à votre prochain cycle de facturation."
+      },
+      "unusedRequests": {
+        "question": "Que se passe-t-il avec les requêtes inutilisées ?",
+        "answer": "Les requêtes inutilisées ne se reportent pas au mois suivant, mais vous pouvez acheter des crédits supplémentaires si nécessaire."
+      },
+      "refunds": {
+        "question": "Offrez-vous des remboursements ?",
+        "answer": "Nous offrons une garantie de remboursement de 30 jours pour les nouveaux abonnements. Contactez le support pour assistance."
+      },
+      "enterprise": {
+        "question": "Y a-t-il un plan entreprise ?",
+        "answer": "Oui ! Contactez notre équipe commerciale pour des solutions entreprise personnalisées avec des remises de volume et un support dédié."
+      }
+    },
+    "contact": {
+      "title": "Besoin d'une solution personnalisée ?",
+      "description": "Contactez notre équipe pour discuter des tarifs entreprise et des intégrations personnalisées.",
+      "email": "omdev.tech@gmail.com"
+    },
+    "success": {
+      "planUpgraded": "Plan mis à niveau avec succès !",
+      "failedUpgrade": "Échec de la mise à niveau du plan",
+      "tryAgainLater": "Échec de la mise à niveau du plan. Veuillez réessayer."
+    }
+  },
+  "app": {
+    "tagline": "Service de fact checking IA"
+  },
+  "guestAccess": {
+    "title": "Prêt à connaître la vérité ?",
+    "description": "Rejoignez des milliers d'utilisateurs qui luttent contre les fake news avec le fact checking IA illimité.",
+    "getFullAccess": "Accès complet",
+    "features": {
+      "unlimitedFactChecking": "Fact checking illimité",
+      "allMediaFormats": "Tous formats média (texte, audio, vidéo)",
+      "saveHistory": "Sauvegardez votre historique de fact checks",
+      "realTimeStreaming": "Traitement de flux en temps réel",
+      "priorityProcessing": "Traitement prioritaire"
+    },
+    "actions": {
+      "signUpWithGoogle": "S'inscrire avec Google - Gratuit",
+      "connecting": "Connexion...",
+      "maybeLater": "Peut-être plus tard"
+    },
+    "trustIndicators": {
+      "noCardRequired": "✓ Sans engagement ni CB",
+      "instantAccess": "✓ Accès instantané",
+      "cancelAnytime": "✓ Résiliation libre",
+      "alreadyTried": "Vous avez déjà testé notre fact checker ? Il est temps de débloquer toute la puissance !"
+    }
+  },
+  "session": {
+    "claims": "Affirmations",
+    "accurate": "précis",
+    "verificationResults": "Résultats de vérification",
+    "completed": "Terminé",
+    "processing": "Traitement"
+  },
+  "legend": {
+    "title": "Légende du statut de vérification",
+    "accurate": "Précis",
+    "accurateDescription": "Affirmations factuellement correctes",
+    "inaccurate": "Imprécis",
+    "inaccurateDescription": "Affirmations fausses ou trompeuses",
+    "uncertain": "Incertain",
+    "uncertainDescription": "Informations contradictoires ou disputées",
+    "noClaims": "Aucune affirmation",
+    "noClaimsDescription": "Aucune affirmation factuelle trouvée à vérifier",
+    "processingDescription": "Actuellement en cours d'analyse",
+    "pendingDescription": "En attente de traitement",
+    "realTimeNote": "Les segments sont traités en temps réel pendant la lecture de la vidéo"
+  },
+  "recording": {
+    "title": "Enregistrement en direct et vérification",
+    "description": "Enregistrez l'audio en temps réel avec transcription automatique et vérification des faits",
+    "clear": "Effacer la session",
+    "transcriptionTitle": "Transcription en direct",
+    "resultsTitle": "Résultats de vérification en direct",
+    "processingRecording": "Traitement de l'enregistrement...",
+    "noVerifiableClaims": "Aucune affirmation vérifiable trouvée dans l'enregistrement en direct.",
+    "toasts": {
+      "started": "Enregistrement en direct démarré",
+      "failed": "Échec du démarrage de l'enregistrement. Veuillez vérifier les autorisations du microphone.",
+      "resumed": "Enregistrement repris",
+      "paused": "Enregistrement mis en pause",
+      "stopped": "Enregistrement arrêté",
+      "cleared": "Session effacée",
+      "processed": "Enregistrement en direct traité et vérifié !",
+      "noClaimsFound": "Enregistrement traité mais aucune affirmation vérifiable trouvée",
+      "processingError": "Échec du traitement de l'enregistrement en direct"
+    }
+  },
+  "processing": {
+    "title": "Statut de traitement",
+    "overallProgress": "Progrès global",
+    "segments": "Segments"
+  },
+  "statuses": {
+    "true": "Vrai",
+    "false": "Faux",
+    "partial": "Partiel",
+    "disputed": "Disputé",
+    "accurate": "Précis",
+    "inaccurate": "Imprécis",
+    "partiallyTrue": "Partiellement vrai",
+    "uncertain": "Incertain",
+    "unknown": "Inconnu", 
+    "notProcessed": "Non traité",
+    "checkFailed": "Échec de la vérification",
+    "notCheckable": "Non vérifiable", 
+    "noText": "Aucun texte"
+  },
+  "confidence": {
+    "high": "Élevé",
+    "medium": "Moyen",
+    "low": "Faible",
+    "insufficient": "Insuffisant"
+  },
+  "claims": {
+    "noClaimsFound": "Aucune affirmation trouvée",
+    "processingClaims": "Traitement des affirmations..."
+  }
+} 

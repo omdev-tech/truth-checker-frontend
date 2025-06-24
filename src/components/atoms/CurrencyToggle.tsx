@@ -16,7 +16,6 @@ export const CurrencyToggle: React.FC<CurrencyToggleProps> = ({
   currency,
   onCurrencyChange,
   size = 'md',
-  variant = 'outline',
   className,
 }) => {
   const sizeClasses = {

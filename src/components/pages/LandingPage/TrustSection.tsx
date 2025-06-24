@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Shield, Award, Users, Clock } from 'lucide-react';
 import { TrustSectionProps } from '@/lib/types/landing';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Icon mapping for trust metrics
@@ -20,6 +21,7 @@ const iconMap = {
  * Addresses user concerns about AI reliability
  */
 export function TrustSection({ metrics }: TrustSectionProps) {
+  const { t } = useTranslation(['dashboard']);
   const getIcon = (metricId: string) => {
     const IconComponent = iconMap[metricId as keyof typeof iconMap];
     return IconComponent || Shield;
@@ -45,6 +47,34 @@ export function TrustSection({ metrics }: TrustSectionProps) {
     }
   };
 
+  // Define static metrics with translation keys
+  const translatedMetrics = [
+    {
+      id: 'accuracy',
+      value: t('dashboard:trust.metrics.accuracy.value'),
+      label: t('dashboard:trust.metrics.accuracy.label'),
+      description: t('dashboard:trust.metrics.accuracy.description')
+    },
+    {
+      id: 'sources',
+      value: t('dashboard:trust.metrics.sources.value'),
+      label: t('dashboard:trust.metrics.sources.label'),
+      description: t('dashboard:trust.metrics.sources.description')
+    },
+    {
+      id: 'claims',
+      value: t('dashboard:trust.metrics.claims.value'),
+      label: t('dashboard:trust.metrics.claims.label'),
+      description: t('dashboard:trust.metrics.claims.description')
+    },
+    {
+      id: 'response-time',
+      value: t('dashboard:trust.metrics.responseTime.value'),
+      label: t('dashboard:trust.metrics.responseTime.label'),
+      description: t('dashboard:trust.metrics.responseTime.description')
+    }
+  ];
+
   return (
     <section id="trust" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -57,14 +87,12 @@ export function TrustSection({ metrics }: TrustSectionProps) {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Trust &
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              {" "}Transparency
+              {t('dashboard:trust.title')}
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Our commitment to scientific accuracy and transparency in AI-powered fact-checking. 
-            Every result is backed by verifiable sources and rigorous methodology.
+            {t('dashboard:trust.subtitle')}
           </p>
         </motion.div>
 
@@ -76,7 +104,7 @@ export function TrustSection({ metrics }: TrustSectionProps) {
           viewport={{ once: true }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16"
         >
-          {metrics.map((metric) => {
+          {translatedMetrics.map((metric) => {
             const IconComponent = getIcon(metric.id);
             
             return (
@@ -125,34 +153,31 @@ export function TrustSection({ metrics }: TrustSectionProps) {
               <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
                 <Award className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground">Scientific Method</h3>
+              <h3 className="text-xl font-semibold text-foreground">{t('dashboard:trust.pillars.scientific.title')}</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Built on peer-reviewed research and established fact-checking methodologies 
-                used by professional journalists and researchers.
+                {t('dashboard:trust.pillars.scientific.description')}
               </p>
             </div>
 
-            {/* Open Source */}
+            {/* Source Transparency */}
             <div className="text-center space-y-4">
               <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground">Source Transparency</h3>
+              <h3 className="text-xl font-semibold text-foreground">{t('dashboard:trust.pillars.transparency.title')}</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Every fact-check includes detailed source citations and confidence scores. 
-                Our methodology is transparent and continuously audited.
+                {t('dashboard:trust.pillars.transparency.description')}
               </p>
             </div>
 
-            {/* Continuous Improvement */}
+            {/* Community Driven */}
             <div className="text-center space-y-4">
               <div className="w-12 h-12 mx-auto bg-primary/10 rounded-lg flex items-center justify-center">
                 <Users className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground">Community Driven</h3>
+              <h3 className="text-xl font-semibold text-foreground">{t('dashboard:trust.pillars.community.title')}</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Our models are continuously improved through expert feedback and 
-                community contributions from fact-checkers worldwide.
+                {t('dashboard:trust.pillars.community.description')}
               </p>
             </div>
           </div>
@@ -168,16 +193,15 @@ export function TrustSection({ metrics }: TrustSectionProps) {
         >
           <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-8 max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold text-foreground mb-4">
-              Ready to verify with confidence?
+              {t('dashboard:trust.cta.title')}
             </h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Join thousands of users who trust our AI-powered fact-checking to 
-              separate truth from misinformation.
+              {t('dashboard:trust.cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <span className="text-sm text-muted-foreground">✓ No credit card required</span>
-              <span className="text-sm text-muted-foreground">✓ Free trial included</span>
-              <span className="text-sm text-muted-foreground">✓ Cancel anytime</span>
+              <span className="text-sm text-muted-foreground">✓ {t('dashboard:trust.cta.benefits.noCard')}</span>
+              <span className="text-sm text-muted-foreground">✓ {t('dashboard:trust.cta.benefits.freeTrial')}</span>
+              <span className="text-sm text-muted-foreground">✓ {t('dashboard:trust.cta.benefits.cancelAnytime')}</span>
             </div>
           </div>
         </motion.div>

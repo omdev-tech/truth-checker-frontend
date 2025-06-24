@@ -1,0 +1,411 @@
+{
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "history": "History",
+    "plans": "Plans",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Sign Up",
+    "toggleMenu": "Toggle menu",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "upgrade": "Upgrade",
+    "factCheck": "Fact Check"
+  },
+  "actions": {
+    "factCheck": "fact-checking",
+    "transcription": "transcription",
+    "liveStream": "live streaming",
+    "action": "action",
+    "upload": "Upload",
+    "analyze": "Analyze",
+    "download": "Download",
+    "share": "Share",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "close": "Close",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset",
+    "clear": "Clear",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "back": "Back",
+    "continue": "Continue",
+    "validate": "Validate",
+    "play": "Play",
+    "pause": "Pause",
+    "tryAgain": "Try Truth Checker",
+    "viewMore": "View More",
+    "showLess": "Show Less",
+    "copy": "Copy",
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "refresh": "Refresh",
+    "finish": "Finish",
+    "select": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "backToHome": "Back to Home",
+    "startRecording": "Start Recording",
+    "pauseRecording": "Pause Recording",
+    "stopRecording": "Stop Recording",
+    "resumeRecording": "Resume",
+    "create": "Create",
+    "update": "Update",
+    "open": "Open",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "browse": "Browse",
+    "paste": "Paste",
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo",
+    "print": "Print",
+    "like": "Like",
+    "dislike": "Dislike",
+    "favorite": "Favorite",
+    "bookmark": "Bookmark",
+    "comment": "Comment",
+    "reply": "Reply",
+    "forward": "Forward",
+    "send": "Send",
+    "receive": "Receive",
+    "start": "Start",
+    "stop": "Stop",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "join": "Join",
+    "leave": "Leave",
+    "enter": "Enter",
+    "exit": "Exit",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password",
+    "changePassword": "Change Password",
+    "resetPassword": "Reset Password",
+    "verify": "Verify",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "enable": "Enable",
+    "disable": "Disable",
+    "show": "Show",
+    "hide": "Hide",
+    "minimize": "Minimize",
+    "maximize": "Maximize"
+  },
+  "status": {
+    "loading": "Loading",
+    "processing": "Processing...",
+    "completed": "Completed",
+    "complete": "Complete",
+    "error": "Error",
+    "success": "Success",
+    "failed": "Failed",
+    "pending": "Pending",
+    "uploading": "Uploading...",
+    "analyzing": "Analyzing...",
+    "ready": "Ready",
+    "online": "Online",
+    "offline": "Offline",
+    "partial": "Partial",
+    "label": "Status",
+    "warning": "Warning",
+    "info": "Info",
+    "connecting": "Connecting...",
+    "checkingAuth": "Checking authentication...",
+    "active": "Active",
+    "inactive": "Inactive",
+    "cancelled": "Cancelled",
+    "paused": "PAUSED",
+    "recording": "RECORDING",
+    "waiting": "Waiting",
+    "scheduled": "Scheduled",
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived",
+    "deleted": "Deleted",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "review": "Under Review"
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "french": "Français",
+    "select": "Select Language",
+    "current": "Current Language",
+    "selector": "Language",
+    "current": "Current language: {{language}}"
+  },
+  "general": {
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "version": "Version",
+    "copyright": "© 2024 Truth Checker. All rights reserved.",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "unknown": "Unknown",
+    "none": "None",
+    "all": "All",
+    "or": "or",
+    "and": "and"
+  },
+  "ui": {
+    "close": "Close",
+    "poweredBy": "Powered by Advanced AI",
+    "verifyFacts": "Verify Facts in Real-Time",
+    "aiDescription": "Our AI-powered fact-checking system analyzes text, documents, audio, and live streams to help you verify information instantly with authoritative sources.",
+    "getFullAccess": "Get Full Access",
+    "currentPlan": "Current Plan",
+    "perMonth": "per month",
+    "confidence": "Confidence",
+    "claims": "Claims",
+    "verificationResults": "Verification Results",
+    "fileInformation": "File Information",
+    "originalInput": "Original Input",
+    "additionalInformation": "Additional Information",
+    "professionalTimeline": "Professional Timeline",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "viewAll": "View All",
+    "noResults": "No Results",
+    "tryAgain": "Try Truth Checker",
+    "goBack": "Go Back",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
+  },
+  "creditExhausted": {
+    "title": "Credits Needed",
+    "description": "You need {{creditsNeeded}} credit(s) for {{action}}, but you have {{creditsRemaining}} remaining.",
+    "badges": {
+      "upgradeNeeded": "Upgrade Needed"
+    },
+    "usage": {
+      "current": "Current Usage",
+      "creditsRemaining": "credits remaining",
+      "nextAction": "Next {{action}} requires {{credits}} credit(s)"
+    },
+    "upgradeWillUnlock": "Upgrading will unlock:",
+    "benefits": {
+      "unlimitedChecks": "Higher credit allowance for more checks",
+      "fasterProcessing": "Extended monthly usage hours",
+      "advancedFeatures": "Full access to all current features"
+    },
+    "pricingHint": "Flexible plans designed for every need",
+    "startingFrom": "Starting from just €5/month",
+    "actions": {
+      "upgradeNow": "Upgrade Now",
+      "viewPlans": "View Plans",
+      "maybeLater": "Maybe Later"
+    }
+  },
+  "accessibility": {
+    "playPause": "{{action}} media",
+    "toggleMenu": "Toggle menu",
+    "loading": "Loading content",
+    "error": "Error occurred",
+    "success": "Operation successful"
+  },
+  "time": {
+    "seconds": "seconds",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "ago": "ago",
+    "now": "now"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "notFound": "The requested resource was not found.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "validation": "Please check your input and try again.",
+    "loadFailed": "Failed to load data"
+  },
+  "success": {
+    "saved": "Saved successfully",
+    "deleted": "Deleted successfully",
+    "updated": "Updated successfully",
+    "created": "Created successfully"
+  },
+  "notApplicable": "N/A",
+  "plans": {
+    "free": "Free",
+    "starter": "Starter", 
+    "casual": "Casual",
+    "independent": "Independent",
+    "professional": "Professional",
+    "business": "Business",
+    "upgradePlan": "Upgrade Plan",
+    "title": "Choose Your Plan",
+    "subtitle": "Unlock the full power of AI-powered fact-checking with flexible plans designed for everyone from casual users to large organizations.",
+    "earlyAdopterDiscount": "💥 Limited time: Save {{percent}}% as an early adopter!",
+    "benefits": {
+      "title": "What You Get With Every Plan",
+      "advancedAI": "Advanced AI fact-checking",
+      "multipleSourceVerification": "Multiple source verification",
+      "detailedReports": "Detailed accuracy reports",
+      "apiAccess": "API access included",
+      "realTimeProcessing": "Real-time processing",
+      "multiLanguage": "Multi-language support",
+      "usageAnalytics": "Usage analytics",
+      "cancelAnytime": "Cancel anytime"
+    },
+    "earlyAdopter": {
+      "title": "🚀 Early Adopter Special - {{percent}}% OFF!",
+      "description": "As we're still in development, we're offering our early supporters an exclusive {{percent}}% discount on all plans. Help us shape the future of AI-powered fact-checking and enjoy premium features at early adopter prices!",
+      "perks": "⚡ All features included • 🔒 Price locked for life • 🎯 Priority support",
+      "faq": {
+        "title": "🎯 Why the early adopter discount?",
+        "description": "We're still refining our platform and want to reward early supporters who help us improve. Your feedback is invaluable, and this discount is our way of saying thanks! Once you subscribe at the discounted rate, your price is locked for life."
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "changePlans": {
+        "question": "Can I change plans anytime?",
+        "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at your next billing cycle."
+      },
+      "unusedRequests": {
+        "question": "What happens to unused requests?",
+        "answer": "Unused requests don't roll over to the next month, but you can purchase additional credits if needed."
+      },
+      "refunds": {
+        "question": "Do you offer refunds?",
+        "answer": "We offer a 30-day money-back guarantee for new subscriptions. Contact support for assistance."
+      },
+      "enterprise": {
+        "question": "Is there an enterprise plan?",
+        "answer": "Yes! Contact our sales team for custom enterprise solutions with volume discounts and dedicated support."
+      }
+    },
+    "contact": {
+      "title": "Need a custom solution?",
+      "description": "Contact our team to discuss enterprise pricing and custom integrations.",
+      "email": "omdev.tech@gmail.com"
+    },
+    "success": {
+      "planUpgraded": "Plan upgraded successfully!",
+      "failedUpgrade": "Failed to upgrade plan",
+      "tryAgainLater": "Failed to upgrade plan. Please try again."
+    }
+  },
+  "app": {
+    "tagline": "AI-Powered Fact Verification"
+  },
+  "guestAccess": {
+    "title": "Ready to get to know the truth?",
+    "description": "Join thousands of users fighting misinformation with unlimited AI-powered fact-checking.",
+    "getFullAccess": "Get Full Access",
+    "features": {
+      "unlimitedFactChecking": "Unlimited fact-checking",
+      "allMediaFormats": "All media formats (text, audio, video)",
+      "saveHistory": "Save your fact-check history",
+      "realTimeStreaming": "Real-time stream processing",
+      "priorityProcessing": "Priority processing"
+    },
+    "actions": {
+      "signUpWithGoogle": "Sign Up with Google - Free",
+      "connecting": "Connecting...",
+      "maybeLater": "Maybe Later"
+    },
+    "trustIndicators": {
+      "noCardRequired": "✓ No credit card required",
+      "instantAccess": "✓ Instant access",
+      "cancelAnytime": "✓ Cancel anytime",
+      "alreadyTried": "Already tried our fact-checker? Time to unlock the full power!"
+    }
+  },
+  "session": {
+    "claims": "Claims",
+    "accurate": "accurate",
+    "verificationResults": "Verification Results",
+    "completed": "Completed",
+    "processing": "Processing"
+  },
+  "legend": {
+    "title": "Fact-Check Status Legend",
+    "accurate": "Accurate",
+    "accurateDescription": "Factually correct claims",
+    "inaccurate": "Inaccurate",
+    "inaccurateDescription": "False or misleading claims",
+    "uncertain": "Uncertain",
+    "uncertainDescription": "Conflicting or disputed information",
+    "noClaims": "No claims",
+    "noClaimsDescription": "No factual claims found to check",
+    "processingDescription": "Currently being analyzed",
+    "pendingDescription": "Waiting to be processed",
+    "realTimeNote": "Segments are processed in real-time as the video plays"
+  },
+  "recording": {
+    "title": "Live Recording & Fact-Check",
+    "description": "Record audio in real-time with automatic transcription and fact-checking",
+    "clear": "Clear Session",
+    "transcriptionTitle": "Live Transcription",
+    "resultsTitle": "Live Fact-Check Results",
+    "processingRecording": "Processing recording...",
+    "noVerifiableClaims": "No verifiable claims found in the live recording.",
+    "toasts": {
+      "started": "Live recording started",
+      "failed": "Failed to start recording. Please check microphone permissions.",
+      "resumed": "Recording resumed",
+      "paused": "Recording paused",
+      "stopped": "Recording stopped",
+      "cleared": "Session cleared",
+      "processed": "Live recording processed and fact-checked!",
+      "noClaimsFound": "Recording processed but no verifiable claims found",
+      "processingError": "Failed to process live recording"
+    }
+  },
+  "processing": {
+    "title": "Processing Status",
+    "overallProgress": "Overall Progress",
+    "segments": "Segments"
+  },
+  "statuses": {
+    "true": "True",
+    "false": "False",
+    "partial": "Partial",
+    "disputed": "Disputed",
+    "accurate": "Accurate",
+    "inaccurate": "Inaccurate",
+    "partiallyTrue": "Partially True",
+    "uncertain": "Uncertain", 
+    "unknown": "Unknown",
+    "notProcessed": "Not processed",
+    "checkFailed": "Check failed",
+    "notCheckable": "Not checkable",
+    "noText": "No text"
+  },
+  "confidence": {
+    "high": "High",
+    "medium": "Medium", 
+    "low": "Low",
+    "insufficient": "Insufficient"
+  },
+  "claims": {
+    "noClaimsFound": "No claims found",
+    "processingClaims": "Processing claims..."
+  }
+} 

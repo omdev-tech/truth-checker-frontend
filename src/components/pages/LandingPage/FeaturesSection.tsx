@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FeaturesSectionProps } from '@/lib/types/landing';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Icon mapping for dynamic icon rendering
@@ -30,6 +31,7 @@ const iconMap = {
  * Uses cards for better visual hierarchy
  */
 export function FeaturesSection({ features }: FeaturesSectionProps) {
+  const { t } = useTranslation(['dashboard']);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -55,6 +57,38 @@ export function FeaturesSection({ features }: FeaturesSectionProps) {
     return IconComponent || FileText;
   };
 
+  // Define static features with translation keys
+  const translatedFeatures = [
+    {
+      id: 'multi-format',
+      title: t('dashboard:features.textAnalysis.title'),
+      description: t('dashboard:features.textAnalysis.description'),
+      icon: 'FileText',
+      benefits: t('dashboard:features.textAnalysis.benefits', { returnObjects: true }) as string[]
+    },
+    {
+      id: 'real-time',
+      title: t('dashboard:features.mediaUpload.title'),
+      description: t('dashboard:features.mediaUpload.description'),
+      icon: 'Zap',
+      benefits: t('dashboard:features.mediaUpload.benefits', { returnObjects: true }) as string[]
+    },
+    {
+      id: 'transparent-sources',
+      title: t('dashboard:features.liveStreams.title'),
+      description: t('dashboard:features.liveStreams.description'),
+      icon: 'Shield',
+      benefits: t('dashboard:features.liveStreams.benefits', { returnObjects: true }) as string[]
+    },
+    {
+      id: 'scientific-method',
+      title: t('dashboard:features.liveRecording.title'),
+      description: t('dashboard:features.liveRecording.description'),
+      icon: 'Microscope',
+      benefits: t('dashboard:features.liveRecording.benefits', { returnObjects: true }) as string[]
+    }
+  ];
+
   return (
     <section id="features" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -67,14 +101,12 @@ export function FeaturesSection({ features }: FeaturesSectionProps) {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Powerful Features for 
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              {" "}Truth Verification
+              {t('dashboard:features.title')}
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Advanced AI technology meets scientific methodology to deliver 
-            comprehensive fact-checking across all media formats.
+            {t('dashboard:features.subtitle')}
           </p>
         </motion.div>
 
@@ -86,7 +118,7 @@ export function FeaturesSection({ features }: FeaturesSectionProps) {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12"
         >
-          {features.map((feature) => {
+          {translatedFeatures.map((feature) => {
             const IconComponent = getIcon(feature.icon);
             
             return (
@@ -121,7 +153,7 @@ export function FeaturesSection({ features }: FeaturesSectionProps) {
                     
                     {/* Hover indicator */}
                     <div className="mt-6 flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-sm font-medium">Learn more</span>
+                      <span className="text-sm font-medium">{t('dashboard:features.learnMore')}</span>
                       <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
                   </CardContent>
@@ -140,10 +172,10 @@ export function FeaturesSection({ features }: FeaturesSectionProps) {
           className="text-center mt-16"
         >
           <p className="text-muted-foreground mb-4">
-            Ready to experience the power of AI-driven fact-checking?
+            {t('dashboard:features.cta')}
           </p>
           <div className="inline-flex items-center space-x-2 text-primary font-medium">
-            <span>Try it now for free</span>
+            <span>{t('dashboard:features.tryNow')}</span>
             <ArrowRight className="h-4 w-4" />
           </div>
         </motion.div>

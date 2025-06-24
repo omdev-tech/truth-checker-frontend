@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface StreamFactCheckerProps {
   onStreamReady: (streamUrl: string, streamType: StreamType, metadata?: StreamMetadata) => void;
@@ -42,6 +43,7 @@ interface StreamValidationResult {
 }
 
 export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactCheckerProps) {
+  const { t } = useTranslation(['factCheck', 'common']);
   const [streamUrl, setStreamUrl] = useState('');
   const [isValidating] = useState(false);
   const [validationResult] = useState<StreamValidationResult | null>(null);
@@ -389,10 +391,10 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Radio className="w-6 h-6 text-primary" />
-            <CardTitle className="text-2xl font-bold">Live Stream Fact-Checker</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t('factCheck:stream.title')}</CardTitle>
           </div>
           <p className="text-muted-foreground">
-            Enter a live stream URL to start real-time fact-checking
+{t('factCheck:stream.urlPlaceholder')}
           </p>
         </CardHeader>
 
@@ -400,11 +402,11 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
           {/* URL Input Section */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Stream URL</label>
+              <label className="text-sm font-medium">{t('factCheck:media.streamUrl')}</label>
               <div className="flex gap-2">
                 <Input
                   type="url"
-                  placeholder="https://youtube.com/watch?v=... or https://twitch.tv/..."
+                  placeholder={t('factCheck:placeholders.streamUrl')}
                   value={streamUrl}
                   onChange={(e) => setStreamUrl(e.target.value)}
                   className="flex-1"
@@ -418,7 +420,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    'Validate'
+t('common:actions.validate', 'Validate')
                   )}
                 </Button>
               </div>
@@ -434,10 +436,10 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                 className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
               />
               <label htmlFor="liveOverride" className="text-sm font-medium cursor-pointer">
-                Force Live Stream Mode
+{t('factCheck:stream.forceLiveMode', 'Force Live Stream Mode')}
               </label>
               <div className="text-xs text-muted-foreground ml-auto">
-                {"Use when URL doesn't show live indicators"}
+                {t('factCheck:stream.liveOverrideHelp')}
               </div>
             </div>
 
@@ -445,15 +447,15 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Youtube className="w-4 h-4 text-red-500" />
-                <span>YouTube Live & Videos</span>
+                <span>{t('factCheck:mediaTypes.youtube')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Twitch className="w-4 h-4 text-purple-500" />
-                <span>Twitch Streams</span>
+                <span>{t('factCheck:media.twitch')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-blue-500" />
-                <span>Direct Stream URLs</span>
+                <span>{t('factCheck:media.directUrls')}</span>
               </div>
             </div>
           </div>
@@ -466,7 +468,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
               onClick={() => setShowAdvanced(!showAdvanced)}
               className="text-muted-foreground hover:text-foreground"
             >
-              Advanced Options {showAdvanced ? '▲' : '▼'}
+              {t('factCheck:stream.advancedOptions')} {showAdvanced ? '▲' : '▼'}
             </Button>
 
             <AnimatePresence>
@@ -479,16 +481,16 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Quality Preference</label>
+                      <label className="text-sm font-medium">{t('factCheck:media.qualityPreference')}</label>
                       <select className="w-full p-2 border rounded-md bg-background">
-                        <option value="auto">Auto (Best Available)</option>
+                        <option value="auto">{t('factCheck:stream.autoQuality')}</option>
                         <option value="1080p">1080p HD</option>
                         <option value="720p">720p HD</option>
                         <option value="480p">480p SD</option>
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Buffer Duration</label>
+                      <label className="text-sm font-medium">{t('factCheck:media.bufferDuration')}</label>
                       <select className="w-full p-2 border rounded-md bg-background">
                         <option value="5">5 seconds</option>
                         <option value="10">10 seconds</option>
@@ -519,7 +521,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                       <AlertCircle className="w-4 h-4 text-red-600" />
                     )}
                     <AlertDescription className={validationResult.isValid ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}>
-                      {validationResult.isValid ? 'Stream validated successfully!' : validationResult.error}
+                      {validationResult.isValid ? t('factCheck:stream.validationSuccess') : validationResult.error}
                     </AlertDescription>
                   </div>
                 </Alert>
@@ -527,22 +529,22 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                 {validationResult.isValid && validationResult.metadata && (
                   <div className="p-4 bg-muted/30 rounded-lg space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-medium">Stream Information</h4>
+                      <h4 className="font-medium">{t('factCheck:media.streamInfo')}</h4>
                       {getStreamTypeBadge(validationResult.streamType)}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Title:</span>
+                        <span className="text-muted-foreground">{t('factCheck:stream.title')}</span>
                         <span className="ml-2 font-medium">{validationResult.metadata.title}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Quality:</span>
+                        <span className="text-muted-foreground">{t('factCheck:stream.quality')}</span>
                         <span className="ml-2 font-medium">{validationResult.metadata.quality}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Type:</span>
+                        <span className="text-muted-foreground">{t('factCheck:stream.type')}</span>
                         <span className="ml-2 font-medium">
-                          {validationResult.metadata.isLive ? 'Live Stream' : 'Video'}
+                          {validationResult.metadata.isLive ? t('factCheck:stream.liveStream') : t('factCheck:mediaTypes.video')}
                         </span>
                       </div>
                     </div>
@@ -555,7 +557,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
                     className="w-full"
                     size="lg"
                   >
-                    Start Fact-Checking
+                    {t('factCheck:stream.startFactChecking')}
                   </Button>
                 )}
               </motion.div>
@@ -573,7 +575,7 @@ export function StreamFactChecker({ onStreamReady, className = '' }: StreamFactC
               >
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Validating stream...</span>
+                  <span>{t('factCheck:stream.validation')}</span>
                 </div>
               </motion.div>
             )}

@@ -7,6 +7,7 @@ import { VerificationCard } from '@/components/molecules/VerificationCard';
 import { truthCheckerApi } from '@/lib/api';
 import { FactCheckResponse, UploadedFile } from '@/lib/types';
 import { SUPPORTED_FILE_TYPES } from '@/lib/constants';
+import { getApiLanguage } from '@/lib/languageUtils';
 import { FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -42,8 +43,8 @@ export function FileFactChecker() {
         f.file === file ? { ...f, status: 'processing' } : f
       ));
 
-      // Perform fact check
-      const response = await truthCheckerApi.checkFile(file);
+      // Perform fact check with correct language
+      const response = await truthCheckerApi.checkFile(file, getApiLanguage());
       
       setFiles(prev => prev.map(f => 
         f.file === file ? { 
