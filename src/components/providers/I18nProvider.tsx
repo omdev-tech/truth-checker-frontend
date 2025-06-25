@@ -36,7 +36,7 @@ export function I18nProvider({ children, detectedLanguage = 'en' }: I18nProvider
         console.log('🌐 Client preferred language:', clientPreferredLang);
         
         // Use server language for hydration, but respect client preference if different
-        let languageToUse = serverLang;
+        const languageToUse = serverLang;
         
         // If client has a different preference than what server detected, use client preference
         // but only after hydration to prevent mismatch

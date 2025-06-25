@@ -8,7 +8,7 @@
     "settings": "Paramètres",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "signup": "S'inscrire",
+    "signup": "Se connecter avec Google",
     "toggleMenu": "Basculer le menu"
   },
   "actions": {
@@ -264,12 +264,12 @@
       "priorityProcessing": "Traitement prioritaire"
     },
     "actions": {
-      "signUpWithGoogle": "S'inscrire avec Google - Gratuit",
+      "signUpWithGoogle": "Se connecter avec Google - Gratuit",
       "connecting": "Connexion...",
       "maybeLater": "Peut-être plus tard"
     },
     "trustIndicators": {
-      "noCardRequired": "✓ Sans engagement ni CB",
+      "noCardRequired": "✓ Sans engagement",
       "instantAccess": "✓ Accès instantané",
       "cancelAnytime": "✓ Résiliation libre",
       "alreadyTried": "Vous avez déjà testé notre fact checker ? Il est temps de débloquer toute la puissance !"
@@ -345,5 +345,22 @@
   "claims": {
     "noClaimsFound": "Aucune affirmation trouvée",
     "processingClaims": "Traitement des affirmations..."
+  },
+  "time": {
+    "justNow": "À l'instant",
+    "minutesAgo": "Il y a {{count}} minute",
+    "minutesAgo_other": "Il y a {{count}} minutes",
+    "hoursAgo": "Il y a {{count}} heure",
+    "hoursAgo_other": "Il y a {{count}} heures",
+    "daysAgo": "Il y a {{count}} jour",
+    "daysAgo_other": "Il y a {{count}} jours"
+  },
+  "fileUpload": {
+    "dropZone": "Déposez vos fichiers ici ou cliquez pour téléverser",
+    "supportedFormats": "Supporte {{formats}} jusqu'à {{maxSize}}",
+    "chooseFiles": "Choisir des Fichiers",
+    "uploadedFiles": "Fichiers Téléversés",
+    "uploadProgress": "{{progress}}% téléversé",
+    "processingFile": "Traitement du fichier..."
   }
 } 

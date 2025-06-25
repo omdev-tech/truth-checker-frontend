@@ -256,7 +256,7 @@
     "remainingFactChecks": "Fact-check completed! {{count}} free fact-checks remaining.",
     "creditRefunded": "Credit refunded due to processing error",
     "signUpPrompt": "Sign up for unlimited fact-checking access!",
-    "signUpFree": "Sign Up Free"
+    "signUpFree": "Sign up Free"
   },
   "landing": {
     "tryFree": "Try Free",
@@ -272,7 +272,7 @@
     "getFullAccess": "Get Full Access - Sign Up Free",
     "triedAllFree": "You've tried all your free fact-checks!",
     "readyToUnlock": "Ready to unlock unlimited AI-powered fact-checking?",
-    "signUpUnlimited": "Sign Up Free - Unlimited Access",
+    "signUpUnlimited": "Sign up Free - Unlimited Access",
     "upgradePrompt": "🚀 Want unlimited fact-checking?",
     "upgradeDescription": "Join thousands fighting misinformation with unlimited access, audio/video analysis, and priority support.",
     "upgradeButton": "Sign Up Free - Unlimited Access",

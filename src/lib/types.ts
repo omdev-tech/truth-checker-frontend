@@ -274,6 +274,7 @@ export interface UserProfile {
   subscription_status: string;
   billing_cycle: string;
   preferred_currency: string;
+  created_at: string;
   usage_percentage: {
     requests: number;
     hours: number;
@@ -397,6 +398,26 @@ export interface HistoryFilters {
   status_filter?: string;
   date_from?: string;
   date_to?: string;
+}
+
+// Guest API types for unauthenticated users
+export interface GuestApiSession {
+  session_id: string;
+  usage_count: number;
+  max_usage: number;
+  remaining_usage: number;
+}
+
+export interface GuestFactCheckRequest {
+  text: string;
+  language?: string;
+  session_id?: string;
+}
+
+export interface GuestFactCheckResponse {
+  claims: Claim[];
+  results: VerificationResult[];
+  session: GuestApiSession;
 } 
 
 // Re-export landing page types for convenience

@@ -53,22 +53,7 @@ export const UsageOverview: React.FC<UsageOverviewProps> = ({
           />
         </div>
 
-        {/* Hours Usage (if applicable) */}
-        {current_period.hours_limit > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium">{t('dashboard:stats.hoursProcessed')}</span>
-            </div>
-            <UsageProgressBar
-              value={current_period.hours_used}
-              max={current_period.hours_limit}
-              showValues
-              showPercentage
-              size="md"
-            />
-          </div>
-        )}
+
 
         {/* Credits Remaining */}
         <div className="space-y-2">

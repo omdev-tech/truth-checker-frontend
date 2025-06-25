@@ -7,8 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { VerificationCard } from '@/components/molecules/VerificationCard';
 import { useGuestSession } from '@/hooks/useGuestSession';
-import { truthCheckerApi } from '@/lib/api';
-import { FactCheckResponse } from '@/lib/types';
+import { GuestFactCheckResponse } from '@/lib/types';
+import { guestApiService } from '@/lib/services/GuestApiService';
 import { MAX_TEXT_LENGTH } from '@/lib/constants';
 import { Search, Sparkles, ArrowRight, CheckCircle, Clock, Database, Brain, Shield, Zap, FileText, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -217,7 +217,7 @@ export function SimpleLandingFactChecker({
 }: SimpleLandingFactCheckerProps) {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<FactCheckResponse | null>(null);
+  const [results, setResults] = useState<GuestFactCheckResponse | null>(null);
   const [hasTriedFactCheck, setHasTriedFactCheck] = useState(false);
   const [showProcessing, setShowProcessing] = useState(false);
   
@@ -264,10 +264,10 @@ export function SimpleLandingFactChecker({
     setResults(null); // Clear previous results
 
     try {
-      const response = await truthCheckerApi.checkText({
-        text: text.trim(),
-        language: getApiLanguage(),
-      });
+      const response = await guestApiService.checkText(
+        text.trim(),
+        getApiLanguage()
+      );
       
       // Wait for processing animation to complete before showing results
       setTimeout(() => {
@@ -275,10 +275,10 @@ export function SimpleLandingFactChecker({
         setShowProcessing(false);
         
         // Show appropriate success message
-        if (usageResult.remainingUsage === 0) {
+        if (response.session.remaining_usage === 0) {
           toast.success(t('factCheck:guest.lastFactCheck'));
         } else {
-          toast.success(t('factCheck:guest.remainingFactChecks', { count: usageResult.remainingUsage }));
+          toast.success(t('factCheck:guest.remainingFactChecks', { count: response.session.remaining_usage }));
         }
       }, 500);
     } catch (error) {
@@ -286,11 +286,7 @@ export function SimpleLandingFactChecker({
       toast.error(t('factCheck:errors.failed'));
       setShowProcessing(false);
       
-      // Refund credit on failure
-      const refundResult = refundUsage();
-      if (refundResult.success) {
-        toast.info(t('factCheck:guest.creditRefunded'));
-      }
+      // Note: guestApiService already handles credit refund on error
     } finally {
       setIsLoading(false);
     }

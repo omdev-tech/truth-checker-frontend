@@ -204,7 +204,7 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>{t('dashboard:profile.memberSince', { date: formatDate(authUser?.id || new Date().toISOString()) })}</span>
+                    <span>{t('dashboard:profile.memberSince', { date: formatDate(userProfile.created_at) })}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Activity className="h-4 w-4 text-muted-foreground" />
@@ -253,21 +253,13 @@ export const ProfilePageTemplate: React.FC<ProfilePageTemplateProps> = ({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="text-center">
                     <div className="space-y-1">
                       <div className="text-2xl font-bold text-primary">
                         {usageStats.current_period.requests_used}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {t('dashboard:profile.statistics.requestsThisMonth')}
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {usageStats.current_period.hours_used}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {t('dashboard:profile.statistics.hoursProcessed')}
                       </div>
                     </div>
                   </div>

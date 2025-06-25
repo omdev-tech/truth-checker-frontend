@@ -11,6 +11,7 @@ import { MAX_FILE_SIZE } from '@/lib/constants';
 import { Upload, File, X, Check, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface FileUploadProps {
   onFileSelect: (file: File) => void;
@@ -29,6 +30,7 @@ export function FileUpload({
   maxFiles = 1,
   className
 }: FileUploadProps) {
+  const { t } = useTranslation(['common']);
   const [isDragOver, setIsDragOver] = useState(false);
 
   const processFiles = useCallback((newFiles: File[]) => {
@@ -130,10 +132,13 @@ export function FileUpload({
             
             <div className="space-y-2">
               <h3 className="font-medium text-foreground">
-                Drop files here or click to upload
+                {t('common:fileUpload.dropZone')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Supports {acceptedTypes.join(', ')} up to {formatFileSize(MAX_FILE_SIZE)}
+                {t('common:fileUpload.supportedFormats', { 
+                  formats: acceptedTypes.join(', '), 
+                  maxSize: formatFileSize(MAX_FILE_SIZE) 
+                })}
               </p>
             </div>
 
@@ -148,7 +153,7 @@ export function FileUpload({
               disabled={files.length >= maxFiles}
               className="cursor-pointer"
             >
-              Choose Files
+              {t('common:fileUpload.chooseFiles')}
             </Button>
           </motion.div>
         </div>
@@ -157,7 +162,7 @@ export function FileUpload({
       {files.length > 0 && (
         <div className="space-y-2">
           <h4 className="font-medium text-sm text-muted-foreground">
-            Uploaded Files
+            {t('common:fileUpload.uploadedFiles')}
           </h4>
           {files.map((uploadedFile, index) => (
             <motion.div
@@ -196,7 +201,7 @@ export function FileUpload({
                   <div className="mt-3">
                     <Progress value={uploadedFile.progress} className="h-1" />
                     <p className="text-xs text-muted-foreground mt-1">
-                      {uploadedFile.progress}% uploaded
+                      {t('common:fileUpload.uploadProgress', { progress: uploadedFile.progress })}
                     </p>
                   </div>
                 )}
@@ -204,7 +209,7 @@ export function FileUpload({
                 {uploadedFile.status === 'processing' && (
                   <div className="mt-3">
                     <p className="text-xs text-muted-foreground">
-                      Processing file...
+                      {t('common:fileUpload.processingFile')}
                     </p>
                   </div>
                 )}

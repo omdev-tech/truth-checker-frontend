@@ -13,7 +13,10 @@ import {
   UpgradeResponse,
   FactCheckHistoryResponse,
   SessionDetailsResponse,
-  HistoryFilters
+  HistoryFilters,
+  GuestApiSession,
+  GuestFactCheckRequest,
+  GuestFactCheckResponse
 } from './types';
 import { getSession } from 'next-auth/react';
 
@@ -139,6 +142,26 @@ export const truthCheckerApi = {
       body: JSON.stringify(requestWithLanguage),
     });
     return handleResponse<FactCheckResponse>(response);
+  },
+
+  // Guest endpoints for unauthenticated users
+  async createGuestSession(): Promise<GuestApiSession> {
+    const response = await fetch(`${API_BASE_URL}/fact-check/guest/session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    
+    return await handleResponse<GuestApiSession>(response);
+  },
+
+  async checkTextGuest(request: GuestFactCheckRequest): Promise<GuestFactCheckResponse> {
+    const response = await fetch(`${API_BASE_URL}/fact-check/guest/text`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+    
+    return await handleResponse<GuestFactCheckResponse>(response);
   },
 
   // File fact checking (with optional authentication)

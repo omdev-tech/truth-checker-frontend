@@ -152,8 +152,13 @@ export function Header() {
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className={`flex items-center gap-3 ${isOnSecondaryPage ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
-          onClick={isOnSecondaryPage ? handleBackToApp : undefined}
+          whileHover={{ opacity: 0.8 }}
+          transition={{ 
+            initial: { duration: 0.3, ease: "easeOut" },
+            hover: { duration: 0.2 }
+          }}
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={handleBackToApp}
         >
           <div className="flex items-center justify-center w-12 h-12 rounded-xl overflow-hidden">
             <Logo width={56} height={56} priority className="w-full h-full" />

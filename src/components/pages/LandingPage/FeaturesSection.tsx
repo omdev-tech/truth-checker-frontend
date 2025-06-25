@@ -150,12 +150,6 @@ export function FeaturesSection({ features }: FeaturesSectionProps) {
                         </div>
                       ))}
                     </div>
-                    
-                    {/* Hover indicator */}
-                    <div className="mt-6 flex items-center text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-sm font-medium">{t('dashboard:features.learnMore')}</span>
-                      <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
-                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

@@ -76,18 +76,11 @@ export function LandingNavigation({
           <div className="hidden md:flex items-center space-x-4">
             <LanguageSelector variant="ghost" size="sm" />
             <Button 
-              variant="ghost" 
               onClick={onSignIn}
-              className="font-medium"
-            >
-              {t('common:navigation.login')}
-            </Button>
-            <Button 
-              onClick={onGetStarted}
               className="bg-primary hover:bg-primary/90 font-medium"
             >
-              {t('common:navigation.signup')}
-            </Button>
+              {t('common:navigation.login')}
+              </Button>
           </div>
 
           {/* Mobile Menu Button */}

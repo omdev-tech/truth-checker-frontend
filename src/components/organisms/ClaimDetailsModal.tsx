@@ -119,7 +119,7 @@ export function ClaimDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] p-0 bg-background border border-border">
+      <DialogContent className="max-w-5xl max-h-[90vh] p-0 bg-background border border-border">
         <DialogHeader className="p-6 pb-4">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
@@ -174,23 +174,14 @@ export function ClaimDetailsModal({
           </div>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto">
-          <div className="p-6 space-y-8">
-            {/* Original Input */}
-            {claim.original_input && claim.original_input !== claim.claim_text && (
-              <div>
-                <h3 className="text-lg font-semibold mb-3 text-foreground">{t('factCheck:details.originalInput')}</h3>
-                <div className="bg-muted rounded-lg p-4 text-sm text-foreground">
-                  {claim.original_input}
-                </div>
-              </div>
-            )}
-
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6 space-y-6">
             {/* Explanation */}
             {claim.explanation && (
               <div>
-                <h3 className="text-lg font-semibold mb-3 text-foreground">{t('factCheck:details.explanation')}</h3>
-                <div className="prose prose-sm max-w-none">
+                <h3 className="text-lg font-semibold mb-4 text-foreground">{t('factCheck:details.explanation')}</h3>
+                <div className="prose prose-sm max-w-none dark:prose-invert">
                   <p className="text-foreground leading-relaxed">
                     {claim.explanation}
                   </p>

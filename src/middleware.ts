@@ -57,7 +57,7 @@ export default withAuth(
     console.log('🌐 Middleware: Final detected language:', detectedLanguage);
     
     // Create response
-    let response = NextResponse.next();
+    const response = NextResponse.next();
 
     // Set language in response headers for SSR
     response.headers.set('x-detected-language', detectedLanguage);

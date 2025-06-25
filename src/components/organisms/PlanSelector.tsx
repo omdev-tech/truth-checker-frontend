@@ -170,9 +170,6 @@ export const PlanSelector: React.FC<PlanSelectorProps> = ({
             <p className="text-sm text-muted-foreground">
               {t('dashboard:plans.info.allPlansInclude')}
             </p>
-            <p className="text-sm text-muted-foreground">
-              {t('dashboard:plans.info.flexibleBilling')}
-            </p>
             {earlyDevelopmentDiscount > 0 && (
               <p className="text-sm text-orange-600 font-medium">
                 {t('dashboard:plans.info.earlyAdopterPricing', { percent: earlyDevelopmentDiscount })}

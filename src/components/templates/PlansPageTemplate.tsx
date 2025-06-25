@@ -36,6 +36,23 @@ export const PlansPageTemplate: React.FC<PlansPageTemplateProps> = ({
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Load user profile data
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (isAuthenticated) {
+        try {
+          const profile = await truthCheckerApi.getUserProfile();
+          setUserProfile(profile);
+        } catch (error) {
+          console.error('Failed to load user profile:', error);
+        }
+      }
+    };
+
+    loadUserProfile();
+  }, [isAuthenticated]);
 
   // Check for payment status on component mount
   useEffect(() => {
@@ -185,7 +202,7 @@ export const PlansPageTemplate: React.FC<PlansPageTemplateProps> = ({
 
         {/* Plan Selector */}
         <PlanSelector
-          currentPlan={user?.id ? 'free' : undefined} // We'll get this from user profile later
+          currentPlan={userProfile?.plan}
           onPlanSelect={handlePlanSelect}
           className="max-w-7xl mx-auto"
           earlyDevelopmentDiscount={IsEarlyDevelopment ? EARLY_ADOPTER_DISCOUNT : 0}

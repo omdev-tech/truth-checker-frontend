@@ -8,7 +8,7 @@
     "settings": "Settings",
     "logout": "Logout",
     "login": "Login",
-    "signup": "Sign Up",
+    "signup": "Sign up with Google",
     "toggleMenu": "Toggle menu",
     "signIn": "Sign In",
     "signOut": "Sign Out",
@@ -96,7 +96,7 @@
     "login": "Login",
     "logout": "Logout",
     "register": "Register",
-    "signUp": "Sign Up",
+    "signUp": "Sign up",
     "forgotPassword": "Forgot Password",
     "changePassword": "Change Password",
     "resetPassword": "Reset Password",
@@ -169,7 +169,24 @@
     "none": "None",
     "all": "All",
     "or": "or",
-    "and": "and"
+    "and": "and",
+    "confidence": "Confidence",
+    "accuracy": "Accuracy",
+    "timestamp": "Timestamp",
+    "duration": "Duration",
+    "fileSize": "File Size",
+    "fileType": "File Type",
+    "originalInput": "Original Input",
+    "additionalInformation": "Additional Information",
+    "professionalTimeline": "Professional Timeline",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "viewAll": "View All",
+    "noResults": "No Results",
+    "tryAgain": "Try Again",
+    "goBack": "Go Back",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
   },
   "ui": {
     "close": "Close",
@@ -326,7 +343,7 @@
       "priorityProcessing": "Priority processing"
     },
     "actions": {
-      "signUpWithGoogle": "Sign Up with Google - Free",
+      "signUpWithGoogle": "Sign up with Google - Free",
       "connecting": "Connecting...",
       "maybeLater": "Maybe Later"
     },
@@ -407,5 +424,22 @@
   "claims": {
     "noClaimsFound": "No claims found",
     "processingClaims": "Processing claims..."
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{{count}} minute ago",
+    "minutesAgo_other": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hour ago",
+    "hoursAgo_other": "{{count}} hours ago",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago"
+  },
+  "fileUpload": {
+    "dropZone": "Drop files here or click to upload",
+    "supportedFormats": "Supports {{formats}} up to {{maxSize}}",
+    "chooseFiles": "Choose Files",
+    "uploadedFiles": "Uploaded Files",
+    "uploadProgress": "{{progress}}% uploaded",
+    "processingFile": "Processing file..."
   }
 } 

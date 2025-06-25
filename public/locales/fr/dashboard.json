@@ -61,6 +61,9 @@
   "history": {
     "title": "Historique de vérification",
     "subtitle": "Consultez vos sessions de vérification passées et leurs résultats",
+    "recentClaims": "Affirmations récentes",
+    "recentSessions": "Sessions récentes",
+    "viewAll": "Voir tout",
     "loading": "Chargement de votre historique...",
     "search": "Rechercher des vérifications...",
     "filter": "Filtrer",
@@ -303,7 +306,7 @@
       "title": "Prêt à fact checker en toute confiance ?",
       "subtitle": "Rejoignez des milliers d'utilisateurs qui font confiance à notre IA pour démêler la vérité de la désinformation.",
       "benefits": {
-        "noCard": "Sans engagement ni CB",
+        "noCard": "Sans engagement",
         "freeTrial": "Test gratuit inclus", 
         "cancelAnytime": "Résiliation à tout moment"
       }
@@ -329,12 +332,12 @@
         "description": "Validé vs fact checkers humains"
       },
       "sources": {
-        "value": "10 000+",
+        "value": "100+",
         "label": "Sources vérifiées", 
         "description": "Bases de données fiables et publications"
       },
       "claims": {
-        "value": "1M+",
+        "value": "1000+",
         "label": "Déclarations analysées",
         "description": "Fact checks réalisés avec succès"
       },

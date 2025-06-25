@@ -61,6 +61,9 @@
   "history": {
     "title": "Fact-Check History",
     "subtitle": "Review your past fact-checking sessions and results",
+    "recentClaims": "Recent Claims",
+    "recentSessions": "Recent Sessions",
+    "viewAll": "View All",
     "loading": "Loading your history...",
     "search": "Search fact-checks...",
     "filter": "Filter",
@@ -336,12 +339,12 @@
         "description": "Verified against human fact-checkers"
       },
       "sources": {
-        "value": "10,000+",
+        "value": "100+",
         "label": "Verified Sources", 
         "description": "Credible databases and publications"
       },
       "claims": {
-        "value": "1M+",
+        "value": "1,000+",
         "label": "Claims Processed",
         "description": "Fact-checks completed successfully"
       },
