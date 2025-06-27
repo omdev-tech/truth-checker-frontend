@@ -1,0 +1,121 @@
+{
+  "title": "Public Gallery",
+  "subtitle": "Browse fact-checked content from our community",
+  "mediaTypes": {
+    "uploadedVideo": "UPLOADED VIDEO",
+    "uploadedAudio": "UPLOADED AUDIO",
+    "youtube": "YOUTUBE VIDEO",
+    "youtubeVideo": "YouTube Video",
+    "mediaFile": "media file",
+    "video": "Video",
+    "audio": "Audio"
+  },
+  "claims": {
+    "analyzed": "Claims Analyzed",
+    "claimsAnalyzed": "{{count}} Claims Analyzed",
+    "verified": "Verified",
+    "disputed": "Disputed", 
+    "uncertain": "Uncertain",
+    "claimsAnalysis": "Claims Analysis ({{count}})",
+    "viewAllClaims": "View All Claims",
+    "clickToView": "Click on individual claim types to view detailed analysis"
+  },
+  "actions": {
+    "watchAndAnalyze": "Watch & Analyze",
+    "info": "Info",
+    "playMedia": "Play Media",
+    "viewDetails": "View Details",
+    "play": "Play",
+    "view": "View",
+    "retry": "Retry",
+    "close": "Close",
+    "loadAnalysis": "Load Analysis",
+    "showAnalysisDashboard": "Show Analysis Dashboard",
+    "analysisDashboard": "Analysis Dashboard",
+    "hidePlayer": "Hide Player"
+  },
+  "sections": {
+    "featured": "Featured",
+    "recent": "Recent", 
+    "popular": "Popular",
+    "contentStatistics": "Content Statistics",
+    "contentInformation": "Content Information"
+  },
+  "filters": {
+    "search": "Search content...",
+    "category": "Category",
+    "mediaType": "Media Type",
+    "sortBy": "Sort by",
+    "viewMode": "View Mode",
+    "grid": "Grid",
+    "list": "List"
+  },
+  "metadata": {
+    "published": "Published:",
+    "contentType": "Content Type:",
+    "status": "Status:",
+    "liveContent": "Live Content:",
+    "liveRecording": "Live Recording",
+    "duration": "Duration",
+    "views": "Views",
+    "truthScore": "Truth Score",
+    "claimsChecked": "Claims Checked",
+    "size": "Size:"
+  },
+  "status": {
+    "public": "Public",
+    "private": "Private",
+    "loading": "Loading...",
+    "loadingAnalysis": "Loading analysis...",
+    "loadingContentDetails": "Loading content details...",
+    "loadingDetailedAnalysis": "Loading detailed analysis...",
+    "noResults": "No content found",
+    "noResultsDescription": "Try adjusting your search filters or check back later for new content.",
+    "errorLoading": "Failed to load content. Please try again.",
+    "errorLoadingDetails": "Failed to load content details"
+  },
+  "badges": {
+    "featured": "Featured",
+    "trending": "Trending",
+    "new": "New",
+    "moreTags": "+{{count}} more"
+  },
+  "viewCount": {
+    "million": "{{count}}M",
+    "thousand": "{{count}}K"
+  },
+  "categories": {
+    "politics": "Politics",
+    "health": "Health",
+    "technology": "Technology",
+    "science": "Science",
+    "business": "Business",
+    "entertainment": "Entertainment",
+    "sports": "Sports",
+    "education": "Education"
+  },
+  "empty": {
+    "title": "No Content Available",
+    "description": "There's no content to display at the moment. Check back later for updates.",
+    "featured": "No featured content available"
+  },
+  "refresh": "Refresh",
+  "loadMore": "Load More",
+  "unknown": "Unknown",
+  "external": {
+    "youtube": "YouTube",
+    "openInYoutube": "Open in YouTube"
+  },
+  "verificationStatus": {
+    "true": "True",
+    "false": "False",
+    "partially_true": "Partially True",
+    "misleading": "Misleading",
+    "unverifiable": "Unverifiable",
+    "disputed": "Disputed",
+    "uncertain": "Uncertain",
+    "not_checkable": "Not Checkable",
+    "error": "Error",
+    "no_text": "No Text"
+  }
+} 

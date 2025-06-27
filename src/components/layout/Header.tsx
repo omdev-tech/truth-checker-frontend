@@ -17,7 +17,7 @@ import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { useAuth } from '@/hooks/useAuth';
 import { truthCheckerApi } from '@/lib/api';
 import { HealthStatus } from '@/lib/types';
-import { Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft, FileText } from 'lucide-react';
+import { Sun, Moon, Activity, User, LogOut, CreditCard, ArrowLeft, FileText, Settings } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { Logo } from '@/components/atoms/Logo';
@@ -254,6 +254,10 @@ export function Header() {
                       <User className="mr-2 h-4 w-4" />
                       <span>{t('navigation.profile')}</span>
                     </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/gallery')}>
+                      <Activity className="mr-2 h-4 w-4" />
+                      <span>Gallery</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer" onClick={handleHistoryClick}>
                       <FileText className="mr-2 h-4 w-4" />
                       <span>{t('navigation.history')}</span>
@@ -262,6 +266,15 @@ export function Header() {
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>{t('navigation.plans')}</span>
                     </DropdownMenuItem>
+                    {user?.email === 'pollet.dam@gmail.com' && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => router.push('/admin/content')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Admin Panel</span>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       className="cursor-pointer text-red-600 focus:text-red-600"

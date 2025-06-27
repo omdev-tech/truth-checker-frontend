@@ -6,11 +6,13 @@ import enCommon from '../../public/locales/en/common.json';
 import enDashboard from '../../public/locales/en/dashboard.json';
 import enFactCheck from '../../public/locales/en/factCheck.json';
 import enAuth from '../../public/locales/en/auth.json';
+import enGallery from '../../public/locales/en/gallery.json';
 
 import frCommon from '../../public/locales/fr/common.json';
 import frDashboard from '../../public/locales/fr/dashboard.json';
 import frFactCheck from '../../public/locales/fr/factCheck.json';
 import frAuth from '../../public/locales/fr/auth.json';
+import frGallery from '../../public/locales/fr/gallery.json';
 
 const resources = {
   en: {
@@ -18,12 +20,14 @@ const resources = {
     dashboard: enDashboard,
     factCheck: enFactCheck,
     auth: enAuth,
+    gallery: enGallery,
   },
   fr: {
     common: frCommon,
     dashboard: frDashboard,
     factCheck: frFactCheck,
     auth: frAuth,
+    gallery: frGallery,
   },
 };
 
@@ -36,7 +40,7 @@ i18n
     fallbackLng: 'en',
     debug: false,
     
-    ns: ['common', 'dashboard', 'factCheck', 'auth'],
+    ns: ['common', 'dashboard', 'factCheck', 'auth', 'gallery'],
     defaultNS: 'common',
     
     keySeparator: '.',

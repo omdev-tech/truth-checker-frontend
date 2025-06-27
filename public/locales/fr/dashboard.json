@@ -90,6 +90,31 @@
       "sourceTypes": "Types de sources"
     }
   },
+  "sessions": {
+    "title": "Sessions",
+    "loading": "Chargement des sessions...",
+    "status": {
+      "processing": "En cours",
+      "completed": "Terminé",
+      "failed": "Échec"
+    },
+    "empty": {
+      "title": "Aucune Session Trouvée",
+      "description": "Commencez à vérifier du contenu pour créer votre première session."
+    }
+  },
+  "segments": {
+    "title": "Segments de Session",
+    "loading": "Chargement des segments...",
+    "empty": {
+      "title": "Aucun segment disponible", 
+      "description": "Cette session ne contient pas encore de segments."
+    },
+    "noSegments": {
+      "title": "Aucun segment trouvé",
+      "description": "Cette session ne contient aucun segment traité."
+    }
+  },
   "usage": {
     "title": "Aperçu d'utilisation",
     "period": {
@@ -196,7 +221,7 @@
     "dropZoneTitle": "Déposez votre fichier média ici",
     "dropZoneSubtitle": "ou cliquez pour parcourir et sélectionner un fichier vidéo ou audio",
     "chooseFile": "Choisir un fichier",
-    "supportedFormats": "Formats supportés : MP4, AVI, MOV, WebM, MP3, WAV, M4A",
+    "supportedFormats": "Formats supportés : MP4, AVI, MOV, WebM, MP3, M4A, OGG",
     "maxFileSize": "Taille de fichier maximale : 500 MB",
     "features": {
       "timeline": {

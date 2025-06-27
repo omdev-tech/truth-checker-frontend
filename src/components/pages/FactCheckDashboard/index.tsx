@@ -9,6 +9,7 @@ import { getApiLanguage } from '@/lib/languageUtils';
 import UploadScreen from './UploadScreen';
 import AnalysisScreen from './AnalysisScreen';
 import { toast } from 'sonner';
+import { useVideoSessionCleanup } from '@/hooks/useSessionCleanup';
 
 interface FactCheckDashboardProps {
   className?: string;
@@ -24,6 +25,10 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation(['dashboard', 'common']);
+  
+  // Session cleanup hook
+  const { handleNavigationAway, handleStopProcessing } = useVideoSessionCleanup();
+  
   const [state, setState] = useState<DashboardState>({
     mode: initialFile ? 'analysis' : initialStream ? 'stream' : 'upload',
     file: initialFile,
@@ -64,6 +69,8 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
   const processingSegmentsRef = useRef<Set<number>>(new Set());
   // Add a ref to prevent multiple simultaneous segment creation for live streams
   const creatingLiveSegmentRef = useRef(false);
+  // Add a ref to store the total number of segments when they're created
+  const totalSegmentsCountRef = useRef<number>(0);
 
   // Handle media loaded for both files and streams
   const handleMediaLoaded = useCallback(async (duration: number) => {
@@ -73,6 +80,9 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     try {
       // Create segments with thumbnails/waveforms
       const segments = await createSegments(source, duration);
+      
+      // Store the total number of segments for consistent chunk processing
+      totalSegmentsCountRef.current = segments.length;
       
       setState(prev => ({
         ...prev,
@@ -487,15 +497,15 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
         compressionRatio: `${((1 - chunkBuffer.duration / audioBuffer.duration) * 100).toFixed(1)}% shorter`
       });
       
-      // Convert buffer to WAV file
-      const wavBlob = await audioBufferToWav(chunkBuffer);
+      // Convert buffer to compressed audio file using MediaRecorder
+      const compressedBlob = await audioBufferToCompressed(chunkBuffer);
       const chunkFile = new File(
-        [wavBlob], 
-        `chunk_${startTime}-${endTime}_${file.name.replace(/\.[^/.]+$/, '.wav')}`, 
-        { type: 'audio/wav' }
+        [compressedBlob], 
+        `chunk_${startTime}-${endTime}_${file.name.replace(/\.[^/.]+$/, '.webm')}`, 
+        { type: compressedBlob.type }
       );
       
-      console.log('💾 WAV chunk created:', {
+      console.log('💾 Compressed audio chunk created:', {
         name: chunkFile.name,
         size: `${(chunkFile.size / 1024 / 1024).toFixed(2)} MB`,
         type: chunkFile.type
@@ -512,46 +522,80 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
     }
   }, []);
 
-  // Convert AudioBuffer to WAV Blob
-  const audioBufferToWav = useCallback(async (buffer: AudioBuffer): Promise<Blob> => {
-    const length = buffer.length;
-    const numberOfChannels = buffer.numberOfChannels;
-    const sampleRate = buffer.sampleRate;
-    const arrayBuffer = new ArrayBuffer(44 + length * numberOfChannels * 2);
-    const view = new DataView(arrayBuffer);
-    
-    // WAV header
-    const writeString = (offset: number, string: string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
+  // Convert AudioBuffer to compressed audio Blob (WebM/Opus instead of WAV)
+  const audioBufferToCompressed = useCallback(async (buffer: AudioBuffer): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      try {
+        // Create a regular audio context for live stream handling
+        const audioContext = new AudioContext();
+        
+        // Create a MediaStreamDestination
+        const dest = audioContext.createMediaStreamDestination();
+        
+        // Create a buffer source and connect it
+        const source = audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(dest);
+        
+        // Use MediaRecorder to encode to compressed audio
+        const chunks: Blob[] = [];
+        let mediaRecorder: MediaRecorder;
+        
+        // Try different MIME types in order of preference
+        const mimeTypes = [
+          'audio/webm;codecs=opus',
+          'audio/webm',
+          'audio/mp4',
+          'audio/mpeg'
+        ];
+        
+        let selectedMimeType = 'audio/webm;codecs=opus'; // Default fallback
+        for (const mimeType of mimeTypes) {
+          if (MediaRecorder.isTypeSupported(mimeType)) {
+            selectedMimeType = mimeType;
+            break;
+          }
+        }
+        
+        mediaRecorder = new MediaRecorder(dest.stream, {
+          mimeType: selectedMimeType
+        });
+        
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunks.push(event.data);
+          }
+        };
+        
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: selectedMimeType });
+          audioContext.close(); // Clean up audio context
+          resolve(blob);
+        };
+        
+        mediaRecorder.onerror = (event) => {
+          audioContext.close(); // Clean up audio context
+          reject(new Error(`MediaRecorder error: ${event}`));
+        };
+        
+        // Start recording
+        mediaRecorder.start();
+        
+        // Play the buffer (this feeds data to MediaRecorder)
+        source.start(0);
+        
+        // Stop recording after the buffer duration + small buffer
+        const durationMs = (buffer.duration * 1000) + 500; // Add 500ms buffer
+        setTimeout(() => {
+          if (mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, durationMs);
+        
+      } catch (error) {
+        reject(error);
       }
-    };
-    
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + length * numberOfChannels * 2, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, numberOfChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * numberOfChannels * 2, true);
-    view.setUint16(32, numberOfChannels * 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, 'data');
-    view.setUint32(40, length * numberOfChannels * 2, true);
-    
-    // Convert audio data
-    let offset = 44;
-    for (let i = 0; i < length; i++) {
-      for (let channel = 0; channel < numberOfChannels; channel++) {
-        const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
-        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-        offset += 2;
-      }
-    }
-    
-    return new Blob([arrayBuffer], { type: 'audio/wav' });
+    });
   }, []);
 
   // Simple fallback: For audio files or when proper chunking fails
@@ -865,7 +909,10 @@ export const FactCheckDashboard: React.FC<FactCheckDashboardProps> = ({
           start_time: segment.startTime,
           end_time: segment.endTime,
           provider: 'elevenlabs',
-          language: getApiLanguage()
+          language: getApiLanguage(),
+          chunk_index: segment.id,
+          total_chunks: totalSegmentsCountRef.current,
+          session_name: state.file?.name ? `Video Analysis: ${state.file.name}` : undefined
         });
         const apiCallDuration = Date.now() - apiCallStart;
 

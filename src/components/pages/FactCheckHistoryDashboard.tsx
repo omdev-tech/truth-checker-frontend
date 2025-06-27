@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { FactCheckHistoryList } from '@/components/organisms/FactCheckHistoryList';
-import { SessionDetailsModal } from '@/components/organisms/SessionDetailsModal';
+import { SessionList } from '@/components/organisms/SessionList';
+import { SessionSegmentsList } from '@/components/organisms/SessionSegmentsList';
 import { ClaimDetailsModal } from '@/components/organisms/ClaimDetailsModal';
+import { SessionDetailsModal } from '@/components/organisms/SessionDetailsModal';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
-import { useFactCheckHistory } from '@/hooks/useFactCheckHistory';
-import { FactCheckSession, FactCheckClaim } from '@/lib/types';
+import { useSessionManagement } from '@/hooks/useSessionManagement';
+import { truthCheckerApi } from '@/lib/api';
+import { SessionSummary, SessionSegment, FactCheckClaim, FactCheckSession } from '@/lib/types';
 import { 
   FileText, 
   TrendingUp, 
@@ -25,32 +27,70 @@ import {
 export function FactCheckHistoryDashboard() {
   const { t } = useTranslation(['dashboard', 'factCheck', 'common']);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     sessions,
-    claims,
+    selectedSession,
+    sessionSegments,
     statistics,
-    isLoading,
+    isLoadingSessions,
+    isLoadingSegments,
     error,
-    hasMore,
+    hasMoreSessions,
     isInitialized,
-    loadMore,
-    refreshHistory,
-    setFilters,
-  } = useFactCheckHistory();
+    loadMoreSessions,
+    selectSession,
+    clearSelectedSession,
+    refreshSessions,
+  } = useSessionManagement();
 
-  const [selectedSession, setSelectedSession] = useState<FactCheckSession | null>(null);
+  // Modal state for displaying claim details
   const [selectedClaim, setSelectedClaim] = useState<FactCheckClaim | null>(null);
-  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [selectedFactCheckSession, setSelectedFactCheckSession] = useState<FactCheckSession | null>(null);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isLoadingClaims, setIsLoadingClaims] = useState(false);
+  const [claims, setClaims] = useState<FactCheckClaim[]>([]);
 
-  const handleSessionClick = (session: FactCheckSession) => {
-    setSelectedSession(session);
-    setIsSessionModalOpen(true);
+  // Auto-select session from URL parameter
+  useEffect(() => {
+    const sessionId = searchParams.get('sessionId');
+    if (sessionId && isInitialized && sessions.length > 0 && !selectedSession) {
+      // Find the session with the matching ID
+      const targetSession = sessions.find(session => session.id === sessionId);
+      if (targetSession) {
+        selectSession(targetSession);
+        // Update URL to remove the parameter (keeps URL clean)
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('sessionId');
+        window.history.replaceState({}, '', newUrl.toString());
+      } else {
+        // Session not found in current page, might need to load more
+        console.log(`Session with ID ${sessionId} not found in current sessions list`);
+      }
+    }
+  }, [isInitialized, sessions, selectedSession, selectSession, searchParams]);
+
+  const handleSessionSelect = (session: SessionSummary) => {
+    selectSession(session);
   };
 
-  const handleCloseSessionModal = () => {
-    setIsSessionModalOpen(false);
-    setSelectedSession(null);
+  const handleSegmentView = async (segment: SessionSegment) => {
+    try {
+      setIsLoadingClaims(true);
+      
+      // Get the fact-check session details which includes claims
+      const sessionResponse = await truthCheckerApi.getSessionDetails(segment.fact_check_session_id);
+      
+      setSelectedFactCheckSession(sessionResponse.session);
+      setClaims(sessionResponse.claims);
+      setIsSessionModalOpen(true);
+    } catch (error) {
+      console.error('Error loading segment details:', error);
+      // Fallback: show error or basic info
+    } finally {
+      setIsLoadingClaims(false);
+    }
   };
 
   const handleClaimClick = (claim: FactCheckClaim) => {
@@ -61,6 +101,12 @@ export function FactCheckHistoryDashboard() {
   const handleCloseClaimModal = () => {
     setIsClaimModalOpen(false);
     setSelectedClaim(null);
+  };
+
+  const handleCloseSessionModal = () => {
+    setIsSessionModalOpen(false);
+    setSelectedFactCheckSession(null);
+    setClaims([]);
   };
 
   const formatDuration = (seconds: number) => {
@@ -104,11 +150,11 @@ export function FactCheckHistoryDashboard() {
         </div>
         <Button
           variant="outline"
-          onClick={refreshHistory}
-          disabled={isLoading}
+          onClick={refreshSessions}
+          disabled={isLoadingSessions}
           className="flex items-center gap-2"
         >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${isLoadingSessions ? 'animate-spin' : ''}`} />
           {t('common:actions.refresh')}
         </Button>
       </div>
@@ -192,29 +238,42 @@ export function FactCheckHistoryDashboard() {
       )}
 
       {/* Loading state for initial load */}
-      {(isLoading && !isInitialized) && (
+      {(isLoadingSessions && !isInitialized) && (
         <div className="flex items-center justify-center py-12">
           <LoadingSpinner />
           <span className="ml-2 text-muted-foreground">{t('dashboard:history.loading')}</span>
         </div>
       )}
 
-      {/* History List - only render when initialized and there's data */}
-      {isInitialized && (sessions.length > 0 || claims.length > 0) && (
-        <FactCheckHistoryList
-          sessions={sessions}
-          claims={claims}
-          isLoading={isLoading}
-          onLoadMore={hasMore ? loadMore : undefined}
-          onSessionClick={handleSessionClick}
-          onClaimClick={handleClaimClick}
-          onFiltersChange={setFilters}
-          hasMore={hasMore}
-        />
+      {/* Main content - Two column layout */}
+      {isInitialized && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left column - Sessions list */}
+          <div className="space-y-4">
+            <SessionList
+              sessions={sessions}
+              selectedSession={selectedSession}
+              isLoading={isLoadingSessions}
+              hasMore={hasMoreSessions}
+              onSessionSelect={handleSessionSelect}
+              onLoadMore={loadMoreSessions}
+            />
+          </div>
+
+          {/* Right column - Session segments */}
+          <div className="space-y-4">
+            <SessionSegmentsList
+              session={selectedSession}
+              segments={sessionSegments}
+              isLoading={isLoadingSegments || isLoadingClaims}
+              onSegmentView={handleSegmentView}
+            />
+          </div>
+        </div>
       )}
 
       {/* Empty state - only show when initialized and no data */}
-      {isInitialized && !isLoading && !error && sessions.length === 0 && claims.length === 0 && (
+      {isInitialized && !isLoadingSessions && !error && sessions.length === 0 && (
         <Card className="text-center py-12">
           <CardContent>
             <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
@@ -230,20 +289,20 @@ export function FactCheckHistoryDashboard() {
         </Card>
       )}
 
-      {/* Session Details Modal */}
-      <SessionDetailsModal
-        session={selectedSession}
-        claims={claims}
-        isOpen={isSessionModalOpen}
-        onClose={handleCloseSessionModal}
-        onClaimClick={handleClaimClick}
-      />
-
       {/* Claim Details Modal */}
       <ClaimDetailsModal
         claim={selectedClaim}
         isOpen={isClaimModalOpen}
         onClose={handleCloseClaimModal}
+      />
+
+      {/* Session Details Modal */}
+      <SessionDetailsModal
+        session={selectedFactCheckSession}
+        claims={claims}
+        isOpen={isSessionModalOpen}
+        onClose={handleCloseSessionModal}
+        onClaimClick={handleClaimClick}
       />
     </div>
   );

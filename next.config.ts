@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
     defaultLocale: 'en',
     localeDetection: false,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb', // Increase body size limit to 50MB for file uploads
+    },
+  },
 };
 
 export default nextConfig;

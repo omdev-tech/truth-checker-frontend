@@ -16,7 +16,9 @@ import {
   HistoryFilters,
   GuestApiSession,
   GuestFactCheckRequest,
-  GuestFactCheckResponse
+  GuestFactCheckResponse,
+  SessionListResponse,
+  SessionDetailsWithSegments
 } from './types';
 import { getSession } from 'next-auth/react';
 
@@ -221,6 +223,19 @@ export const truthCheckerApi = {
       formData.append('end_time', String(config.end_time));
     }
 
+    // Add the missing chunk metadata for session grouping
+    if (config.chunk_index !== undefined) {
+      formData.append('chunk_index', String(config.chunk_index));
+    }
+    
+    if (config.total_chunks !== undefined) {
+      formData.append('total_chunks', String(config.total_chunks));
+    }
+    
+    if (config.session_name) {
+      formData.append('session_name', config.session_name);
+    }
+
     const response = await makeAuthenticatedFormDataRequest(`${API_BASE_URL}/stt/transcribe-chunk`, formData);
     return handleResponse<ChunkProcessingResponse>(response);
   },
@@ -312,6 +327,27 @@ export const truthCheckerApi = {
 
   async getFactCheckStatistics(): Promise<any> {
     const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/users/fact-check-history/statistics`);
+    return handleResponse<any>(response);
+  },
+
+  // Session Management API methods
+  async getSessions(limit = 20, offset = 0): Promise<SessionListResponse> {
+    const params = new URLSearchParams();
+    params.append('limit', limit.toString());
+    params.append('offset', offset.toString());
+    
+    const url = `${API_BASE_URL}/api/sessions?${params.toString()}`;
+    const response = await makeAuthenticatedRequest(url);
+    return handleResponse<SessionListResponse>(response);
+  },
+
+  async getSessionWithSegments(sessionId: string): Promise<SessionDetailsWithSegments> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/sessions/${sessionId}/segments`);
+    return handleResponse<SessionDetailsWithSegments>(response);
+  },
+
+  async getUserSessionStats(): Promise<any> {
+    const response = await makeAuthenticatedRequest(`${API_BASE_URL}/api/sessions/stats/user`);
     return handleResponse<any>(response);
   },
 

@@ -68,7 +68,7 @@ export const CONFIDENCE_CONFIG = {
 
 export const SUPPORTED_FILE_TYPES = {
   text: ['.txt', '.md', '.doc', '.docx'],
-  audio: ['.wav', '.mp3', '.m4a', '.ogg', '.webm'],
+  audio: ['.mp3', '.webm', '.m4a', '.ogg', '.wav'],
   video: ['.mp4', '.avi', '.mov', '.webm'],
 } as const;
 

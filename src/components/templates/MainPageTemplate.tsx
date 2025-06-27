@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,29 +11,32 @@ import { LiveRecording } from '@/components/organisms/LiveRecording';
 import { StreamFactChecker } from '@/components/organisms/StreamFactChecker';
 import FactCheckDashboard from '@/components/pages/FactCheckDashboard';
 import { ClaimDetailsModal } from '@/components/organisms/ClaimDetailsModal';
-import { SessionDetailsModal } from '@/components/organisms/SessionDetailsModal';
 import { Header } from '@/components/layout/Header';
-import { TabType, StreamData, StreamMetadata, FactCheckClaim, FactCheckSession } from '@/lib/types';
-import { useFactCheckHistory } from '@/hooks/useFactCheckHistory';
+import { TabType, StreamData, StreamMetadata, FactCheckClaim, SessionSummary } from '@/lib/types';
+import { useSessionManagement } from '@/hooks/useSessionManagement';
 import { MessageSquare, Play, Mic, Radio, Clock, FileText, ArrowRight, CheckCircle, XCircle, AlertTriangle, Calendar, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useSessionCleanup } from '@/hooks/useSessionCleanup';
 
 export function MainPageTemplate() {
   const { t } = useTranslation(['dashboard', 'factCheck', 'common']);
+  const router = useRouter();
+  
+  // Session cleanup hook
+  const { completeCurrentSessions } = useSessionCleanup();
+  
   const [activeTab, setActiveTab] = useState<TabType>('text');
   const [showDashboard, setShowDashboard] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [streamData, setStreamData] = useState<StreamData | null>(null);
   
   // History state - now with sessions
-  const [selectedSession, setSelectedSession] = useState<FactCheckSession | null>(null);
   const [selectedClaim, setSelectedClaim] = useState<FactCheckClaim | null>(null);
-  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
   
-  // Use history hook to get recent sessions and claims
-  const { sessions, claims, isLoading: historyLoading } = useFactCheckHistory();
+  // Use session management hook to get recent sessions
+  const { sessions, isLoadingSessions: historyLoading } = useSessionManagement();
   
   // Get recent sessions (last 10)
   const recentSessions = sessions.slice(0, 10);
@@ -54,20 +58,20 @@ export function MainPageTemplate() {
   };
 
   const handleCloseDashboard = () => {
+    // Complete current processing sessions when user closes dashboard
+    completeCurrentSessions('dashboard_closed');
+    
     setShowDashboard(false);
     setUploadedFile(null);
     setStreamData(null);
   };
 
-  const handleSessionClick = (session: FactCheckSession) => {
-    setSelectedSession(session);
-    setIsSessionModalOpen(true);
+  const handleSessionClick = (session: SessionSummary) => {
+    // Navigate to history page with session ID parameter
+    router.push(`/history?sessionId=${session.id}`);
   };
 
-  const handleCloseSessionModal = () => {
-    setIsSessionModalOpen(false);
-    setSelectedSession(null);
-  };
+
 
   const handleClaimClick = (claim: FactCheckClaim) => {
     setSelectedClaim(claim);
@@ -160,7 +164,7 @@ export function MainPageTemplate() {
                           <FileText className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-foreground line-clamp-2 leading-tight">
-                              {session.title}
+                              {session.name}
                             </p>
                             <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1">
@@ -169,7 +173,7 @@ export function MainPageTemplate() {
                               </div>
                               <div className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
-                                <span>{formatDuration(session.total_processing_time_seconds)}</span>
+                                <span>{session.total_segments} segments</span>
                               </div>
                             </div>
                             <div className="flex items-center gap-2 mt-1">
@@ -188,7 +192,7 @@ export function MainPageTemplate() {
                       variant="ghost" 
                       size="sm" 
                       className="w-full mt-4 text-muted-foreground hover:text-foreground"
-                      onClick={() => window.location.href = '/history'}
+                      onClick={() => router.push('/history')}
                     >
                       {t('dashboard:history.viewAll')}
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -377,14 +381,7 @@ export function MainPageTemplate() {
         onClose={handleCloseClaimModal}
       />
 
-      {/* Session Details Modal */}
-      <SessionDetailsModal
-        session={selectedSession}
-        claims={claims}
-        isOpen={isSessionModalOpen}
-        onClose={handleCloseSessionModal}
-        onClaimClick={handleClaimClick}
-      />
+
     </div>
   );
 } 

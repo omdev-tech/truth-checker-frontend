@@ -286,5 +286,18 @@
     "claimsCount": "Affirmations ({{count}})",
     "noClaimsTitle": "Aucune Affirmation Trouvée",
     "noClaimsDescription": "Cette session n'a encore aucune affirmation."
+  },
+  "segment": {
+    "statistics": "Statistiques",
+    "trueClaims": "Affirmations vraies",
+    "falseClaims": "Affirmations fausses",
+    "totalClaims": "Total des affirmations",
+    "timing": "Chronométrage",
+    "start": "Début",
+    "end": "Fin",
+    "duration": "Durée",
+    "accuracyBreakdown": "Répartition de la précision",
+    "accuracyScore": "Score de précision",
+    "total": "Total"
   }
 } 

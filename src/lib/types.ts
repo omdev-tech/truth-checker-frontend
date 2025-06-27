@@ -54,6 +54,9 @@ export interface ChunkProcessingRequest {
   fast_mode?: boolean;
   start_time?: number;
   end_time?: number;
+  chunk_index?: number;
+  total_chunks?: number;
+  session_name?: string;
 }
 
 export interface StreamProcessingRequest {
@@ -398,6 +401,55 @@ export interface HistoryFilters {
   status_filter?: string;
   date_from?: string;
   date_to?: string;
+}
+
+// Session Management Types
+export interface SessionListResponse {
+  sessions: SessionSummary[];
+  statistics: {
+    total_sessions: number;
+    completed_sessions: number;
+    processing_sessions: number;
+    failed_sessions: number;
+    total_claims: number;
+    average_accuracy: number;
+    sessions_by_type: Record<string, number>;
+  };
+}
+
+export interface SessionSummary {
+  id: string;
+  user_id: string;
+  name: string;
+  content_type: 'text' | 'video' | 'audio' | 'live_recording' | 'stream';
+  source_url?: string;
+  source_metadata: Record<string, any>;
+  total_segments: number;
+  total_claims: number;
+  overall_accuracy_percentage: number;
+  status: 'processing' | 'completed' | 'failed';
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}
+
+export interface SessionSegment {
+  session_id: string;
+  fact_check_session_id: string;
+  segment_number: number;
+  start_time: number;
+  end_time: number;
+  name: string;
+  accuracy_percentage: number;
+  total_claims: number;
+  true_claims: number;
+  false_claims: number;
+  created_at: string;
+}
+
+export interface SessionDetailsWithSegments {
+  session: SessionSummary;
+  segments: SessionSegment[];
 }
 
 // Guest API types for unauthenticated users

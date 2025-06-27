@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
 import { I18nProvider } from './I18nProvider';
 import { CreditExhaustedProvider } from './CreditExhaustedProvider';
+import { SessionCleanupProvider } from './SessionCleanupProvider';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -22,7 +23,9 @@ export function Providers({ children, detectedLanguage = 'en' }: ProvidersProps)
       >
         <I18nProvider detectedLanguage={detectedLanguage}>
           <CreditExhaustedProvider>
-            {children}
+            <SessionCleanupProvider>
+              {children}
+            </SessionCleanupProvider>
           </CreditExhaustedProvider>
         </I18nProvider>
         <Toaster 

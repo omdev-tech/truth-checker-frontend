@@ -408,12 +408,18 @@
     "accurate": "Accurate",
     "inaccurate": "Inaccurate",
     "partiallyTrue": "Partially True",
+    "partially_true": "Partially True",
     "uncertain": "Uncertain", 
     "unknown": "Unknown",
     "notProcessed": "Not processed",
     "checkFailed": "Check failed",
     "notCheckable": "Not checkable",
-    "noText": "No text"
+    "not_checkable": "Not checkable",
+    "noText": "No text",
+    "no_text": "No text",
+    "misleading": "Misleading",
+    "unverifiable": "Unverifiable",
+    "error": "Error"
   },
   "confidence": {
     "high": "High",

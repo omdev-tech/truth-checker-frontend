@@ -7,6 +7,6 @@ module.exports = {
   fallbackLng: 'en',
   debug: process.env.NODE_ENV === 'development',
   reloadOnPrerender: process.env.NODE_ENV === 'development',
-  ns: ['common', 'dashboard', 'factCheck', 'auth'],
+  ns: ['common', 'dashboard', 'factCheck', 'auth', 'gallery'],
   defaultNS: 'common',
 } 

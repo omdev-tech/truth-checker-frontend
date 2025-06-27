@@ -329,12 +329,18 @@
     "accurate": "Précis",
     "inaccurate": "Imprécis",
     "partiallyTrue": "Partiellement vrai",
+    "partially_true": "Partiellement vrai",
     "uncertain": "Incertain",
     "unknown": "Inconnu", 
     "notProcessed": "Non traité",
     "checkFailed": "Échec de la vérification",
-    "notCheckable": "Non vérifiable", 
-    "noText": "Aucun texte"
+    "notCheckable": "Non vérifiable",
+    "not_checkable": "Non vérifiable", 
+    "noText": "Aucun texte",
+    "no_text": "Aucun texte",
+    "misleading": "Trompeur",
+    "unverifiable": "Invérifiable",
+    "error": "Erreur"
   },
   "confidence": {
     "high": "Élevé",

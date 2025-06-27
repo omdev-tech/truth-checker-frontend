@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { SequencerState, SegmentData, ChunkProcessingResponse } from '@/lib/types';
 import { truthCheckerApi } from '@/lib/api';
 import { CONFIG } from '@/lib/config';
 import ColorLegend from '../../molecules/ColorLegend';
 import { useTranslation } from 'react-i18next';
+import { useVideoSessionCleanup } from '@/hooks/useSessionCleanup';
 
 // Temporary simple implementations - will be replaced with full components
 interface VideoPlayerProps {
@@ -178,6 +179,9 @@ const VideoSequencer: React.FC<VideoSequencerProps> = ({
 }) => {
   const { t } = useTranslation('common');
   
+  // Session cleanup hook
+  const { handleNavigationAway, handleStopProcessing } = useVideoSessionCleanup();
+  
   const [state, setState] = useState<SequencerState>({
     file: null,
     duration: 0,
@@ -191,6 +195,9 @@ const VideoSequencer: React.FC<VideoSequencerProps> = ({
 
   const [processingCount, setProcessingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  
+  // Add ref to store total segments count consistently
+  const totalSegmentsRef = useRef<number>(0);
 
   // Create video chunks from file duration
   const createVideoChunks = useCallback((duration: number): SegmentData[] => {
@@ -245,7 +252,10 @@ const VideoSequencer: React.FC<VideoSequencerProps> = ({
         fast_mode: true,
         start_time: segment.startTime,
         end_time: segment.endTime,
-        provider: 'elevenlabs'
+        provider: 'elevenlabs',
+        chunk_index: segment.id,
+        total_chunks: totalSegmentsRef.current,
+        session_name: state.file?.name ? `Video Analysis: ${state.file.name}` : undefined
       });
 
       // Update segment with results
@@ -300,6 +310,9 @@ const VideoSequencer: React.FC<VideoSequencerProps> = ({
   const handleFileUpload = useCallback((file: File) => {
     setError(null);
     
+    // Complete current sessions before starting new processing
+    handleStopProcessing();
+    
     // Create object URL for video playback
     const videoUrl = URL.createObjectURL(file);
     
@@ -312,11 +325,14 @@ const VideoSequencer: React.FC<VideoSequencerProps> = ({
       isPlaying: false,
       selectedSegment: null,
     }));
-  }, []);
+  }, [handleStopProcessing]);
 
   // Handle video metadata loaded
   const handleVideoLoaded = useCallback((duration: number) => {
     const segments = createVideoChunks(duration);
+    
+    // Store total segments count for consistent chunk processing
+    totalSegmentsRef.current = segments.length;
     
     setState(prev => ({
       ...prev,

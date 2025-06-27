@@ -216,7 +216,7 @@
     "title": "Audio Fact Check",
     "description": "Upload audio files or record live audio for fact-checking",
     "uploadTitle": "Upload Audio File",
-    "uploadDescription": "Supported formats: MP3, WAV, M4A, OGG",
+    "uploadDescription": "Supported formats: MP3, WebM, M4A, OGG",
     "recordTitle": "Record Audio",
     "recordDescription": "Click to start recording your audio for fact-checking",
     "clickToUpload": "Click to upload or drag and drop",
@@ -282,5 +282,18 @@
     "claimsCount": "Claims ({{count}})",
     "noClaimsTitle": "No Claims Found",
     "noClaimsDescription": "This session doesn't have any claims yet."
+  },
+  "segment": {
+    "statistics": "Statistics",
+    "trueClaims": "True claims",
+    "falseClaims": "False claims",
+    "totalClaims": "Total claims",
+    "timing": "Timing",
+    "start": "Start",
+    "end": "End",
+    "duration": "Duration",
+    "accuracyBreakdown": "Accuracy Breakdown",
+    "accuracyScore": "Accuracy Score",
+    "total": "Total"
   }
 } 

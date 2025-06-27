@@ -1,0 +1,121 @@
+{
+  "title": "Galerie Publique",
+  "subtitle": "Parcourir le contenu vérifié de notre communauté",
+  "mediaTypes": {
+    "uploadedVideo": "VIDÉO TÉLÉVERSÉE",
+    "uploadedAudio": "AUDIO TÉLÉVERSÉ",
+    "youtube": "VIDÉO YOUTUBE",
+    "youtubeVideo": "Vidéo YouTube",
+    "mediaFile": "fichier média",
+    "video": "Vidéo",
+    "audio": "Audio"
+  },
+  "claims": {
+    "analyzed": "Affirmations Analysées",
+    "claimsAnalyzed": "{{count}} Affirmations Analysées",
+    "verified": "Vérifiées",
+    "disputed": "Contestées", 
+    "uncertain": "Incertaines",
+    "claimsAnalysis": "Analyse des Affirmations ({{count}})",
+    "viewAllClaims": "Voir Toutes les Affirmations",
+    "clickToView": "Cliquez sur les types d'affirmations individuels pour voir l'analyse détaillée"
+  },
+  "actions": {
+    "watchAndAnalyze": "Visionner et Analyser",
+    "info": "Info",
+    "playMedia": "Lire le Média",
+    "viewDetails": "Voir les Détails",
+    "play": "Lecture",
+    "view": "Voir",
+    "retry": "Réessayer",
+    "close": "Fermer",
+    "loadAnalysis": "Charger l'Analyse",
+    "showAnalysisDashboard": "Afficher le Tableau de Bord d'Analyse",
+    "analysisDashboard": "Tableau de Bord d'Analyse",
+    "hidePlayer": "Masquer le Lecteur"
+  },
+  "sections": {
+    "featured": "À la Une",
+    "recent": "Récent", 
+    "popular": "Populaire",
+    "contentStatistics": "Statistiques du Contenu",
+    "contentInformation": "Informations du Contenu"
+  },
+  "filters": {
+    "search": "Rechercher du contenu...",
+    "category": "Catégorie",
+    "mediaType": "Type de Média",
+    "sortBy": "Trier par",
+    "viewMode": "Mode d'Affichage",
+    "grid": "Grille",
+    "list": "Liste"
+  },
+  "metadata": {
+    "published": "Publié :",
+    "contentType": "Type de Contenu :",
+    "status": "Statut :",
+    "liveContent": "Contenu en Direct :",
+    "liveRecording": "Enregistrement en Direct",
+    "duration": "Durée",
+    "views": "Vues",
+    "truthScore": "Score de Vérité",
+    "claimsChecked": "Affirmations Vérifiées",
+    "size": "Taille :"
+  },
+  "status": {
+    "public": "Public",
+    "private": "Privé",
+    "loading": "Chargement...",
+    "loadingAnalysis": "Chargement de l'analyse...",
+    "loadingContentDetails": "Chargement des détails du contenu...",
+    "loadingDetailedAnalysis": "Chargement de l'analyse détaillée...",
+    "noResults": "Aucun contenu trouvé",
+    "noResultsDescription": "Essayez d'ajuster vos filtres de recherche ou revenez plus tard pour du nouveau contenu.",
+    "errorLoading": "Échec du chargement du contenu. Veuillez réessayer.",
+    "errorLoadingDetails": "Échec du chargement des détails du contenu"
+  },
+  "badges": {
+    "featured": "À la Une",
+    "trending": "Tendance",
+    "new": "Nouveau",
+    "moreTags": "+{{count}} de plus"
+  },
+  "viewCount": {
+    "million": "{{count}}M",
+    "thousand": "{{count}}K"
+  },
+  "categories": {
+    "politics": "Politique",
+    "health": "Santé",
+    "technology": "Technologie",
+    "science": "Science",
+    "business": "Business",
+    "entertainment": "Divertissement",
+    "sports": "Sports",
+    "education": "Éducation"
+  },
+  "empty": {
+    "title": "Aucun Contenu Disponible",
+    "description": "Il n'y a pas de contenu à afficher pour le moment. Revenez plus tard pour des mises à jour.",
+    "featured": "Aucun contenu à la une disponible"
+  },
+  "refresh": "Actualiser",
+  "loadMore": "Charger Plus",
+  "unknown": "Inconnu",
+  "external": {
+    "youtube": "YouTube",
+    "openInYoutube": "Ouvrir dans YouTube"
+  },
+  "verificationStatus": {
+    "true": "Vrai",
+    "false": "Faux",
+    "partially_true": "Partiellement Vrai",
+    "misleading": "Trompeur",
+    "unverifiable": "Invérifiable",
+    "disputed": "Contesté",
+    "uncertain": "Incertain",
+    "not_checkable": "Non Vérifiable",
+    "error": "Erreur",
+    "no_text": "Aucun Texte"
+  }
+} 

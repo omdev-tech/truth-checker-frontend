@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { FactCheckHistoryDashboard } from '@/components/pages/FactCheckHistoryDashboard';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { Header } from '@/components/layout/Header';
@@ -44,7 +44,16 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <FactCheckHistoryDashboard />
+      <div className="container mx-auto px-4">
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-12">
+            <LoadingSpinner />
+            <span className="ml-2 text-gray-600">Loading history...</span>
+          </div>
+        }>
+          <FactCheckHistoryDashboard />
+        </Suspense>
+      </div>
     </div>
   );
 } 

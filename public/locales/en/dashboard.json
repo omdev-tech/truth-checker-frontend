@@ -90,6 +90,31 @@
       "sourceTypes": "Source Types"
     }
   },
+  "sessions": {
+    "title": "Sessions",
+    "loading": "Loading sessions...",
+    "status": {
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "empty": {
+      "title": "No Sessions Found",
+      "description": "Start fact-checking content to create your first session."
+    }
+  },
+  "segments": {
+    "title": "Session Segments",
+    "loading": "Loading segments...",
+    "empty": {
+      "title": "No segments available", 
+      "description": "This session doesn't have any segments yet."
+    },
+    "noSegments": {
+      "title": "No segments found",
+      "description": "This session doesn't contain any processed segments."
+    }
+  },
   "usage": {
     "title": "Usage Overview",
     "period": {
@@ -196,7 +221,7 @@
     "dropZoneTitle": "Drop your media file here",
     "dropZoneSubtitle": "or click to browse and select a video or audio file",
     "chooseFile": "Choose File",
-    "supportedFormats": "Supported formats: MP4, AVI, MOV, WebM, MP3, WAV, M4A",
+    "supportedFormats": "Supported formats: MP4, AVI, MOV, WebM, MP3, M4A, OGG",
     "maxFileSize": "Maximum file size: 500MB",
     "features": {
       "timeline": {

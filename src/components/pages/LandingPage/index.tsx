@@ -6,6 +6,7 @@ import { LandingNavigation } from '@/components/layout/LandingNavigation';
 import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { HowItWorksSection } from './HowItWorksSection';
+import { PublicGallerySection } from './PublicGallerySection';
 import { TrustSection } from './TrustSection';
 import { CTASection } from './CTASection';
 import { GuestAccessModal } from '@/components/molecules/GuestAccessModal';
@@ -143,6 +144,9 @@ export function LandingPage({ className }: LandingPageProps) {
         <HowItWorksSection 
           steps={LANDING_PAGE_CONFIG.howItWorks}
         />
+
+        {/* Public Gallery Section */}
+        <PublicGallerySection />
 
         {/* Trust Section */}
         <TrustSection 

@@ -95,6 +95,15 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
             <Button 
               size="lg"
               variant="outline"
+              onClick={() => window.location.href = '/gallery'}
+              className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200"
+            >
+              Browse Gallery
+            </Button>
+            
+            <Button 
+              size="lg"
+              variant="outline"
               onClick={onSignUp}
               className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200"
             >
