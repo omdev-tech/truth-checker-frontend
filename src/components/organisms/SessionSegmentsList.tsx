@@ -177,13 +177,13 @@ export function SessionSegmentsList({
                         </span>
                         {onSegmentView && (
                           <Button
-                            variant="outline"
+                            variant="default"
                             size="sm"
                             onClick={() => onSegmentView(segment)}
-                            className="h-7 px-2"
+                            className="h-8 px-3 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm"
                           >
-                            <Eye className="w-3 h-3 mr-1" />
-                            View
+                            <Eye className="w-4 h-4 mr-2" />
+                            {t('common:actions.view')}
                           </Button>
                         )}
                       </div>

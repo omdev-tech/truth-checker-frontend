@@ -10,6 +10,9 @@ export interface PublicContent {
   duration?: number;
   truth_percentage: number;
   total_claims: number;
+  verified_claims?: number;
+  disputed_claims?: number;
+  uncertain_claims?: number;
   view_count: number;
   status: 'processing' | 'public' | 'private' | 'archived';
   is_featured: boolean;

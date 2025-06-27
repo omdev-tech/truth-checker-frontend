@@ -7,6 +7,7 @@ import { HeroSection } from './HeroSection';
 import { FeaturesSection } from './FeaturesSection';
 import { HowItWorksSection } from './HowItWorksSection';
 import { PublicGallerySection } from './PublicGallerySection';
+import { RecentContentSlider } from '@/components/organisms/RecentContentSlider';
 import { TrustSection } from './TrustSection';
 import { CTASection } from './CTASection';
 import { GuestAccessModal } from '@/components/molecules/GuestAccessModal';
@@ -147,6 +148,13 @@ export function LandingPage({ className }: LandingPageProps) {
 
         {/* Public Gallery Section */}
         <PublicGallerySection />
+
+        {/* Recent Content Slider */}
+        <section className="py-16 bg-gradient-to-br from-muted/30 to-background">
+          <div className="container mx-auto px-4">
+            <RecentContentSlider />
+          </div>
+        </section>
 
         {/* Trust Section */}
         <TrustSection 

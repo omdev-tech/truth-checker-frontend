@@ -297,7 +297,7 @@
     "end": "Fin",
     "duration": "Durée",
     "accuracyBreakdown": "Répartition de la précision",
-    "accuracyScore": "Score de précision",
+    "accuracyScore": "Score de vérité",
     "total": "Total"
   }
 } 

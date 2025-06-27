@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,6 +40,7 @@ interface PublicContent {
   view_count: number;
   media_type: string;
   has_media: boolean;
+  thumbnail_url?: string;
   youtube_url?: string;
   uploaded_media_filename?: string;
   media_size_formatted?: string;
@@ -297,6 +299,22 @@ export function PublicGalleryMediaCard({
               )}
             </div>
 
+            {/* Thumbnail for compact view */}
+            {content.thumbnail_url && (
+              <div className="mb-3">
+                <div className="relative w-full h-24 bg-muted rounded-lg overflow-hidden">
+                  <Image
+                    src={content.thumbnail_url}
+                    alt={content.title}
+                    fill
+                    className="object-cover transition-transform duration-200 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                </div>
+              </div>
+            )}
+
             {/* Media Info */}
             {content.has_media && (
               <div className="flex items-center gap-2 mb-3">
@@ -406,6 +424,34 @@ export function PublicGalleryMediaCard({
         </CardHeader>
 
         <CardContent className="pt-0">
+          
+          {/* Thumbnail for full view */}
+          {content.thumbnail_url && (
+            <div className="mb-4">
+              <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden cursor-pointer" onClick={handleVignetteClick}>
+                <Image
+                  src={content.thumbnail_url}
+                  alt={content.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                    <Play className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+                {content.is_featured && (
+                  <div className="absolute top-3 right-3">
+                    <Badge className="bg-yellow-500/90 text-white border-0">
+                      <Star className="h-3 w-3 mr-1" />
+                      {t('gallery:badges.featured')}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           
           {/* Media Preview */}
           {content.has_media && !isPlayerVisible && (

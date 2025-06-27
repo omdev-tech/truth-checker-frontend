@@ -21,6 +21,7 @@ import { TruthPercentageBadge } from '@/components/atoms/TruthPercentageBadge';
 import { ContentTypeBadge } from '@/components/atoms/ContentTypeBadge';
 import { LoadingSpinner } from '@/components/atoms/LoadingSpinner';
 import { AdminMediaManager } from '@/components/organisms/AdminMediaManager';
+import { AdminThumbnailManager } from '@/components/organisms/AdminThumbnailManager';
 import { 
   PublicContent, 
   PublicContentListResponse,
@@ -85,8 +86,11 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
   const [adminContent, setAdminContent] = useState<PublicContent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingContent, setEditingContent] = useState<PublicContent | null>(null);
   const [selectedSession, setSelectedSession] = useState<SessionSummary | null>(null);
   const [expandedMediaPanels, setExpandedMediaPanels] = useState<Set<string>>(new Set());
+  const [expandedThumbnailPanels, setExpandedThumbnailPanels] = useState<Set<string>>(new Set());
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   
   // Use session management hook
@@ -98,7 +102,15 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
     category: 'general',
     tags: ''
   });
+  const [editFormData, setEditFormData] = useState<CreateContentFormData>({
+    session_id: '',
+    title: '',
+    description: '',
+    category: 'general',
+    tags: ''
+  });
   const [isCreating, setIsCreating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Helper function to get auth headers
@@ -186,6 +198,67 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
     }
   };
 
+  const handleEditContent = (content: PublicContent) => {
+    setEditingContent(content);
+    setEditFormData({
+      session_id: content.session_id,
+      title: content.title,
+      description: content.description,
+      category: content.content_metadata?.category || 'general',
+      tags: content.content_metadata?.tags 
+        ? Array.isArray(content.content_metadata.tags) 
+          ? content.content_metadata.tags.join(', ')
+          : content.content_metadata.tags
+        : ''
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateContent = async () => {
+    if (!editingContent || !editFormData.title || !editFormData.description) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    setIsEditing(true);
+    
+    try {
+      const updates = {
+        title: editFormData.title,
+        description: editFormData.description,
+        category: editFormData.category || undefined,
+        tags: editFormData.tags || undefined
+      };
+
+      const updatedContent = await PublicContentApi.updatePublicContent(editingContent.id, updates);
+      
+      // Update local state
+      setAdminContent(prev => 
+        prev.map(content => 
+          content.id === editingContent.id ? updatedContent : content
+        )
+      );
+      
+      // Reset form and close modal
+      setEditFormData({
+        session_id: '',
+        title: '',
+        description: '',
+        category: 'general',
+        tags: ''
+      });
+      setEditingContent(null);
+      setIsEditModalOpen(false);
+      
+      toast.success('Content updated successfully!');
+    } catch (error) {
+      console.error('Failed to update content:', error);
+      toast.error('Failed to update content. Please try again.');
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
   const handleDeleteContent = async (contentId: string) => {
     if (!confirm('Are you sure you want to delete this content? This action cannot be undone.')) {
       return;
@@ -233,6 +306,18 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
     });
   };
 
+  const toggleThumbnailPanel = (contentId: string) => {
+    setExpandedThumbnailPanels(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(contentId)) {
+        newSet.delete(contentId);
+      } else {
+        newSet.add(contentId);
+      }
+      return newSet;
+    });
+  };
+
   const handleMediaUpdate = (contentId: string, mediaInfo: any) => {
     // Update local content state if needed
     setAdminContent(prev => 
@@ -243,6 +328,18 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
       )
     );
     toast.success('Media updated successfully');
+  };
+
+  const handleThumbnailUpdate = (contentId: string, thumbnailInfo: any) => {
+    // Update local content state if needed
+    setAdminContent(prev => 
+      prev.map(content => 
+        content.id === contentId 
+          ? { ...content, thumbnail_url: thumbnailInfo.thumbnail_url }
+          : content
+      )
+    );
+    toast.success('Thumbnail updated successfully');
   };
 
   const getMediaIcon = (content: PublicContent) => {
@@ -551,7 +648,22 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {/* TODO: Edit functionality */}}
+                        onClick={() => toggleThumbnailPanel(content.id)}
+                        className="gap-2"
+                      >
+                        <ImageIcon className="h-4 w-4" />
+                        Thumbnail
+                        {expandedThumbnailPanels.has(content.id) ? (
+                          <ChevronUp className="h-3 w-3" />
+                        ) : (
+                          <ChevronDown className="h-3 w-3" />
+                        )}
+                      </Button>
+                      
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditContent(content)}
                       >
                         <Edit3 className="h-4 w-4" />
                       </Button>
@@ -580,6 +692,25 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
                         <AdminMediaManager
                           contentId={content.id}
                           onMediaUpdate={(mediaInfo) => handleMediaUpdate(content.id, mediaInfo)}
+                          className="bg-background rounded-lg"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Expandable Thumbnail Management Panel */}
+                  {expandedThumbnailPanels.has(content.id) && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="border-l border-r border-b rounded-b-lg bg-muted/20"
+                    >
+                      <div className="p-4">
+                        <AdminThumbnailManager
+                          contentId={content.id}
+                          onThumbnailUpdate={(thumbnailInfo) => handleThumbnailUpdate(content.id, thumbnailInfo)}
                           className="bg-background rounded-lg"
                         />
                       </div>
@@ -739,6 +870,99 @@ export function AdminContentManager({ className }: AdminContentManagerProps) {
                 </>
               ) : (
                 'Create Content'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Content Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Public Content</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Content Details Form */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Title *
+                </label>
+                <Input
+                  value={editFormData.title}
+                  onChange={(e) => setEditFormData(prev => ({
+                    ...prev,
+                    title: e.target.value
+                  }))}
+                  placeholder="Enter a descriptive title..."
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Description *
+                </label>
+                <Textarea
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData(prev => ({
+                    ...prev,
+                    description: e.target.value
+                  }))}
+                  placeholder="Describe what was fact-checked and the results..."
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Category
+                </label>
+                <Input
+                  value={editFormData.category}
+                  onChange={(e) => setEditFormData(prev => ({
+                    ...prev,
+                    category: e.target.value
+                  }))}
+                  placeholder="e.g., politics, science, health..."
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Tags (optional)
+                </label>
+                <Input
+                  value={editFormData.tags}
+                  onChange={(e) => setEditFormData(prev => ({
+                    ...prev,
+                    tags: e.target.value
+                  }))}
+                  placeholder="e.g., climate,environment,news (comma-separated)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleUpdateContent}
+              disabled={!editingContent || isEditing}
+            >
+              {isEditing ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Updating...
+                </>
+              ) : (
+                'Update Content'
               )}
             </Button>
           </DialogFooter>

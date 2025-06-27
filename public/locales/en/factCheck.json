@@ -293,7 +293,7 @@
     "end": "End",
     "duration": "Duration",
     "accuracyBreakdown": "Accuracy Breakdown",
-    "accuracyScore": "Accuracy Score",
+    "accuracyScore": "Truth Score",
     "total": "Total"
   }
 } 

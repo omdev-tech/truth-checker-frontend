@@ -1,28 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
+function getAccessTokenFromRequest(request: NextRequest): string | null {
+  const authHeader = request.headers.get('authorization');
+  
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+  
+  return null;
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { contentId: string } }
+  { params }: { params: Promise<{ contentId: string }> }
 ) {
   try {
-    const session = await getServerSession();
+    const resolvedParams = await params;
+    const accessToken = getAccessTokenFromRequest(request);
     
-    if (!session?.accessToken) {
+    if (!accessToken) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - No access token in header' },
         { status: 401 }
       );
     }
 
     const response = await fetch(
-      `${BACKEND_URL}/api/admin/public-content/${params.contentId}/media`,
+      `${BACKEND_URL}/api/admin/public-content/${resolvedParams.contentId}/media`,
       {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${session.accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       }
@@ -50,24 +60,25 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { contentId: string } }
+  { params }: { params: Promise<{ contentId: string }> }
 ) {
   try {
-    const session = await getServerSession();
+    const resolvedParams = await params;
+    const accessToken = getAccessTokenFromRequest(request);
     
-    if (!session?.accessToken) {
+    if (!accessToken) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - No access token in header' },
         { status: 401 }
       );
     }
 
     const response = await fetch(
-      `${BACKEND_URL}/api/admin/public-content/${params.contentId}/media`,
+      `${BACKEND_URL}/api/admin/public-content/${resolvedParams.contentId}/media`,
       {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${session.accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       }

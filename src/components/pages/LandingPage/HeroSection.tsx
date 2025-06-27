@@ -94,9 +94,8 @@ export function HeroSection({ onTryDemo, onSignUp }: HeroSectionProps) {
             
             <Button 
               size="lg"
-              variant="outline"
               onClick={() => window.location.href = '/gallery'}
-              className="border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200"
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-8 py-3 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             >
               Browse Gallery
             </Button>

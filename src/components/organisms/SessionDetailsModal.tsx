@@ -69,7 +69,7 @@ export function SessionDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-none h-[90vh] p-0 bg-background border border-border shadow-2xl flex flex-col">
+      <DialogContent className="!w-[90vw] sm:!w-[75vw] md:!w-[65vw] lg:!w-[55vw] xl:!w-[50vw] !max-w-none h-[90vh] p-0 bg-background border border-border shadow-2xl flex flex-col">
         <DialogHeader className="p-6 pb-4 border-b border-border/50 flex-shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
